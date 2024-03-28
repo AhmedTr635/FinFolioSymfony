@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Controller;
+use App\Services\QrCodeService;
 use Symfony\Component\Form\FormError;
 use App\Entity\User;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+
 use App\Form\UserLogin;
 use App\Form\UserType;
 use App\Repository\UserRepository;
@@ -71,7 +74,7 @@ class UserController extends AbstractController
     //------------------------SignUp------------------------------------
 
     #[Route('/register', name: 'signup')]
-    public function register(Request $request ,EntityManagerInterface $entityManager,ManagerRegistry $managerRegistry, SessionInterface $session): Response
+    public function register(Request $request ,ManagerRegistry $managerRegistry, SessionInterface $session,QrCodeService $qrCode): Response
     {
 
         $user = new User();
@@ -93,7 +96,8 @@ class UserController extends AbstractController
             }
             else {
                 $code = $this->generateRecoveryCode(5);
-                $this->envoyerMail($user, $code);
+                $qrCode->qrcode($code);
+                $this->envoyerMail($user);
                 $user->setCode($code);
                 $verificationData = [
 
@@ -204,8 +208,9 @@ class UserController extends AbstractController
 
 
     #[Route('/frontUser', name:'frontUser')]
-    public function template (MailService $mailer){
-        return $this->render('user/verification.html.twig');
+    public function template (QrCodeService $qrCode){
+        $qrCode->qrcode("dddd");
+        //return $this->render('user/dasg.html.twig');
 
 
     }
@@ -278,10 +283,35 @@ class UserController extends AbstractController
         return $recoveryCode;
     }
 
-    public function envoyerMail(User $user,string $code)
+    public function envoyerMail(User $user)
     {
-        $htmlContent = '
-<!DOCTYPE html>
+
+
+        $transport = Transport::fromDsn('smtp://finfoliofinfolio@gmail.com:txzoffvmvmoiuyzw@smtp.gmail.com:587');
+
+// Create a Mailer object
+        $mailer = new Mailer($transport);
+
+// Create an Email object
+        $email = (new Email());
+
+// Set the "From address"
+        $email->from('finfoliofinfolio@gmail.com');
+
+// Set the "To address"
+        $email->to($user->getEmail()
+        );
+
+
+
+// Set a "subject"
+        $email->subject('Verification du compte!');
+
+// Set the plain-text "Body"
+        $email->text('The plain text version of the message.');
+
+// Set HTML "Body"
+        $email->html('<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -326,7 +356,8 @@ class UserController extends AbstractController
         <h2>Vérification du compte</h2>
         <p>Merci de vous être inscrit sur notre plateforme. Pour vérifier votre compte, veuillez utiliser le code suivant :</p>
         <div class="verification-code">
-            <p style="font-size: 24px; font-weight: bold;">' . $code . '</p>
+            <img src="cid:qrCode" alt="">
+
         </div>
         <p>Entrez ce code dans l\'application pour confirmer votre adresse e-mail et finaliser votre inscription.</p>
         <div class="footer">
@@ -334,42 +365,10 @@ class UserController extends AbstractController
         </div>
     </div>
 </body>
-</html>
-';
-        $transport = Transport::fromDsn('smtp://finfoliofinfolio@gmail.com:txzoffvmvmoiuyzw@smtp.gmail.com:587');
-
-// Create a Mailer object
-        $mailer = new Mailer($transport);
-
-// Create an Email object
-        $email = (new Email());
-
-// Set the "From address"
-        $email->from('finfoliofinfolio@gmail.com');
-
-// Set the "To address"
-        $email->to($user->getEmail()
-        );
+</html>');
+        $email->embed(fopen('C:\Users\PC\Desktop\SymfonyFinFolio\public\assets\img\qrCode\codeQr.png', 'r'), 'qrCode');
 
 
-
-// Set a "subject"
-        $email->subject('Verification du compte!');
-
-// Set the plain-text "Body"
-        $email->text('The plain text version of the message.');
-
-// Set HTML "Body"
-        $email->html($htmlContent);
-
-// Add an "Attachment"
-        /*
-        $email->attachFromPath('example_1.txt');
-        $email->attachFromPath('example_2.txt');
-
-        // Add an "Image"
-        $email->embed(fopen('image_1.png', 'r'), 'Image_Name_1');
-        $email->embed(fopen('image_2.jpg', 'r'), 'Image_Name_2');*/
 
 // Sending email with status
         try {
