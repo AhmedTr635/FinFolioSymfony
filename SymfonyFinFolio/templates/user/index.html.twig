@@ -1,0 +1,89 @@
+
+{% extends 'user/usersPage.html.twig' %}
+{% block list %}
+        <tbody>
+        {% for user in users %}
+            {# <tr>#}
+            <tr class="odd">
+
+            <td class="">
+                <div class="d-flex justify-content-start align-items-center user-name">
+                    <div class="avatar-wrapper"><div class="avatar avatar-sm me-3">
+                            <span class="avatar-initial rounded-circle bg-label-primary">VK</span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <a href="{{ path('app_user_show', {'id': user.id}) }}" class="text-body text-truncate">
+                            <span class="fw-medium">{{ user.nom  ~ " " ~ user.prenom  }}</span>
+                        </a>
+                        <small class="text-muted">{{ user.email }}</small>
+                    </div
+                    ></div>
+            </td>
+            <td>
+                <span class="text-truncate d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-success w-px-30 h-px-30 me-2">
+                        <i class="bx bx-cog bx-xs"></i>
+                    </span>{{ user.role }}</span>
+            </td>
+            <td>
+                <span class="fw-medium">{{ user.numtel }}</span>
+            </td>
+            <td>{{ user.datepunition  }}</td>
+            <td class="sorting_1">
+                <span class="badge bg-label-success">{{ user.statut }}</span>
+            </td>
+            <td>
+                <div class="d-inline-block text-nowrap">
+                    <button class="btn btn-sm btn-icon"><i class="bx bx-edit"></i></button>
+                    <!--<button class="btn btn-sm btn-icon delete-record">
+                        <i class="bx bx-trash"></i></button>-->
+                    <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                        <button class="btn btn-sm btn-icon delete-record"  type="submit">
+                            <i class="bx bx-trash"></i>
+                        </button>
+                    </form>
+                    <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                        <i class="bx bx-dots-vertical-rounded me-2"></i></button>
+                    <div class="dropdown-menu dropdown-menu-end m-0">
+                        <a href="{{ path('app_user_show', {'id': user.id}) }}" class="dropdown-item">View</a>
+                        <a href="javascript:" class="dropdown-item">Suspend</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+                {#  <td>{{ user.nom }}</td>
+                <td>{{ user.prenom }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.numtel }}</td>
+                <td>{{ user.nbcredit }}</td>
+                <td>{{ user.rate }}</td>
+                <td>{{ user.role }}</td>
+                <td>{{ user.statut }}</td>
+                <td>{{ user.datepunition }}</td>
+                <td>
+                    <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a>
+                    {{ include('user/_delete_form.html.twig') }}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="16">no records found</td>
+            </tr>#}
+
+        {% endfor %}
+        </tbody>
+
+{% endblock %}
+{% block ajoutUser%}
+    {{ include('user/_form.html.twig') }}
+
+    <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+
+{% endblock %}
+ {% block userConnecte %}
+{% if app.user != null %}
+     <span class="fw-medium d-block">{{ app.user.username }}</span>
+     {% endif%}
+ {% endblock %}

@@ -1,0 +1,77 @@
+{% extends 'Login.html.twig' %}
+
+
+{% block body %}
+<!--6LdgcqMpAAAAADJ3LSgxHbBwihba2cY59SivtTXL code aadi image
+6LdgcqMpAAAAAD7lqags8f57NE4LhNrxmhe-v-Ql code secret
+6LeoaqMpAAAAAPHCNJrrm8Z4Oa2Hd9K9DIvQ-lyZ check adeya
+6LdCpKQpAAAAAP6lqtC8K3l_N0pRD6U2nj3OYFpD
+6LdCpKQpAAAAAH22ulvCny_4VXwTGGjxsckAjEhK
+
+-->
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <form method="post" id="login-form">
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="mb-3">
+                You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+            </div>
+        {% endif %}
+
+        <label for="inputEmail">Email</label>
+        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+        <label for="inputPassword">Password</label>
+        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+        <div class="g-recaptcha mt-2" data-sitekey="6LdgcqMpAAAAADJ3LSgxHbBwihba2cY59SivtTXL "  data-size="normal" data-theme="light" data-type="image"></div>
+        <div id="captcha-error-message" class="error-message"></div>
+
+        <!--6LeoaqMpAAAAAB0qe_2JtoLXRyDHfVtAem-VTzrZ
+        -->
+        <input type="hidden" name="_csrf_token"
+               value="{{ csrf_token('authenticate') }}"
+        >
+       <!-- <div class="checkbox mb-3">
+            <label>
+                <input type="checkbox" name="_remember_me">Remember me
+            </label>
+        </div>-->
+        <div>
+            <button class="btn btn-lg btn-primary mt-2  d-grid w-100" type="submit" id="signin-button">
+                Sign in
+            </button>
+        </div>
+    </form>
+    <style>
+        .error-message {
+            color: red;
+            display: none; /* Caché par défaut */
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var signInButton = document.getElementById('signin-button');
+            var errorMessage = document.getElementById('captcha-error-message');
+
+            signInButton.addEventListener('click', function (event) {
+                var response = grecaptcha.getResponse();
+
+                if (response.length === 0) {
+                    event.preventDefault();
+                    //alert('Please complete the reCAPTCHA to sign in.');
+                    errorMessage.textContent = 'Veuillez cocher la case reCAPTCHA avant de vous connecter.';
+                    errorMessage.style.display = 'block'; // Afficher le message d'erreur
+                }
+
+            });
+        });
+    </script>
+
+{% endblock %}
+
+
