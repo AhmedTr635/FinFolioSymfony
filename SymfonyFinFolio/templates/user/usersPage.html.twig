@@ -1691,7 +1691,6 @@
                     <i class="bx bx-x bx-sm search-toggler cursor-pointer"></i>
                 </div>
 
-
             </nav>
 
 
@@ -1715,12 +1714,10 @@
                                 <div class="card-body">
                                     <div class="d-flex align-items-start justify-content-between">
                                         <div class="content-left">
-                                            <span>Session</span>
+                                            <span>Nombre d'utilisateurs</span>
                                             <div class="d-flex align-items-end mt-2">
                                                 <h4 class="mb-0 me-2">21,459</h4>
-                                                <small class="text-success">(+29%)</small>
                                             </div>
-                                            <p class="mb-0">Total Users</p>
                                         </div>
                                         <div class="avatar">
             <span class="avatar-initial rounded bg-label-primary">
@@ -1736,12 +1733,10 @@
                                 <div class="card-body">
                                     <div class="d-flex align-items-start justify-content-between">
                                         <div class="content-left">
-                                            <span>Paid Users</span>
+                                            <span>Nombre d'admins</span>
                                             <div class="d-flex align-items-end mt-2">
                                                 <h4 class="mb-0 me-2">4,567</h4>
-                                                <small class="text-success">(+18%)</small>
                                             </div>
-                                            <p class="mb-0">Last week analytics </p>
                                         </div>
                                         <div class="avatar">
             <span class="avatar-initial rounded bg-label-danger">
@@ -1760,9 +1755,7 @@
                                             <span>Active Users</span>
                                             <div class="d-flex align-items-end mt-2">
                                                 <h4 class="mb-0 me-2">19,860</h4>
-                                                <small class="text-danger">(-14%)</small>
                                             </div>
-                                            <p class="mb-0">Last week analytics</p>
                                         </div>
                                         <div class="avatar">
             <span class="avatar-initial rounded bg-label-success">
@@ -1778,12 +1771,10 @@
                                 <div class="card-body">
                                     <div class="d-flex align-items-start justify-content-between">
                                         <div class="content-left">
-                                            <span>Pending Users</span>
+                                            <span>Utilisateurs désactives</span>
                                             <div class="d-flex align-items-end mt-2">
                                                 <h4 class="mb-0 me-2">237</h4>
-                                                <small class="text-success">(+42%)</small>
                                             </div>
-                                            <p class="mb-0">Last week analytics</p>
                                         </div>
                                         <div class="avatar">
             <span class="avatar-initial rounded bg-label-warning">
@@ -1795,10 +1786,15 @@
                             </div>
                         </div>
                     </div>
+
+
+
+
                     <!-- Users List Table -->
 
                         <div class="card-datatable table-responsive">
                             <table class="datatables-users table border-top">
+
                                 <thead>
                                 <tr>
                                     <th>User</th>
@@ -1813,8 +1809,13 @@
                                 {% block list %}{% endblock %}
                             </table>
                         </div>
+
                         <!-- Offcanvas to add new user -->
                         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddUser" aria-labelledby="offcanvasAddUserLabel">
+                            {% block chercherUser %}
+                                <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                                    <label><input type="search" class="form-control form-control-sm" placeholder="Search.." aria-controls="DataTables_Table_0"></label></div>
+                            {% endblock %}
                             <div class="offcanvas-header">
                                 <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Ajouter User</h5>
                                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -1826,6 +1827,9 @@
                                     {% endblock %}
                             </div>
                         </div>
+
+
+
                     </div>
 
 
@@ -1925,4 +1929,5 @@
 </html>
 
 <!-- beautify ignore:end -->
+
 

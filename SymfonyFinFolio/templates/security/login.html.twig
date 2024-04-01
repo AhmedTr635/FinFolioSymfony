@@ -23,10 +23,20 @@
             </div>
         {% endif %}
 
+        <div class="d-flex justify-content-between">
+            <a href="{{ path('mdp_page') }}">
+                <small>Mot de passe oublié?</small>
+            </a>
+        </div>
         <label for="inputEmail">Email</label>
         <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
         <label for="inputPassword">Password</label>
         <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+        <div class="d-flex justify-content-between">
+            <a href="{{ path('mdp_page') }}">
+                <small>Mot de passe oublié?</small>
+            </a>
+        </div>
         <div class="g-recaptcha mt-2" data-sitekey="6LdgcqMpAAAAADJ3LSgxHbBwihba2cY59SivtTXL "  data-size="normal" data-theme="light" data-type="image"></div>
         <div id="captcha-error-message" class="error-message"></div>
 

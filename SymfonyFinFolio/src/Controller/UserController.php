@@ -159,6 +159,79 @@ class UserController extends AbstractController
 
 
     }
+
+    /****************************************************
+     Mot de passe Oublié
+    ****************************************************
+     */
+    #[Route('/passwordOublie', name: 'mdp_page')]
+    public function passwordOublie(Request $request,ManagerRegistry $managerRegistry,  SessionInterface $session)
+    {
+        $errorMessage=null;
+
+        // Comparer les codes de vérification
+        if ($request->isMethod('POST')) {
+            // Retrieve submitted verification code from the request
+            $submittedMail = $request->request->get('mail');
+            $existingUser = $managerRegistry->getRepository(User::class)->findOneBy(['email' => $submittedMail]);
+
+            // Retrieve verification code from session
+
+            // Compare submitted verification code with stored verification code
+            if (!$existingUser) {
+
+                $errorMessage="Votre mail n'existe pas ";
+
+            }
+            else {
+                // Redirect user to login page after successful verification
+                $user_modif = [
+
+                    'user' => $existingUser,
+                ];
+                $session->set('user_modif', $user_modif);
+                return $this->redirectToRoute('mdpCh_page');
+            }}
+
+        return $this->renderForm('user/passwordOublie.html.twig',[
+            'errorMessage'=>$errorMessage
+        ]);
+
+
+    }
+    #[Route('/changerPassword', name: 'mdpCh_page')]
+    public function passwordOublieChanger(Request $request,ManagerRegistry $managerRegistry,  EntityManagerInterface $entityManager ,SessionInterface $session)
+    {
+
+        $user_modif = $session->get('user_modif');
+        $user = $user_modif['user'];
+
+        // Comparer les codes de vérification
+        if ($request->isMethod('POST')) {
+            // Retrieve submitted verification code from the request
+            $submittedPassword = $request->request->get('password');
+           $user->setPassword(sha1($submittedPassword));
+
+            $entityManager->flush();
+
+
+            return $this->redirectToRoute('app_login');
+            }
+
+        return $this->renderForm('user/confirmerPassword.html.twig',[
+        ]);
+
+
+    }
+
+
+
+
+    /****************************************************
+    Fin  Mot de passe Oublié
+     ****************************************************
+     */
+
     #[Route('/registerBack', name: 'signupback')]
     public function registerBack(Request $request ,EntityManagerInterface $entityManager,ManagerRegistry $managerRegistry): Response
     {
@@ -212,11 +285,6 @@ class UserController extends AbstractController
         $qrCode->qrcode("dddd");
         //return $this->render('user/dasg.html.twig');
 
-
-    }
-    #[Route('/listUsers', name:'ListUsers')]
-    public function usersPage (){
-        return $this->render('user/usersPage.html.twig');
 
     }
 
