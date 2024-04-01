@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 use App\Services\QrCodeService;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\FormError;
 use App\Entity\User;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -185,12 +186,15 @@ class UserController extends AbstractController
             }
             else {
                 // Redirect user to login page after successful verification
+
+                $existingUser->setCode($this->generateRecoveryCode(5));
+                $this->envoyerMail($existingUser);
                 $user_modif = [
 
                     'user' => $existingUser,
                 ];
                 $session->set('user_modif', $user_modif);
-                return $this->redirectToRoute('mdpCh_page');
+                return $this->redirectToRoute('verification_code_page');
             }}
 
         return $this->renderForm('user/passwordOublie.html.twig',[
@@ -210,8 +214,8 @@ class UserController extends AbstractController
         if ($request->isMethod('POST')) {
             // Retrieve submitted verification code from the request
             $submittedPassword = $request->request->get('password');
-           $user->setPassword(sha1($submittedPassword));
-
+            $existingUser = $managerRegistry->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
+            $existingUser->setPassword(sha1($submittedPassword));
             $entityManager->flush();
 
 
@@ -219,6 +223,40 @@ class UserController extends AbstractController
             }
 
         return $this->renderForm('user/confirmerPassword.html.twig',[
+        ]);
+
+
+    }
+
+
+    #[Route('/verificationPassword', name: 'verification_code_page')]
+    public function verificationPagePassword(Request $request, SessionInterface $session, EntityManagerInterface $entityManager)
+    {
+
+        $user_modif = $session->get('user_modif');
+        $user = $user_modif['user'];
+        $verificationCode = $user->getCode();
+        $errorMessage = null;
+        // Comparer les codes de vérification
+        if ($request->isMethod('POST')) {
+            // Retrieve submitted verification code from the request
+            $submittedVerificationCode = $request->request->get('verificationCode');
+
+            // Retrieve verification code from session
+
+            // Compare submitted verification code with stored verification code
+            if ($submittedVerificationCode == $verificationCode) {
+                // Verification successful, update user data and redirect to login page
+
+                // Redirect user to login page after successful verification
+                return $this->redirectToRoute('mdpCh_page');
+            }else {
+                $errorMessage="Le code de vérification est incorrect";
+            }}
+
+        return $this->renderForm('user/verificationcodePassword.html.twig',[
+            'user'=>$user,
+            'errorMessage'=>$errorMessage
         ]);
 
 
@@ -281,10 +319,11 @@ class UserController extends AbstractController
 
 
     #[Route('/frontUser', name:'frontUser')]
-    public function template (QrCodeService $qrCode){
-        $qrCode->qrcode("dddd");
-        //return $this->render('user/dasg.html.twig');
-
+    public function template (ManagerRegistry $managerRegistry,EntityManagerInterface $entityManager){
+        $existingUser = $managerRegistry->getRepository(User::class)->findOneBy(['email' => "ahmedtrabelsi103@gmail.com"]);
+        $existingUser->setRate(4);
+        $entityManager->flush();
+        return $this->render('Dashbooard.html.twig');
 
     }
 
@@ -422,7 +461,7 @@ class UserController extends AbstractController
 <body>
     <div class="container">
         <h2>Vérification du compte</h2>
-        <p>Merci de vous être inscrit sur notre plateforme. Pour vérifier votre compte, veuillez utiliser le code suivant :</p>
+        <p>Nous vous remercions d"avoir choisi notre plateforme. Pour vérifier votre compte, veuillez utiliser le code suivant :</p>
         <div class="verification-code">
             <img src="cid:qrCode" alt="">
 
@@ -453,6 +492,7 @@ class UserController extends AbstractController
         }
 
     }
+
 
 
 
