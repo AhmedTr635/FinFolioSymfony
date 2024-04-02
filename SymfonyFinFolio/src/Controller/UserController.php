@@ -63,9 +63,21 @@ class UserController extends AbstractController
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $repository = $managerRegistry->getRepository(User::class);
+
+        $adminsCount = $repository->count(['role' => 'admin']);
+        $usersCount = $repository->count(['role' => 'user']);
+        $activeCount = $repository->count(['statut' => 'active']);
+        $desactiveCount = $repository->count(['statut' => 'desactive']);
+
+
         return $this->render('user/index.html.twig', [
             'users' => $userRepository->findAll(),
-            'form' => $form->createView() // Passer la vue du formulaire au modèle Twig
+            'form' => $form->createView() ,
+            'adminsCount' => $adminsCount ,
+            'usersCount' => $usersCount ,
+            'activeCount' => $activeCount ,
+            'desactiveCount' => $desactiveCount
         ]);
     }
 
@@ -166,7 +178,7 @@ class UserController extends AbstractController
     ****************************************************
      */
     #[Route('/passwordOublie', name: 'mdp_page')]
-    public function passwordOublie(Request $request,ManagerRegistry $managerRegistry,  SessionInterface $session)
+    public function passwordOublie(Request $request,ManagerRegistry $managerRegistry,  SessionInterface $session,QrCodeService $qrCode)
     {
         $errorMessage=null;
 
@@ -186,8 +198,9 @@ class UserController extends AbstractController
             }
             else {
                 // Redirect user to login page after successful verification
-
-                $existingUser->setCode($this->generateRecoveryCode(5));
+                $code=$this->generateRecoveryCode(5);
+                $existingUser->setCode($code);
+                $qrCode->qrcode($code);
                 $this->envoyerMail($existingUser);
                 $user_modif = [
 
