@@ -1,0 +1,273 @@
+{% extends 'bo.html.twig' %}
+
+{% block title %}Tax index{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" href="../../assets/css/tax/taxDash.css">
+        <div class="col-md-3 mb-4">
+            <input type="text" id="searchInput" placeholder="tapez un type " style="margin-top: 40px;">
+        </div>
+
+
+
+{#    <!-- Order Statistics -->#}
+{#    <div class="col-md-5 col-lg-4 col-xl-4 order-0 mb-4">#}
+{#        <div class="card h-100">#}
+{#            <div class="card-header d-flex align-items-center justify-content-between pb-0">#}
+{#                <div class="card-title mb-0">#}
+{#                    <h5 class="m-0 me-2">Tax</h5>#}
+{#                    <small class="text-muted">42.82k Total Sales</small>#}
+{#                </div>#}
+
+{#            </div>#}
+{#            <div class="card-body">#}
+{#                <div class="d-flex justify-content-between align-items-center mb-3">#}
+{#                    <div class="d-flex flex-column align-items-center gap-0">#}
+{#                        <h2 class="mb-4">{{ sommeTax }}$</h2>#}
+{#                        <span>Total tax</span>#}
+{#                    </div>#}
+{#                    <div id="chartTax"></div>#}
+{#                </div>#}
+
+{#                {% for tax in taxes %}#}
+{#                    <li class="d-flex mb-4 pb-1">#}
+{#                        <div class="avatar flex-shrink-0 me-3">#}
+{#                            <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-dollar text-primary"></i></span>#}
+{#                        </div>#}
+{#                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">#}
+{#                            <div class="me-2">#}
+{#                                <h6 class="mb-0">{{ tax.type }}</h6>#}
+{#                            </div>#}
+{#                            <div class="me-2">#}
+{#                                <h6 class="mb-0">{{ tax.montant }}$</h6>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </li>#}
+{#                {% endfor %}#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+
+    <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between pb-0">
+                <div class="card-title mb-0">
+                    <h5 class="m-0 me-2">Tax</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="d-flex flex-column align-items-center gap-2">
+                            <h4 class="mb-4">{{ sommeTax }}$</h4>
+                            <span>Total tax</span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div id="chartTax"></div>
+                    </div>
+                </div>
+                <ul>
+                    {% for type, sum in sumsByType %}
+                        <li class="d-flex mb-4 pb-1">
+                            <div class="avatar flex-shrink-0 me-3">
+                                <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-dollar text-primary"></i></span>
+                            </div>
+                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                <div class="me-2">
+                                    <h6 class="mb-0">{{ type }}</h6>
+                                </div>
+                                <div class="me-2">
+                                    <h6 class="mb-0">{{ sum }}$</h6>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card">
+    <div id="tableau-container" class="table-responsive text-nowrap">
+    <table id="taxTable" class="table table-borderless">
+        <thead>
+            <tr>
+                <th>Montant</th>
+                <th>Type</th>
+                <th>Optimisation</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for tax in taxes %}
+            <tr>
+                <td>{{ tax.montant }}</td>
+                <td>{{ tax.type }}</td>
+                <td>{{ tax.optimisation }}</td>
+
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+    </div>
+
+
+    <script>
+        let input = document.getElementById('searchInput');
+        let table = document.getElementById('taxTable');
+
+        // Add event listener to input field
+        input.addEventListener('input', function() {
+            let filter = input.value.toUpperCase();
+            let rows = table.getElementsByTagName('tr');
+
+            // Loop through all table rows, hide those that don't match the search query
+            for (let i = 0; i < rows.length; i++) {
+                let type = rows[i].getElementsByTagName('td')[1];
+                if (type) {
+                    if (type.textContent.toUpperCase().indexOf(filter) > -1) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            var chartLabels = JSON.parse('{{ chartData.labels|raw }}');
+            var chartDataValues = JSON.parse('{{ chartData.data|raw }}');
+            var seriesColors = ['#b193f8', '#71dd37', '#03c3ec','#ff378d']; // Define colors for each series
+            var totalExpense = {{ sommeTax }}; // Calculate total expense
+
+            new ApexCharts(document.querySelector("#chartTax"), {
+                series: chartDataValues,
+                chart: {
+                    height: 200,
+                    type: 'donut',
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '75%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    fontSize: "0.8125rem",
+                                    label: "",
+                                    formatter: function (w) {
+                                        return ""; // Return empty string if percentage is not available
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    width: 2,
+                    curve: "smooth"
+                },
+                legend: {
+                    show: false,
+                    position: 'bottom',
+                    fontSize: '20px',
+                    fontFamily: 'Arial, sans-serif',
+                    labels: { colors: '#9a74f1' }
+                },
+                labels: chartLabels,
+
+                colors: seriesColors, // Assign colors array to the colors option
+                markers: {
+                    size: 6,
+                    colors: '#9a74f1',
+                    strokeWidth: 3,
+                    hover: { size: 8 }
+                },
+                grid: { show: false }
+            }).render();
+        });
+
+        {#document.addEventListener('DOMContentLoaded', function () {#}
+        {#    var chartLabels = JSON.parse('{{ chartData.labels|raw }}');#}
+        {#    var chartDataValues = JSON.parse('{{ chartData.data|raw }}');#}
+
+        {#    new ApexCharts(document.querySelector("#chartTax"), {#}
+        {#        series: chartDataValues,#}
+        {#        chart: {#}
+        {#            height: 350,#}
+        {#            type: 'donut',#}
+        {#        },#}
+        {#        plotOptions: {#}
+        {#            pie: {#}
+        {#                donut: {#}
+        {#                    size: '75%',#}
+        {#                }#}
+        {#            }#}
+        {#        },#}
+        {#        dataLabels: {#}
+        {#            enabled: false#}
+        {#        },#}
+        {#        stroke: {#}
+        {#            width: 2,#}
+        {#            curve: "smooth"#}
+        {#        },#}
+        {#        legend: {#}
+        {#            show: true,#}
+        {#            position: 'bottom',#}
+        {#            fontSize: '20px',#}
+        {#            fontFamily: 'Arial, sans-serif',#}
+        {#            labels: { colors: '#9a74f1' }#}
+        {#        },#}
+        {#        colors: ['#9a74f1'],#}
+        {#        markers: {#}
+        {#            size: 6,#}
+        {#            colors: '#9a74f1',#}
+        {#            strokeWidth: 3,#}
+        {#            hover: { size: 8 }#}
+        {#        },#}
+        {#        grid: { show: false },#}
+        {#        xaxis: {#}
+        {#            categories: chartLabels,#}
+        {#            labels: { style: { fontSize: '14px', colors: 'rgba(12,12,12,0.37)' } }#}
+        {#        },#}
+        {#        yaxis: {#}
+        {#            labels: { style: { fontSize: '14px', colors: 'rgba(12,12,12,0.37)' } }#}
+        {#        },#}
+        {#        tooltip: {#}
+        {#            enabled: true,#}
+        {#            enabledOnSeries: undefined,#}
+        {#            shared: true,#}
+        {#            followCursor: false,#}
+        {#            intersect: false,#}
+        {#            inverseOrder: false,#}
+        {#            custom: undefined,#}
+        {#            hideEmptySeries: true,#}
+        {#            fillSeriesColor: false,#}
+        {#            theme: false,#}
+        {#            x: {#}
+        {#                show: true,#}
+        {#                formatter: undefined,#}
+        {#            },#}
+        {#            y: {#}
+        {#                formatter: undefined,#}
+        {#                title: {#}
+        {#                    formatter: (seriesName) => seriesName,#}
+        {#                },#}
+        {#            }#}
+        {#        }#}
+        {#    }).render();#}
+        {#});#}
+
+    </script>
+
+{% endblock %}

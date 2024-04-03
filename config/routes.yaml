@@ -1,0 +1,6 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+generate_excel:
+  path: '/generate-excel'
+  controller: 'App\Controller\DepenseController::generateExcel'

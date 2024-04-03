@@ -1,0 +1,829 @@
+{% extends 'bo.html.twig' %}
+
+{% block title %}
+    try me
+{% endblock %}
+
+{% block content %}
+        <link rel="stylesheet" href="../../assets/css/depense/depensedash.css">
+    {% block js %}{%endblock %}
+    {%block js0 %}{%endblock %}
+<style>
+    .depMoney{
+        color: #30de30;
+        font-size: 20px;
+    }
+</style>
+    <!-- Bootstrap CSS -->
+    <script src="{{asset('../../assets/js/depense/depensedash.js') }}" ></script>
+
+    <!-- Bootstrap JavaScript -->
+
+    <div class="content-wrapper">
+
+
+        <div class="container-xl">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <input type="text" id="searchInput" placeholder="Tapez un type" style="margin-top: 40px;">
+                </div>
+                <div class="col-md-4 mb-4">
+                    <form action="{{ path('generate_excel') }}" method="post">
+                        <button type="submit" class="btn btn-primary justify-content-end"  style="margin-top: 45px">Télécharger version Excel</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- End Somme des dépenses card and Download Excel button -->
+
+            <!-- Vos dépenses table -->
+            <div class="row">
+                <div class="col-md-8 mb-4"> <!-- Adjusting column size to accommodate both elements -->
+                    <h5 class="card-header">Vos dépenses</h5>
+                    <button  class=" add-depense-button btn btn-primary" id="add-expense-button">Add</button>
+
+                </div>
+{#                <form method="POST" action="{{ path('app_depense_new') }}">#}
+
+{#                    <div id="edit-depense-popup" class="popup">#}
+{#                        <div class="popup-content">#}
+{#                            <div id="edit-form-container"></div>#}
+{#                            <button  id="close-depense-popup" class= " btn btn-primary close-button">Fermer</button>#}
+{#                        </div>#}
+{#                    </div>#}
+
+                </div>
+            <div class="card">
+                <div id="tableau-container" class="table-responsive text-nowrap">
+                    <table id="depenseTable" class="table table-borderless">
+                            <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Montant</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for depense in depenses %}
+                            <tr>
+                                <td><span class="fw-medium">{{ depense.type }}</span></td>
+                                <td>{{ depense.montant }}</td>
+                                <td>{{ depense.date | date("Y-m-d") }}</td>
+                                <td>
+
+                                        <button class="edit-expense-button btn btn-primary" data-id="{{ depense.id }}">Modifier</button>
+                                        <form action="{{ path('app_depense_delete', {'id': depense.id}) }}" method="post" style="display: inline-block;" class="delete-form">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ depense.id) }}">
+                                            <div class="col-md-6 col-sm-12">
+                                                <button type="button" class="btn btn-danger confirm-delete">
+                                                    Supprimer
+                                                </button>
+                                            </div>
+                                        </form>
+
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+            </div>
+                <div id="expense-popup" class="popup">
+                    <div class="popup-content">
+                        <!-- Content of the popup -->
+                        <div id="form-container"></div>
+                        <span id="close-popup" class="close-button">&times;</span>
+
+                    </div>
+                </div>
+                <div id="popup-overlay" class="overlay"></div>
+                <div style="height: 20px"></div>
+            <!-- End Vos dépenses table -->
+            <!-- End Vos dépenses table -->
+
+                <div class="col-md-10 col-lg-7 order-1 mb-4">
+                    <div class="card h-100">
+
+                        <div class="card-body px-0">
+                            <div class="tab-content p-0">
+                                <div class="tab-pane fade show active" id="navs-tabs-line-card-income" role="tabpanel">
+                                    <div class="d-flex p-4 pt-3">
+                                        <div class="avatar flex-shrink-0 me-3">
+                                            <img src="../../assets/img/icons/unicons/wallet.png" alt="User">
+                                        </div>
+                                        <div class="container">
+                                            <small class="text-muted d-block">Total Balance</small>
+                                            <div class="d-flex align-items-center">
+                                                <h6 class="depMoney"  >{{ totalMontant}} $</h6>
+
+                                            </div>
+                                        </div>
+                                        <div ></div>
+                                        <div class="container">
+                                            <small class="text-muted d-block">Depense ce mois </small>
+                                            <div class="d-flex align-items-center">
+                                                <h6 class="depMoney" >{{ totalByMonth}} $</h6>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="chart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const addButton = document.getElementById('add-expense-button');
+                        const popup = document.getElementById('expense-popup');
+                        const closeButton = document.getElementById('close-expense-popup');
+                        const formContainer = document.getElementById('form-container');
+                        const overlay = document.getElementById('popup-overlay');
+
+                        addButton.addEventListener('click', function () {
+                            popup.style.display = 'block';
+                            // Charger le contenu du formulaire dans le popup
+                            formContainer.innerHTML = '';
+                            fetch('/depense/new') // Modifier l'URL selon vos besoins
+                                .then(response => response.text())
+                                .then(html => {
+                                    formContainer.innerHTML = html;
+                                    const form = document.getElementById('expense_form');
+                                    form.action = '/depense/new';
+                                    form.addEventListener('submit', function (event) {
+                                        event.preventDefault();
+                                        const formData = new FormData(form);
+                                        fetch(form.action, {
+                                            method: 'POST',
+                                            body: formData
+                                        })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    return response.text().then(html => {
+                                                        formContainer.innerHTML = html;
+                                                    });
+                                                }
+                                                // Close the popup
+                                                popup.style.display = 'none';
+                                                overlay.style.display = 'none';
+                                                // Reload the page to reflect the changes
+                                                window.location.reload();
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                            });
+                                    });
+                                });
+
+                        });
+                    })
+
+
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const editButtons = document.querySelectorAll('.edit-expense-button');
+                        const popup = document.getElementById('edit-depense-popup');
+                        const closeButton = document.getElementById('close-depense-popup');
+                        const formContainer = document.getElementById('edit-form-container');
+
+                        editButtons.forEach(function(editButton) {
+                            editButton.addEventListener('click', function(event) {
+                                event.preventDefault(); // Prevent the default link behavior
+                                const expenseId = this.getAttribute('data-id');
+                                popup.style.display = 'block';
+                                formContainer.innerHTML = '';
+                                fetch('/depense/' + expenseId + '/edit')
+                                    .then(response => response.text())
+                                    .then(html => {
+                                        formContainer.innerHTML = html;
+                                        const form = document.getElementById('expense_form');
+                                        form.action = '/depense/' + expenseId + '/edit';
+
+                                    });
+                            });
+                        });
+
+                        closeButton.addEventListener('click', function() {
+                            popup.style.display = 'none';
+                        });
+
+                    });
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var chartLabels = JSON.parse('{{ chartData.labels|raw }}');
+                        var chartData = JSON.parse('{{ chartData.data|raw }}');
+
+                        new ApexCharts(document.querySelector("#chart"), {
+                    series: [{
+                        name: 'Mes depense',
+                        data: chartData
+                    }],
+                            chart: {
+                                height: 350,
+                                type: 'area'
+                            },
+                    dataLabels: { enabled: false },
+                    stroke: { width: 2, curve: "smooth" },
+                    legend: {
+                        show: true,
+                            position: 'bottom',
+                            fontSize: '20px',
+                            fontFamily: 'Arial, sans-serif',
+                            labels: { colors: '#9a74f1' }
+                    },
+                    colors: ['#9a74f1'],
+                        markers: { size: 6, colors: '#9a74f1', strokeWidth: 3, hover: { size: 8 } },
+                    grid: { show: false },
+                    xaxis: {  axisBorder: {
+                            show: false
+                        },
+                        axisTicks: {
+                            show: false
+                        },
+                        categories: chartLabels,
+                        labels: {
+                        style: {
+                            fontSize: '14px',
+                            colors: 'rgba(12,12,12,0.37)' }
+                    }
+                    },
+                            title: {
+                                text: 'Depense Par mois',
+                                fontSize:15,
+                                floating: true,
+                                offsetY: 330,
+                                align: 'center',
+                                style: {
+                                    color: '#9a74f1'
+                                }
+                            },
+                    yaxis: {
+                        labels: { style: { fontSize: '14px', colors: 'rgba(12,12,12,0.37)' } } },
+                    tooltip: {
+
+                        enabled: true,
+                        enabledOnSeries: undefined,
+                        shared: true,
+                        followCursor: false,
+                        intersect: false,
+                        inverseOrder: false,
+                        custom: undefined,
+                        hideEmptySeries: true,
+                        fillSeriesColor: false,
+                        theme: false,
+
+                        y: {
+                            formatter: undefined,
+                            title: {
+                                formatter: (seriesName) => seriesName,
+                            },
+                        },
+
+
+                    }
+
+                    }).render();
+                    });
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Add event listeners to all delete buttons
+                        var deleteButtons = document.querySelectorAll('.confirm-delete');
+                        deleteButtons.forEach(function(button) {
+                            button.addEventListener('click', function() {
+                                var form = this.closest('.delete-form');
+                                if (form) {
+                                    // Show the confirmation dialog
+                                    Swal.fire({title:"êtes vous sûr?",text:"Vous ne pourrez plus recupérer ces données!",icon:"warning",showCancelButton:!0,confirmButtonText:"Oui,je suis sûr",customClass:{confirmButton:"btn btn-danger me-3",cancelButton:"btn btn-label-secondary"},buttonsStyling:!1}).then((result) => {
+                                        if (result.isConfirmed) {
+                                            // If confirmed, submit the corresponding form
+                                            form.submit();
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    });
+//////////
+
+
+                </script>
+
+                <style>
+                    /* Add CSS styles to make the chart container bigger */
+                    #chart {
+                        width: 600px; /* Set the width */
+                        height: 400px; /* Set the height */
+                    }
+                </style>
+            </div>
+
+            <!-- End Content -->
+        </div>
+
+    </div>
+
+    </div>
+    <!-- End Content wrapper -->
+
+    <!-- Overlay -->
+    <div class="layout-overlay layout-menu-toggle"></div>
+
+    <!-- Drag Target Area To SlideIn Menu On Small Screens -->
+    <div class="drag-target"></div>
+
+    <script src="/public/js/charts-apex.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include ApexCharts JavaScript file -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+
+
+
+    <script>
+
+        let input = document.getElementById('searchInput');
+        let table = document.getElementById('depenseTable');
+
+        // Add event listener to input field
+        input.addEventListener('input', function() {
+            let filter = input.value.toUpperCase();
+            let rows = table.getElementsByTagName('tr');
+
+            // Loop through all table rows, hide those that don't match the search query
+            for (let i = 0; i < rows.length; i++) {
+                let type = rows[i].getElementsByTagName('td')[0];
+                if (type) {
+                    if (type.textContent.toUpperCase().indexOf(filter) > -1) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        });
+    </script>
+
+    <script src="{{ asset('../../assets/vendor/libs/moment/moment.js') }}"></script>
+    <script src="{{ asset('../../assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+    <script src="{{ asset('../../assets/vendor/libs/select2/select2.js') }}"></script>
+    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/popular.js') }}"></script>
+    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/bootstrap5.js') }}"></script>
+    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/auto-focus.js') }}"></script>
+    <script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+    <script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+
+    <!-- Main JS -->
+    <script src="{{ asset('../../assets/js/main.js') }}"></script>
+
+
+    <!-- Page JS -->
+    <script src="{{ asset('../../assets/js/app-user-list.js') }}"></script>
+
+{% endblock %}
+
+{#//////////////////////////////////////////////////////////////////////////////////////#}
+{#{% extends 'bo.html.twig' %}#}
+
+{#{% block title %}#}
+{#    try me#}
+{#{% endblock %}#}
+
+{#{% block content %}#}
+{#    <link rel="stylesheet" href="../../assets/css/depense/depensedash.css">#}
+{#    {% block js %}{%endblock %}#}
+{#    {%block js0 %}{%endblock %}#}
+{#    <style>#}
+{#        .depMoney{#}
+{#            color: #30de30;#}
+{#            font-size: 20px;#}
+{#        }#}
+{#    </style>#}
+{#    <!-- Bootstrap CSS -->#}
+{#    <script src="{{asset('../../assets/js/depense/depensedash.js') }}" ></script>#}
+
+{#    <!-- Bootstrap JavaScript -->#}
+
+{#    <div class="content-wrapper">#}
+
+
+{#        <div class="container-xl">#}
+{#            <div class="row">#}
+{#                <div class="col-md-4 mb-4">#}
+{#                    <input type="text" id="searchInput" placeholder="Tapez un type" style="margin-top: 40px;">#}
+{#                </div>#}
+{#                <div class="col-md-4 mb-4">#}
+{#                    <form action="{{ path('generate_excel') }}" method="post">#}
+{#                        <button type="submit" class="btn btn-primary justify-content-end"  style="margin-top: 45px">Télécharger version Excel</button>#}
+{#                    </form>#}
+{#                </div>#}
+{#            </div>#}
+
+{#            <!-- End Somme des dépenses card and Download Excel button -->#}
+
+{#            <!-- Vos dépenses table -->#}
+{#            <div class="row">#}
+{#                <div class="col-md-8 mb-4"> <!-- Adjusting column size to accommodate both elements -->#}
+{#                    <h5 class="card-header">Vos dépenses</h5>#}
+{#                </div>#}
+{#                <div class="col-md-4 mb-4 d-flex justify-content-md-end"> <!-- Using flexbox utilities -->#}
+{#                    <button class="btn btn-primary" id="add-expense-button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEditUser">Ajouter</button>#}
+{#                    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEditUser" aria-labelledby="offcanvasAddUserLabel">#}
+{#                        <div class="offcanvas-header">#}
+{#                            <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Ajouter Dépense</h5>#}
+{#                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>#}
+{#                        </div>#}
+{#                        <div class="offcanvas-body mx-0 flex-grow-0">#}
+{#                            <form action="{{ path('app_depense_new') }}" method="POST" >#}
+{#                                <div class="form-group">#}
+{#                                    <label for="type">Type:</label>#}
+{#                                    <input type="text" class="form-control" id="type" name="type">#}
+{#                                    <div class="error">    </div>#}
+{#                                </div>#}
+{#                                <div class="form-group">#}
+{#                                    <label for="montant">Montant:</label>#}
+{#                                    <input type="number" class="form-control" id="montant" name="montant">#}
+{#                                    <div class="error"> </div>#}
+{#                                </div>#}
+{#                                <div class="form-group">#}
+{#                                    <label for="date">Date:</label>#}
+{#                                    <input type="date" class="form-control" id="date" name="date" required>#}
+{#                                    <div class="error-message">veuillez saisir une date valid </div>#}
+
+{#                                </div>#}
+
+{#                                <button type="submit" class="btn btn-primary">Save</button>#}
+{#                            </form>#}
+
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+
+
+
+{#                </div>#}
+{#                <div class="card">#}
+{#                    <div id="tableau-container" class="table-responsive text-nowrap">#}
+{#                        <table id="depenseTable" class="table table-borderless">#}
+{#                            <thead>#}
+{#                            <tr>#}
+{#                                <th>Type</th>#}
+{#                                <th>Montant</th>#}
+{#                                <th>Date</th>#}
+{#                                <th>Actions</th>#}
+{#                            </tr>#}
+{#                            </thead>#}
+{#                            <tbody>#}
+{#                            {% for depense in depenses %}#}
+{#                                <tr>#}
+{#                                    <td><span class="fw-medium">{{ depense.type }}</span></td>#}
+{#                                    <td>{{ depense.montant }}</td>#}
+{#                                    <td>{{ depense.date | date("Y-m-d") }}</td>#}
+{#                                    <td>#}
+{#                                        <button class="edit-expense-button btn btn-primary" data-id="{{ depense.id }}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasEditUser{{ depense.id }}">Modifier</button>#}
+{#                                        <form action="{{ path('app_depense_delete', {'id': depense.id}) }}" method="post" style="display: inline-block;" class="delete-form">#}
+{#                                            <input type="hidden" name="_method" value="DELETE">#}
+{#                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ depense.id) }}">#}
+{#                                            <div class="col-md-6 col-sm-12">#}
+{#                                                <button type="button" class="btn btn-danger confirm-delete">Supprimer</button>#}
+{#                                            </div>#}
+{#                                        </form>#}
+{#                                    </td>#}
+{#                                </tr>#}
+{#                                <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEditUser{{ depense.id }}" aria-labelledby="offcanvasEditUserLabel{{ depense.id }}">#}
+{#                                    <div class="offcanvas-header">#}
+{#                                        <h5 id="offcanvasEditUserLabel{{ depense.id }}" class="offcanvas-title">Modifier la dépense</h5>#}
+{#                                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>#}
+{#                                    </div>#}
+{#                                    <div class="offcanvas-body mx-0 flex-grow-0">#}
+{#                                        <form action="{{ path('app_depense_edit', {'id': depense.id}) }}" method="POST">#}
+{#                                            <div class="form-group">#}
+{#                                                <label for="type">Type:</label>#}
+{#                                                <input type="text" class="form-control" id="type" name="type" value="{{ depense.type }}">#}
+{#                                            </div>#}
+{#                                            <div class="form-group">#}
+{#                                                <label for="montant">Montant:</label>#}
+{#                                                <input type="number" class="form-control" id="montant" name="montant" value="{{ depense.montant }}">#}
+{#                                            </div>#}
+{#                                            <div class="form-group">#}
+{#                                                <label for="date">Date:</label>#}
+{#                                                <input type="date" class="form-control" id="date" name="date" value="{{ depense.date|date('Y-m-d') }}">#}
+{#                                            </div>#}
+{#                                            <button type="submit" class="btn btn-primary">Save Changes</button>#}
+{#                                        </form>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            {% endfor %}#}
+
+
+{#                            </tbody>#}
+{#                        </table>#}
+
+{#                    </div>#}
+{#                    <div style="height: 20px"></div>#}
+{#                    <!-- End Vos dépenses table -->#}
+{#                    <!-- End Vos dépenses table -->#}
+
+{#                    <div class="col-md-10 col-lg-7 order-1 mb-4">#}
+{#                        <div class="card h-100">#}
+
+{#                            <div class="card-body px-0">#}
+{#                                <div class="tab-content p-0">#}
+{#                                    <div class="tab-pane fade show active" id="navs-tabs-line-card-income" role="tabpanel">#}
+{#                                        <div class="d-flex p-4 pt-3">#}
+{#                                            <div class="avatar flex-shrink-0 me-3">#}
+{#                                                <img src="../../assets/img/icons/unicons/wallet.png" alt="User">#}
+{#                                            </div>#}
+{#                                            <div class="container">#}
+{#                                                <small class="text-muted d-block">Total Balance</small>#}
+{#                                                <div class="d-flex align-items-center">#}
+{#                                                    <h6 class="depMoney"  >{{ totalMontant}} $</h6>#}
+
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                            <div ></div>#}
+{#                                            <div class="container">#}
+{#                                                <small class="text-muted d-block">Depense ce mois </small>#}
+{#                                                <div class="d-flex align-items-center">#}
+{#                                                    <h6 class="depMoney" >{{ totalByMonth}} $</h6>#}
+
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                        <div id="chart"></div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <script>#}
+{#                        document.addEventListener('DOMContentLoaded', function () {#}
+{#                            var chartLabels = JSON.parse('{{ chartData.labels|raw }}');#}
+{#                            var chartData = JSON.parse('{{ chartData.data|raw }}');#}
+
+{#                            new ApexCharts(document.querySelector("#chart"), {#}
+{#                                series: [{#}
+{#                                    name: 'Mes depense',#}
+{#                                    data: chartData#}
+{#                                }],#}
+{#                                chart: {#}
+{#                                    height: 350,#}
+{#                                    type: 'area'#}
+{#                                },#}
+{#                                dataLabels: { enabled: false },#}
+{#                                stroke: { width: 2, curve: "smooth" },#}
+{#                                legend: {#}
+{#                                    show: true,#}
+{#                                    position: 'bottom',#}
+{#                                    fontSize: '20px',#}
+{#                                    fontFamily: 'Arial, sans-serif',#}
+{#                                    labels: { colors: '#9a74f1' }#}
+{#                                },#}
+{#                                colors: ['#9a74f1'],#}
+{#                                markers: { size: 6, colors: '#9a74f1', strokeWidth: 3, hover: { size: 8 } },#}
+{#                                grid: { show: false },#}
+{#                                xaxis: {  axisBorder: {#}
+{#                                        show: false#}
+{#                                    },#}
+{#                                    axisTicks: {#}
+{#                                        show: false#}
+{#                                    },#}
+{#                                    categories: chartLabels,#}
+{#                                    labels: {#}
+{#                                        style: {#}
+{#                                            fontSize: '14px',#}
+{#                                            colors: 'rgba(12,12,12,0.37)' }#}
+{#                                    }#}
+{#                                },#}
+{#                                title: {#}
+{#                                    text: 'Depense Par mois',#}
+{#                                    fontSize:15,#}
+{#                                    floating: true,#}
+{#                                    offsetY: 330,#}
+{#                                    align: 'center',#}
+{#                                    style: {#}
+{#                                        color: '#9a74f1'#}
+{#                                    }#}
+{#                                },#}
+{#                                yaxis: {#}
+{#                                    labels: { style: { fontSize: '14px', colors: 'rgba(12,12,12,0.37)' } } },#}
+{#                                tooltip: {#}
+
+{#                                    enabled: true,#}
+{#                                    enabledOnSeries: undefined,#}
+{#                                    shared: true,#}
+{#                                    followCursor: false,#}
+{#                                    intersect: false,#}
+{#                                    inverseOrder: false,#}
+{#                                    custom: undefined,#}
+{#                                    hideEmptySeries: true,#}
+{#                                    fillSeriesColor: false,#}
+{#                                    theme: false,#}
+
+{#                                    y: {#}
+{#                                        formatter: undefined,#}
+{#                                        title: {#}
+{#                                            formatter: (seriesName) => seriesName,#}
+{#                                        },#}
+{#                                    },#}
+
+
+{#                                }#}
+
+{#                            }).render();#}
+{#                        });#}
+{#                        document.addEventListener('DOMContentLoaded', function() {#}
+{#                            // Add event listeners to all delete buttons#}
+{#                            var deleteButtons = document.querySelectorAll('.confirm-delete');#}
+{#                            deleteButtons.forEach(function(button) {#}
+{#                                button.addEventListener('click', function() {#}
+{#                                    var form = this.closest('.delete-form');#}
+{#                                    if (form) {#}
+{#                                        // Show the confirmation dialog#}
+{#                                        Swal.fire({title:"êtes vous sûr?",text:"Vous ne pourrez plus recupérer ces données!",icon:"warning",showCancelButton:!0,confirmButtonText:"Oui,je suis sûr",customClass:{confirmButton:"btn btn-danger me-3",cancelButton:"btn btn-label-secondary"},buttonsStyling:!1}).then((result) => {#}
+{#                                            if (result.isConfirmed) {#}
+{#                                                // If confirmed, submit the corresponding form#}
+{#                                                form.submit();#}
+{#                                            }#}
+{#                                        });#}
+{#                                    }#}
+{#                                });#}
+{#                            });#}
+{#                        });#}
+{#                        //////////#}
+{#                            document.addEventListener('DOMContentLoaded', function() {#}
+{#                            const addButton = document.getElementById('add-expense-button');#}
+{#                            const popup = document.getElementById('offcanvasEditUser');#}
+{#                            const closeAddPopupBtn = document.querySelector('#offcanvasEditUser .btn-close');#}
+{#                            const formContainer = document.querySelector('#offcanvasEditUser .offcanvas-body');#}
+{#                            const overlay = document.querySelector('#offcanvasEditUser');#}
+
+{#                            addButton.addEventListener('click', function() {#}
+{#                            popup.style.display = 'block';#}
+{#                            // Charger le contenu du formulaire dans le popup#}
+{#                            formContainer.innerHTML = '';#}
+{#                            fetch('/depense/new') // Modifier l'URL selon vos besoins#}
+{#                            .then(response => response.text())#}
+{#                            .then(html => {#}
+{#                            formContainer.innerHTML = html;#}
+{#                            const form = document.getElementById('expense_form');#}
+{#                            form.action = '/depense/new';#}
+
+{#                            form.addEventListener('submit', function(event) {#}
+{#                            event.preventDefault();#}
+{#                            const formData = new FormData(form);#}
+{#                            fetch(form.action, {#}
+{#                            method: 'POST',#}
+{#                            body: formData#}
+{#                        })#}
+{#                            .then(response => {#}
+{#                            if (!response.ok) {#}
+{#                            return response.text().then(html => {#}
+{#                            formContainer.innerHTML = html;#}
+{#                        });#}
+{#                        }#}
+{#                            // Close the popup#}
+{#                            popup.style.display = 'none';#}
+{#                            overlay.style.display = 'none';#}
+{#                            // Reload the page to reflect the changes#}
+{#                            window.location.reload();#}
+{#                        })#}
+{#                            .catch(error => {#}
+{#                            console.error('Error:', error);#}
+{#                        });#}
+{#                        });#}
+{#                        });#}
+{#                        });#}
+
+{#                            closeAddPopupBtn.addEventListener('click', function() {#}
+{#                            popup.style.display = 'none';#}
+{#                            overlay.style.display = 'none';#}
+{#                        });#}
+
+{#                            // Close popup and overlay when clicking on overlay#}
+{#                            overlay.addEventListener('click', function(event) {#}
+{#                            if (event.target === overlay) {#}
+{#                            popup.style.display = 'none';#}
+{#                            overlay.style.display = 'none';#}
+{#                        }#}
+{#                        });#}
+{#                        });#}
+{#                        document.addEventListener('DOMContentLoaded', function() {#}
+{#                            const editButtons = document.querySelectorAll('.edit-expense-button');#}
+{#                            const popup = document.getElementById('offcanvasEditUser');#}
+{#                            const formContainer = document.querySelector('#offcanvasEditUser .offcanvas-body');#}
+{#                            const overlay = document.querySelector('#offcanvasEditUser');#}
+
+{#                            editButtons.forEach(button => {#}
+{#                                button.addEventListener('click', function() {#}
+{#                                    popup.style.display = 'block';#}
+{#                                    // Load the form content into the popup#}
+{#                                    formContainer.innerHTML = '';#}
+{#                                    const depenseId = this.dataset.id;#}
+{#                                    fetch('/depense/' + depenseId + '/edit') // Modify the URL according to your needs#}
+{#                                        .then(response => response.text())#}
+{#                                        .then(html => {#}
+{#                                            formContainer.innerHTML = html;#}
+{#                                            const form = document.getElementById('expense_form');#}
+{#                                            form.action = '/depense/' + depenseId + '/edit'; // Set the form action to the edit URL#}
+
+{#                                            form.addEventListener('submit', function(event) {#}
+{#                                                event.preventDefault();#}
+{#                                                const formData = new FormData(form);#}
+{#                                                fetch(form.action, {#}
+{#                                                    method: 'POST',#}
+{#                                                    body: formData#}
+{#                                                })#}
+{#                                                    .then(response => {#}
+{#                                                        if (!response.ok) {#}
+{#                                                            return response.text().then(html => {#}
+{#                                                                formContainer.innerHTML = html;#}
+{#                                                            });#}
+{#                                                        }#}
+{#                                                        // Close the popup#}
+{#                                                        popup.style.display = 'none';#}
+{#                                                        overlay.style.display = 'none';#}
+{#                                                        // No need to reload the page here#}
+{#                                                    })#}
+{#                                                    .catch(error => {#}
+{#                                                        console.error('Error:', error);#}
+{#                                                    });#}
+{#                                            });#}
+{#                                        });#}
+{#                                });#}
+{#                            });#}
+{#                        });#}
+
+
+{#                    </script>#}
+
+{#                    <style>#}
+{#                        /* Add CSS styles to make the chart container bigger */#}
+{#                        #chart {#}
+{#                            width: 600px; /* Set the width */#}
+{#                            height: 400px; /* Set the height */#}
+{#                        }#}
+{#                    </style>#}
+{#                </div>#}
+
+{#                <!-- End Content -->#}
+{#            </div>#}
+
+{#    <!-- End Content wrapper -->#}
+
+{#    <!-- Overlay -->#}
+{#    <div class="layout-overlay layout-menu-toggle"></div>#}
+
+{#    <!-- Drag Target Area To SlideIn Menu On Small Screens -->#}
+{#    <div class="drag-target"></div>#}
+
+{#    <script src="/public/js/charts-apex.js"></script>#}
+{#    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>#}
+{#    <!-- Include ApexCharts JavaScript file -->#}
+{#    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>#}
+
+
+
+
+{#    <script>#}
+
+{#        let input = document.getElementById('searchInput');#}
+{#        let table = document.getElementById('depenseTable');#}
+
+{#        // Add event listener to input field#}
+{#        input.addEventListener('input', function() {#}
+{#            let filter = input.value.toUpperCase();#}
+{#            let rows = table.getElementsByTagName('tr');#}
+
+{#            // Loop through all table rows, hide those that don't match the search query#}
+{#            for (let i = 0; i < rows.length; i++) {#}
+{#                let type = rows[i].getElementsByTagName('td')[0];#}
+{#                if (type) {#}
+{#                    if (type.textContent.toUpperCase().indexOf(filter) > -1) {#}
+{#                        rows[i].style.display = '';#}
+{#                    } else {#}
+{#                        rows[i].style.display = 'none';#}
+{#                    }#}
+{#                }#}
+{#            }#}
+{#        });#}
+{#        <script src="{{ asset('../../assets/vendor/libs/moment/moment.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/select2/select2.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/popular.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/bootstrap5.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/auto-focus.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>#}
+
+{#    <!-- Main JS -->#}
+{#    <script src="{{ asset('../../assets/js/main.js') }}"></script>#}
+
+
+{#    <!-- Page JS -->#}
+{#    <script src="{{ asset('../../assets/js/app-user-list.js') }}"></script>#}
+
+{#    </script>#}
+
+
+{#{% endblock %}#}
