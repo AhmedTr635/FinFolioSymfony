@@ -1,0 +1,163 @@
+
+
+
+/* CSS for the progress bar aligned to the right */
+.event-details progress {
+    float: right; /* Align the progress bar to the right */
+    clear: both; /* Clear any floats to ensure proper layout */
+    height: 20px; /* Set the height of the progress bar */
+    margin-bottom: 10px; /* Add some spacing below the progress bar */
+    width: 60%; /* Adjust the width to fill the container */
+}
+
+/* Container for all events */
+.event-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Individual event */
+.event {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #eaeaea; /* Light gray border */
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+}
+
+/* Header of each event */
+.event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Date styling */
+.event-date {
+    color: #666666; /* Gray color */
+}
+
+/* Details of each event */
+.event-details p {
+    margin-bottom: 10px;
+    color: #333333; /* Darker text color */
+}
+
+/* Actions for each event (e.g., edit, delete) */
+.event-actions a {
+    margin-right: 10px;
+    color: #007bff; /* Blue link color */
+    text-decoration: none; /* Remove underline */
+}
+
+.event-actions a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+/* No records message */
+.no-records {
+    font-style: italic;
+    color: #999999; /* Light gray color */
+}
+
+/* Style for the stars */
+.event-container .event-details .rating span {
+    margin-right: 5px; /* Add spacing between stars */
+    /* Set the opacity to make the stars transparent */
+}
+
+/* Define different colors for different progress levels */
+.event-details progress::-webkit-progress-value {
+    background-color: #007bff; /* Blue color for filled portion */
+}
+
+.event-details progress::-webkit-progress-bar {
+    background-color: #ddd; /* Grey color for unfilled portion */
+    border-radius: 5px; /* Add rounded corners to the progress bar */
+}
+
+
+.event-meta {
+    display: flex;
+    align-items: center;
+}
+
+.event-date, .event-address {
+    color: #666666; /* Gray color */
+    margin-right: 50px; /* Add some spacing between date and address */
+}
+
+
+.event-details {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping to handle smaller screens */
+}
+
+.rating,
+.progress-container {
+    flex: 1; /* Take up equal space */
+    margin-right: 10px; /* Add some spacing between rating and progress bar */
+}
+
+
+
+
+
+
+
+/*.btn-give-donation:hover{*/
+/*    background-color: #0056b3; !* Darker blue on hover *!*/
+/*}*/
+
+.btn-give-donation {
+    margin-bottom: 10px; /* Add some space below the button */
+}
+
+
+
+
+
+
+
+/* This CSS will style the form fields for better appearance */
+/* You can place it in a separate file like edit.css and include it in your template */
+
+/* Style for form labels */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+/* Style for form inputs */
+input[type="text"],
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Style for submit button */
+button[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Style for submit button on hover */
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+
+
+

@@ -1,0 +1,741 @@
+
+
+{% extends 'sidebar.html.twig' %}
+
+{% block container %}
+{% block the_navbar %}
+    {% endblock %}
+
+
+        {% block title %}{% endblock %}
+
+    {% block body %}
+
+
+        <div class="container-xxl flex-grow-1 container-p-y">
+            <div class="row align-items-center">
+                <div class="col-md-4 mb-4">
+                    <input type="text" id="searchInput" placeholder="Search... " class="form-control">
+                </div>
+                <div class="col-md-2 mb-4">
+                    <button  class=" add-event-button btn btn-primary" id="add-event-button">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="width: 700px; height: 400px; background-color: white; border-radius: 10px; margin-left: 30px;">
+            <div class="d-flex px-4">
+                <div class="avatar flex-shrink-0 me-3" style="margin-top: 20px">
+                    <img src="../../assets/img/icons/unicons/wallet.png" alt="User">
+                </div>
+                <div>
+                    <small class="text-muted d-block" style="margin-top: 20px">Total Donations</small>
+                    <div class="d-flex align-items-center">
+                        <h6 class="mb-0 me-1"> ${{ totalDonations }}</h6>
+                        <small class="text-success fw-medium">
+                            <i class="bx bx-chevron-up"></i>
+                            42.9%
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div id="donationsChart" class="chart-container" ></div>
+        </div>
+
+
+        <div id="chart"></div>
+
+
+        <div class="container">
+            <table  id="eventTable" class="table">
+                <thead>
+                <tr>
+
+                    <th>Nom Event</th>
+                    <th>Montant</th>
+                    <th>Date</th>
+                    <th>Adresse</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for evennement in evennements %}
+                    <tr>
+
+                        <td>{{ evennement.nomEvent }}</td>
+                        <td>{{ evennement.montant }}</td>
+                        <td>{{ evennement.date ? evennement.date|date('Y-m-d H:i:s') : '' }}</td>
+                        <td>{{ evennement.adresse }}</td>
+                        <td>{{ evennement.description }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="edit-event-button btn btn-primary" data-id="{{ evennement.id }}">Edit</button>
+                                <form action="{{ path('app_evennement_delete', {'id': evennement.id}) }}" method="post" class="delete-form" style="display: inline-block;">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evennement.id) }}">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7">No events found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+
+{#        <div id="event-popup" class="popup">#}
+{#            <div class="popup-content">#}
+{#                <!-- Content of the popup -->#}
+{#                <div id="form-container"></div>#}
+{#                <span id="close-popup" class="close-button">&times;</span>#}
+
+{#            </div>#}
+{#        </div>#}
+{#        #}
+        <div id="popup-overlay" class="overlay"></div>
+
+
+        <div id="event-popup" class="popup">
+            <div class="popup-content">
+                <!-- Content of the popup -->
+                <div id="form-container">
+                    <form id="event-form-popup" action="{{ path('app_evennement_new') }}" method="post">
+                        <label for="nom_event">Nom Event:</label>
+                        <input type="text" id="nom_event" name="nom_event"><br>
+                        <span id="nom_event-error" class="error-message"></span><br>
+
+                        <label for="montant">Montant:</label>
+                        <input type="text" id="montant" name="montant"><br>
+                        <span id="montant-error" class="error-message"></span><br>
+
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" name="date"><br>
+                        <span id="date-error" class="error-message"></span><br>
+
+                        <label for="adresse">Adresse:</label>
+                        <input type="text" id="adresse" name="adresse"><br>
+                        <span id="adresse-error" class="error-message"></span><br>
+
+                        <label for="description">Description:</label><br>
+                        <textarea id="description" name="description" rows="4" cols="50"></textarea><br>
+                        <span id="description-error" class="error-message"></span><br>
+
+                        <input type="submit" value="Submit">
+                    </form>
+                </div>
+                <span id="close-popup" class="close-button">&times;</span>
+            </div>
+        </div>
+
+
+
+
+        <!-- Pop-up container for editing event -->
+        <div id="edit-event-popup" class="popup">
+            <div class="popup-content">
+                <div id="edit-form-container"></div>
+                <span id="close-popup" class="close-button">&times;</span>
+
+            </div>
+        </div>
+{#        <div id="popup-overlay" class="overlay"></div>#}
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
+
+        <link rel="stylesheet" href="../../assets/css/admindash.css" />
+        <link rel="stylesheet" href="../../assets/css/popup.css" />
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+        <script>
+
+
+
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const addButton = document.getElementById('add-event-button');
+                const popup = document.getElementById('event-popup');
+                const closeAddPopupBtn = document.getElementById('close-popup');
+                const formContainer = document.getElementById('form-container');
+                const overlay = document.getElementById('popup-overlay');
+
+                addButton.addEventListener('click', function() {
+                    popup.style.display = 'block';
+                    overlay.style.display = 'block';
+                    formContainer.innerHTML = '';
+
+                    fetch('/event/new')
+                        .then(response => response.text())
+                        .then(html => {
+                            formContainer.innerHTML = html;
+                            const form = document.getElementById('event_form');
+                            form.action = '/event/new';
+                            setupFormValidation(form); // Set up validation after the form is loaded
+
+                            form.addEventListener('submit', function(event) {
+                                event.preventDefault();
+                                const formData = new FormData(form);
+                                fetch(form.action, {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            return response.text().then(html => {
+                                                formContainer.innerHTML = html;
+                                            });
+                                        }
+                                        popup.style.display = 'none';
+                                        overlay.style.display = 'none';
+                                        window.location.reload();
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                    });
+                            });
+                        });
+                });
+
+                closeAddPopupBtn.addEventListener('click', function() {
+                    popup.style.display = 'none';
+                    overlay.style.display = 'none';
+                });
+
+                overlay.addEventListener('click', function() {
+                    popup.style.display = 'none';
+                    this.style.display = 'none';
+                });
+
+                function setupFormValidation(form) {
+                    const nameInput = form.querySelector('#evennement_nom_event');
+                    const montantInput = form.querySelector('#evennement_montant');
+                    const dateInput =form.querySelector('#evennement_date');
+                    const adresseInput =form.querySelector('#evennement_adresse');
+                    const descriptionInput =form.querySelector('#evennement_description');
+
+                    nameInput.addEventListener('input', function() {
+                        validateName(nameInput);
+                    });
+
+                    montantInput.addEventListener('input', function() {
+                        validatemontant(montantInput);
+                    });
+
+                    dateInput.addEventListener('input', function() {
+                        validatedate(dateInput);
+                    });
+
+                    adresseInput.addEventListener('input', function() {
+                        validateadresse(adresseInput);
+                    });
+
+                    descriptionInput.addEventListener('input', function() {
+                        validatedescription(descriptionInput);
+                    });
+
+
+
+
+                    // More listeners can be added here for other inputs
+                }
+
+                function validateName(input) {
+                    const errorElement = document.getElementById(input.id + '-error');
+                    const name = input.value.trim();
+                    if (!/^[a-zA-Z\s]*$/.test(name)) {
+                        showError(input, errorElement, 'Name must contain only alphabetic characters');
+                    } else if (name === '') {
+                        showError(input, errorElement, 'Name is required');
+                    } else {
+                        hideError(input, errorElement);
+                    }
+                }
+
+                function validatemontant(input) {
+                    const errorElement = document.getElementById(input.id + '-error');
+                    const montant = input.value.trim();
+                    if (!montant) {
+                        showError(input, errorElement, 'Amount is required');
+                    } else if (!/^\d+(\.\d+)?$/.test(montant)) {
+                        showError(input, errorElement, 'Amount must be a numeric value');
+                    } else {
+                        hideError(input, errorElement);
+                    }
+                }
+
+
+                function validatedate(input) {
+                    const errorElement = document.getElementById(input.id + '-error');
+                    const date = input.value.trim();
+                    if (!date) {
+                        showError(input, errorElement, 'Date is required');
+                    } else if (new Date(date) <= new Date()) {
+                        showError(input, errorElement, 'Date must be a future date');
+                    } else {
+                        hideError(input, errorElement);
+                    }
+                }
+
+                function validateadresse(input) {
+                    const errorElement = document.getElementById(input.id + '-error');
+                    const adresse = input.value.trim();
+                    if (!adresse) {
+                        showError(input, errorElement, 'Address is required');
+                    } else if (adresse.length < 10) {
+                        showError(input, errorElement, 'Address must be at least 10 characters');
+                    } else {
+                        hideError(input, errorElement);
+                    }
+                }
+
+                function validatedescription(input) {
+                    const errorElement = document.getElementById(input.id + '-error');
+                    const description = input.value.trim();
+                    if (!description) {
+                        showError(input, errorElement, 'Description is required');
+                    } else if (description.length < 20) {
+                        showError(input, errorElement, 'Description must be at least 20 characters');
+                    } else {
+                        hideError(input, errorElement);
+                    }
+                }
+
+
+                function showError(input, errorElement, message) {
+                    errorElement.textContent = message;
+                    input.classList.add('is-invalid');
+                    input.classList.remove('is-valid');
+                }
+
+                function hideError(input, errorElement) {
+                    errorElement.textContent = '';
+                    input.classList.add('is-valid');
+                    input.classList.remove('is-invalid');
+                }
+            });
+
+
+// edit
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const editButtons = document.querySelectorAll('.edit-event-button');
+                const editPopup = document.getElementById('edit-event-popup');
+                const closeEditPopupBtn = document.getElementById('close-popup');
+                const editFormContainer = document.getElementById('edit-form-container');
+                const overlay = document.getElementById('popup-overlay');
+
+                editButtons.forEach(function(editButton) {
+                    editButton.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        const eventId = this.getAttribute('data-id');
+                        editPopup.style.display = 'block';
+                        overlay.style.display = 'block'; // Show overlay
+                        editFormContainer.innerHTML = '';
+                        fetch('/event/' + eventId + '/edit')
+                            .then(response => response.text())
+                            .then(html => {
+                                editFormContainer.innerHTML = html;
+                                const editForm = document.getElementById('event_form');
+                                editForm.action = '/event/' + eventId + '/edit';
+                                setupFormValidation(editForm); // Set up validation after the form is loaded
+                            });
+                    });
+                });
+
+                closeEditPopupBtn.addEventListener('click', function() {
+                    editPopup.style.display = 'none';
+                    overlay.style.display = 'none'; // Hide overlay
+                });
+
+                // Close popup and overlay when clicking on overlay
+                overlay.addEventListener('click', function() {
+                    editPopup.style.display = 'none';
+                    this.style.display = 'none';
+                });
+
+                function setupFormValidation(form) {
+                    const nameInput = form.querySelector('#evennement_nom_event');
+                    const montantInput = form.querySelector('#evennement_montant');
+                    const dateInput =form.querySelector('#evennement_date');
+                    const adresseInput =form.querySelector('#evennement_adresse');
+                    const descriptionInput =form.querySelector('#evennement_description');
+
+                    nameInput.addEventListener('input', function() {
+                        validateName(nameInput);
+                    });
+
+                    montantInput.addEventListener('input', function() {
+                        validatemontant(montantInput);
+                    });
+
+                    dateInput.addEventListener('input', function() {
+                        validatedate(dateInput);
+                    });
+
+                    adresseInput.addEventListener('input', function() {
+                        validateadresse(adresseInput);
+                    });
+
+                    descriptionInput.addEventListener('input', function() {
+                        validatedescription(descriptionInput);
+                    });
+
+                    // More listeners can be added here for other inputs
+                }
+
+                function validateName(input) {
+                    const errorElement = document.getElementById(input.id + '-error');
+                    const name = input.value.trim();
+                    if (!/^[a-zA-Z\s]*$/.test(name)) {
+                        showError(input, errorElement, 'Name must contain only alphabetic characters');
+                    } else if (name === '') {
+                        showError(input, errorElement, 'Name is required');
+                    } else {
+                        hideError(input, errorElement);
+                    }
+                }
+
+                function validatemontant(input) {
+                    const errorElement = document.getElementById(input.id + '-error');
+                    const montant = input.value.trim();
+                    if (!montant) {
+                        showError(input, errorElement, 'Amount is required');
+                    } else if (!/^\d+(\.\d+)?$/.test(montant)) {
+                        showError(input, errorElement, 'Amount must be a numeric value');
+                    } else {
+                        hideError(input, errorElement);
+                    }
+                }
+
+                function validatedate(input) {
+                    const errorElement = document.getElementById(input.id + '-error');
+                    const date = input.value.trim();
+                    if (!date) {
+                        showError(input, errorElement, 'Date is required');
+                    } else if (new Date(date) <= new Date()) {
+                        showError(input, errorElement, 'Date must be a future date');
+                    } else {
+                        hideError(input, errorElement);
+                    }
+                }
+
+                function validateadresse(input) {
+                    const errorElement = document.getElementById(input.id + '-error');
+                    const adresse = input.value.trim();
+                    if (!adresse) {
+                        showError(input, errorElement, 'Address is required');
+                    } else if (adresse.length < 10) {
+                        showError(input, errorElement, 'Address must be at least 10 characters');
+                    } else {
+                        hideError(input, errorElement);
+                    }
+                }
+
+                function validatedescription(input) {
+                    const errorElement = document.getElementById(input.id + '-error');
+                    const description = input.value.trim();
+                    if (!description) {
+                        showError(input, errorElement, 'Description is required');
+                    } else if (description.length < 20) {
+                        showError(input, errorElement, 'Description must be at least 20 characters');
+                    } else {
+                        hideError(input, errorElement);
+                    }
+                }
+
+
+                function showError(input, errorElement, message) {
+                    errorElement.textContent = message;
+                    input.classList.add('is-invalid');
+                    input.classList.remove('is-valid');
+                }
+
+                function hideError(input, errorElement) {
+                    errorElement.textContent = '';
+                    input.classList.add('is-valid');
+                    input.classList.remove('is-invalid');
+                }
+            });
+
+
+
+// search
+
+            document.addEventListener('DOMContentLoaded', function() {
+                let input = document.getElementById('searchInput');
+                let table = document.getElementById('eventTable');
+                let rows = table.getElementsByTagName('tr');
+
+                // Add event listener to input field
+                input.addEventListener('input', function() {
+                    let filter = input.value.toUpperCase();
+
+                    // Loop through all table rows starting from index 1
+                    for (let i = 0; i < rows.length; i++) {
+                        // Skip the first row (header row)
+                        if (i === 0) continue;
+
+                        let cells = rows[i].getElementsByTagName('td');
+                        let rowVisible = false; // Flag to determine if row should be visible
+
+                        // Loop through all cells in the row
+                        for (let j = 0; j < cells.length; j++) {
+                            let cell = cells[j];
+                            if (cell) {
+                                // Check if cell content matches the search query
+                                if (cell.textContent.toUpperCase().indexOf(filter) > -1) {
+                                    rowVisible = true; // If any cell matches, set flag to true
+                                    break; // Break the loop since we found a match
+                                }
+                            }
+                        }
+
+                        // Show or hide the row based on the flag
+                        if (rowVisible) {
+                            rows[i].style.display = ''; // Show the row
+                        } else {
+                            rows[i].style.display = 'none'; // Hide the row
+                        }
+                    }
+                });
+            });
+
+//chart
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const eventData = {{ totalDonationsByEventId | json_encode | raw }};
+                const eventIds = Object.keys(eventData);
+                const totalDonations = Object.values(eventData);
+
+                // Extracting the total donations from the objects
+                const numericTotalDonations = totalDonations.map(item => parseFloat(item.totalDonations));
+
+                // Maximum donation value for setting chart's maximum y-axis value
+                const maxTotalDonation = Math.max(...numericTotalDonations);
+
+                const chart = new ApexCharts(document.querySelector("#donationsChart"), {
+                    series: [{
+                        name: 'Total Donations',
+                        data: numericTotalDonations
+                    }],
+                    chart: {
+                        type: 'area',
+                        height: 350,
+                        animations: {
+                            enabled: true,
+                            easing: 'easeinout',
+                            speed: 800,
+                            animateGradually: {
+                                enabled: true,
+                                delay: 150
+                            },
+                            dynamicAnimation: {
+                                enabled: true,
+                                speed: 350
+                            }
+                        },
+                        toolbar: {
+                            show: true
+                        },
+
+                        zoom: {
+                            enabled: true
+                        },
+                        dropShadow: {
+                            enabled: true,
+                            color: '#000', // Set the color of the shadow
+                            top: 5,
+                            left: 0,
+                            blur: 5,
+                            opacity: 0.2,
+                            gradient: {
+                                enabled: true, // Enable gradient
+                                shade: 'dark', // Set the shade of the gradient
+                                type: 'vertical', // Specify the direction of the gradient
+                                shadeIntensity: 0.5 // Set the intensity of the shadow
+                            }
+                        }
+                    },
+                    colors: ['#885bee'], // Updated to a soothing blue
+                    dataLabels: {
+                        enabled: false
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 3
+                    },
+                    grid: {
+                        row: {
+                            colors: ['transparent', 'transparent'], // makes grid lines transparent
+                            opacity: 0.5
+                        },
+                        column: {
+                            colors: ['transparent', 'transparent']
+                        },
+                        borderColor: '#e7e7e7',
+                        strokeDashArray: [4, 4]
+                    },
+                    xaxis: {
+                        categories: eventIds,
+                        labels: {
+                            style: {
+                                colors: [],
+                                fontSize: '12px'
+                            }
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'Total Donations ($)',
+                            style: {
+                                color: '#473786'
+                            }
+                        },
+                        min: 0,
+                        max: maxTotalDonation, // Automatically calculates the maximum
+                        labels: {
+                            formatter: function (val) {
+                                return "$" + parseInt(val);
+                            },
+                            style: {
+                                color: []
+                            }
+                        }
+                    },
+                    tooltip: {
+                        theme: 'dark',
+                        style: {
+                            fontSize: '12px', // Decrease the font size for a smaller tooltip
+                            padding: '6px 10px', // Reduce the padding for a smaller tooltip
+                            borderRadius: '3px', // Decrease the border radius for a smaller tooltip
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            color: '#fff',
+                            textAlign: 'center',
+                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // Add a box shadow for a nice effect
+                        },
+                    },
+
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'right',
+                        floating: true,
+                        offsetY: -25,
+                        offsetX: -5
+                    },
+                    markers: { size: 6, colors: '#9a74f1', strokeWidth: 3, hover: { size: 8 } },
+                });
+
+                chart.render();
+            });
+
+
+
+
+
+
+
+
+
+        </script>
+
+
+        <style>
+            /* Popup container */
+            .popup {
+                display: none; /* Hide the pop-up by default */
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #ffffff;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                z-index: 10000; /* Set a high z-index value */
+                padding: 20px;
+                width: 50%; /* Adjust the maximum width as needed */
+                height: 90vh; /* Adjust the maximum height as needed */
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            /* Popup Content Styles */
+            .popup-content {
+                margin: 0 auto; /* Center the content horizontally */
+            }
+
+            /* Close Button Styles */
+            .close-button {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                cursor: pointer;
+            }
+
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+                z-index: 9999; /* Ensure overlay is on top of everything */
+            }
+            .close-button {
+                position: absolute;
+                top: 2px;
+                right: 10px;
+                cursor: pointer;
+                font-size: 30px; /* Adjust the font size as needed */
+            }
+
+            #searchInput {
+                width: 100%;
+                padding: 10px;
+                font-size: 16px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-sizing: border-box;
+            }
+
+            #searchInput:focus {
+                outline: none;
+                border-color: #007bff; /* Change to your desired focus color */
+                box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25); /* Change to your desired focus shadow */
+            }
+
+
+            .is-invalid {
+                border-color: red !important; /* Change border color to red for invalid fields */
+            }
+
+            .error-message {
+                color: red; /* Color for error messages */
+                font-size: 14px; /* Font size for error messages */
+            }
+
+
+
+
+        </style>
+    {% endblock %}
+{% endblock %}
+
+
+
+
+
+
