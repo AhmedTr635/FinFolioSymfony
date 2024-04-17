@@ -7,6 +7,7 @@ use App\Entity\Tax;
 use App\Entity\User;
 use App\Form\DepenseType;
 use App\Repository\DepenseRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use League\Csv\Writer;
@@ -62,31 +63,18 @@ class DepenseController extends AbstractController
             'totalByMonth' => $totalByMonth,
             'expensesByMonth' => $expensesByMonth,
             'chartData' => $chartData,
+            'form' => $form->createView()
+
         ]);
     }
 
     #[Route('/new', name: 'app_depense_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager,UserRepository $userRepository): Response
     {
         $depense = new Depense();
 
-        $user = new User();
-        $user->setNom('John'); // Set user's name
-        $user->setPrenom('Doe'); // Set user's last name
-        $user->setEmail('john.doe@example.com'); // Set user's email
-        $user->setNumtel('123456789'); // Set user's phone number
-        $user->setPassword('password'); // Set user's password
-        $user->setAdresse('123 Main Street'); // Set user's address
-        $user->setNbcredit(0); // Set user's credit count
-        $user->setRate(0.0); // Set user's rate
-        $user->setRole('ROLE_USER'); // Set user's role
-        $user->setSolde('0'); // Set user's solde
-        $user->setStatut('active'); // Set user's status
-        $user->setImage('default.jpg'); // Set user's image
-        $user->setDatepunition(''); // Set user's punishment date
-        $user->setTotalTax(0.0); // Set user's total tax
-        $entityManager->persist($user);
-        $entityManager->flush();
+        $user = $userRepository->find(106);
+
         $depense->setUser($user);
 // Now you can use this $user instance to perform operations like persisting it to the database
 
@@ -94,7 +82,6 @@ class DepenseController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($depense);
             $tax= new Tax();
             $tax->setMontant($depense->getMontant()*0.14);
             $tax->setType("depense");
@@ -103,6 +90,8 @@ class DepenseController extends AbstractController
 //        $entityManager->persist($tax);
 //        $entityManager->flush();
             $depense->setTax($tax);
+            $entityManager->persist($depense);
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_depense_index', [], Response::HTTP_SEE_OTHER);

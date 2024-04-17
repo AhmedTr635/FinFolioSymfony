@@ -21,6 +21,8 @@ class Depense
     private ?\DateTimeInterface $date = null ;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "le Type ne doit pas être null.")]
+
     #[Assert\Length(
         max: 225,
         maxMessage: "Le type ne doit pas exceder {{ limit }} caractere."
@@ -31,7 +33,7 @@ class Depense
     #[Assert\NotBlank(message: "le montant ne doit pas être null.")]
     #[Assert\Length(
         max: 225,
-        maxMessage: "Le MONTANT ne doit pas exceder {{ limit }} caractere."
+        maxMessage: "Le montant ne doit pas exceder {{ limit }} caractére."
     )]
     private ?float $montant = null;
 

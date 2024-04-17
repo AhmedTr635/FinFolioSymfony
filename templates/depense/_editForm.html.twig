@@ -1,0 +1,32 @@
+{#{{ form_start(form, {'attr': {'id': 'expense_form_edit', 'class': 'was-validated' ,'novalidate':'novalidate'}}) }}#}
+{#<div class="container" style="max-width: 100%; width: auto;">#}
+{#    <div class="row">#}
+{#        <div class="col-md-6 form-group">#}
+{#            {{ form_label(form.type) }}#}
+{#            {{ form_widget(form.type, {'attr': {'class': 'form-control js-input'}}) }}#}
+{#            {% if form_errors(form.type) %}#}
+
+{#            <div class="error">{{ form_errors(form.type) }}</div>#}
+{#            {% endif %}<!-- Display Symfony form errors -->#}
+{#        </div>#}
+{#        <div class="col-md-6 form-group">#}
+{#            {{ form_label(form.montant, 'Montant') }}#}
+{#            {{ form_widget(form.montant, {'attr': {'class': 'form-control','type':'number'}}) }}#}
+{#            {% if form_errors(form.montant) %}#}
+
+{#                <div class="error">{{ form_errors(form.montant) }}</div>#}
+{#            {% endif %}#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="row">#}
+{#        <div class="col-md-8 form-group">#}
+{#            {{ form_label(form.date, 'Date') }}#}
+{#            {{ form_widget(form.date, {'attr': {'class': 'form-control', 'type':'date'}}) }}#}
+
+{#        </div>#}
+{#    </div>#}
+{#    <button type="submit" class="btn btn-primary" style="margin-top: 25px;" >save</button>#}
+{#</div>#}
+
+{#{{ form_end(form) }}#}
+

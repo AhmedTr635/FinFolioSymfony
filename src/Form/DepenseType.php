@@ -20,56 +20,61 @@ class DepenseType extends AbstractType
         $builder
 
 
-
-            ->add('montant',NumberType ::class, [
+            ->add('montant', NumberType ::class, [
                 'attr' => [
                     'class' => 'form-control',
                 ],
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'Merci de saisir votre montant',
-                    ]),
-//                    new Assert\Length([
-//                        'min' => 3,
-//                        'minMessage' => 'Le montant doit avoir au moins {{ limit }} caractères',
-//                    ]),
-                    new Assert\Positive([
-                        'message' => 'Le montant doit être positif.',
-                    ]),
-                ],
+
             ])
             ->add('type', TextType::class, [
-                'attr' =>['class' => 'form-control',
-],
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'Merci de saisir votre type',
-                    ]),
-
-
+                'attr' => ['class' => 'form-control',
                 ],
+
             ])
-
-
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
-
-
-//                'constraints' => [
-//                    new Assert\NotBlank([
-//                        'message' => 'Please enter the date.',
-//                    ]),
-//                    new Assert\Date([
-//                        'message' => 'entrer une date .',
-//                    ]),
-//                    // You can add additional constraints here if needed
-//                ],
-//                 Add any additional date options as needed
-            ]);
-
+                'data' => new \DateTime(), // Set default value to current date
+]);
 
     }
 
+//    {
+//        $builder
+//
+//
+//
+//            ->add('montant',NumberType ::class, [
+//                'attr' => [
+//                    'class' => 'form-control',
+//                ],
+//
+//            ])
+//            ->add('type', TextType::class, [
+//                'attr' =>['class' => 'form-control',
+//
+//                ],
+//
+//            ])
+//
+//
+//            ->add('date', DateType::class, [
+//                'widget' => 'single_text',
+//
+//                'attr' => ['class' => 'form-control',
+//                ],
+////                'constraints' => [
+////                    new Assert\NotBlank([
+////                        'message' => 'Please enter the date.',
+////                    ]),
+////                    new Assert\Date([
+////                        'message' => 'entrer une date .',
+////                    ]),
+////                    // You can add additional constraints here if needed
+////                ],
+////                 Add any additional date options as needed
+//            ])
+//        ;
+//    }
 
 
     public function configureOptions(OptionsResolver $resolver): void
