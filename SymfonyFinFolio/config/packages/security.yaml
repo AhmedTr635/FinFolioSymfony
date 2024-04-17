@@ -20,6 +20,7 @@ security:
             lazy: true
             provider: app_user_provider
             custom_authenticator:
+                - App\Security\GoogleAuthenticator
                 - App\Security\AppCustomAuthenticator
 
             logout:
@@ -42,6 +43,8 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

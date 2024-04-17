@@ -26,7 +26,12 @@
             <td>
                 <span class="fw-medium">{{ user.numtel }}</span>
             </td>
-            <td>{{ user.datepunition }}</td>
+            {% if user.datepunition is not defined or user.datepunition|date('d/m/Y') == '30/11/-0001' %}
+                <td>{{ "Pas de punition"  }}</td>
+            {% else %}
+                <td>{{ user.datepunition|date('d/m/Y')  }}</td>
+            {% endif %}
+
             {% if user.statut == 'active' %}
                 <td class="sorting_1">
                     <span class="badge bg-label-success">{{ user.statut }}</span>
@@ -38,10 +43,15 @@
             {% endif %}
             <td>
                 <div class="d-inline-block text-nowrap">
-                    <button class="btn btn-sm btn-icon"><i class="bx bx-edit"></i></button>
-                    <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                    <button class="btn  btn-sm btn-icon edit-user "  type="button" data-bs-toggle="offcanvas" href="{{ path('app_user_edit', {'id': user.id}) }}" data-user-id="{{ user.id }}" data-bs-target="#offcanvasEditUser"><i class="bx bx-edit"></i></button>
+{#                    <a class="btn btn-sm btn-icon edit-user" href="{{ path('app_user_edit', {'id': user.id}) }}">#}
+{#                        <i class="bx bx-edit"></i>#}
+{#                    </a>#}
+
+                    <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }} " class="delete-form" >
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                        <button class="btn btn-sm btn-icon delete-record"  type="submit">
+                            <button class="btn btn-sm btn-icon delete-record confirm-delete"  type="submit">
+
                             <i class="bx bx-trash"></i>
                         </button>
                     </form>
@@ -57,12 +67,121 @@
         </tr>
     {% endfor %}
     </tbody>
+    {{ knp_pagination_render(users, paginationTemplate) }}
 
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners to all delete buttons
+        var deleteButtons = document.querySelectorAll('.confirm-delete');
+        deleteButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var form = this.closest('.delete-form');
+                if (form) {
+                    // Show the confirmation dialog
+                    Swal.fire({title:"êtes vous sûr?",text:"Vous ne pourrez plus recupérer ces données!",icon:"warning",showCancelButton:!0,confirmButtonText:"Oui",customClass:{confirmButton:"btn btn-danger me-3",cancelButton:"btn btn-label-secondary"},buttonsStyling:!1}).then((result) => {
+                        if (result.isConfirmed) {
+                            // If confirmed, submit the corresponding form
+                            form.submit();
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+</script>
 {% endblock %}
 
 {% block ajoutUser %}
-    {{ include('user/_form.html.twig') }}
-    <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+ {{ include('user/_form.html.twig') }}
+ <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+{% endblock %}
+{% block modificationUser %}
+    <div id="edit-user-form" >
+
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        {#document.addEventListener('DOMContentLoaded', function() {#}
+        {#    const offcanvasEditUser = new bootstrap.Offcanvas(document.getElementById('offcanvasEditUser'));#}
+
+        {#    // Gestion du clic sur le bouton "Modifier"#}
+        {#    document.querySelectorAll('.edit-user').forEach(function(button) {#}
+        {#        button.addEventListener('click', function() {#}
+        {#            const userId = this.getAttribute('data-user-id');#}
+        {#            console.log(userId);#}
+        {#            // Requête AJAX pour charger le formulaire de modification#}
+        {#            fetch('{{ path('app_user_edit', {'id': 'USER_ID'}) }}'.replace('USER_ID', userId))#}
+
+        {#                .then(response => response.text())#}
+        {#                .then(data => {#}
+        {#                    console.log(data);#}
+        {#                    document.getElementById('edit-user-form').innerHTML = data;#}
+        {#                    //offcanvasEditUser.show();#}
+        {#                    // Inclure le script JavaScript ici pour qu'il soit exécuté après le chargement du formulaire#}
+
+        {#                   setupValidation();#}
+
+        {#                })#}
+
+        {#                .catch(error => {#}
+        {#                    console.error('Error:', error);#}
+        {#                });#}
+        {#        });#}
+        {#    });#}
+        {#});#}
+        document.addEventListener('DOMContentLoaded', function() {
+            const formContainer = document.getElementById('edit-user-form');
+
+            document.querySelectorAll('.edit-user').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+
+                    // Requête AJAX pour charger le formulaire de modification
+                    fetch('/user/'.concat(userId, '/edit'))
+                        .then(response => response.text())
+                        .then(html => {
+                            formContainer.innerHTML = html;
+                            const form = document.getElementById('user-form');
+
+                            form.addEventListener('submit', function(event) {
+                                event.preventDefault();
+                                const formData = new FormData(form);
+                                fetch('/user/'.concat(userId, '/edit'), {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            return response.text().then(html => {
+                                                formContainer.innerHTML = html;
+                                                setupValidation(); // Réinitialiser la validation après le chargement du formulaire
+                                            });
+                                        }
+                                        window.location.reload();
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                    });
+                            });
+
+                            setupValidation(); // Configurer la validation une fois le formulaire chargé
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                });
+            });
+        });
+
+    </script>
+    <script src="{{ asset('assets/jsUser/validation.js') }}"></script>
+
 {% endblock %}
 
 {% block userConnecte %}
@@ -83,4 +202,31 @@
     {{ desactiveCount }}
 {% endblock %}
 
+{% block imageUser %}
+    {% if app.user %}
+        {% if app.user.image %}
+            {% set cheminAbsolu = app.user.image %}
+            {% set nomFichier = "imagesUser/"~cheminAbsolu|split('\\')|last %}
+            <img  src="{{ asset(nomFichier) }}" alt class="w-px-40 h-auto rounded-circle">
 
+        {% else %}
+            <p>L'utilisateur n'a pas d'image.</p>
+        {% endif %}
+    {% else %}
+        <p>Vous n'êtes pas connecté.</p>
+    {% endif %}
+{% endblock %}
+{% block imageUserHabta %}
+
+    {% if app.user %}
+        {% if app.user.image %}
+            {% set cheminAbsolu = app.user.image %}
+            {% set nomFichier = "imagesUser/"~cheminAbsolu|split('\\')|last %}
+            <img src="{{ asset(nomFichier) }}" alt class="w-px-40 h-auto rounded-circle">
+        {% else %}
+            <p>L'utilisateur n'a pas d'image.</p>
+        {% endif %}
+    {% else %}
+        <p>Vous n'êtes pas connecté.</p>
+    {% endif %}
+{% endblock %}

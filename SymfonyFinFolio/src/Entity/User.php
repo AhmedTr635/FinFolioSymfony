@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Controller\MailService;
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -58,11 +59,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 500)]
     private ?string $image = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $datepunition = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    private ?\DateTimeInterface $datepunition = null;
 
     #[ORM\Column]
     private ?float $total_tax = null;
+
+    public function getDatepunition(): ?\DateTimeInterface
+    {
+        return $this->datepunition;
+    }
+
+    public function setDatepunition(?\DateTimeInterface $datepunition): void
+    {
+        $this->datepunition = $datepunition;
+    }
 
 
     private ?string $code = null;
@@ -288,17 +299,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getDatepunition(): ?string
-    {
-        return $this->datepunition;
-    }
 
-    public function setDatepunition(string $datepunition): static
-    {
-        $this->datepunition = $datepunition;
 
-        return $this;
-    }
 
     public function getTotalTax(): ?float
     {

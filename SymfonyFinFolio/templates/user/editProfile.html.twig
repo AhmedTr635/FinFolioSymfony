@@ -4,12 +4,12 @@
 <html lang="en" class="light-style layout-navbar-fixed layout-menu-fixed layout-compact " dir="ltr" data-theme="theme-default" data-assets-path="../../assets/" data-template="vertical-menu-template">
 
 
-<!-- Mirrored from demos.themeselection.com/sneat-bootstrap-html-admin-template/html/vertical-menu-template/app-user-list.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 21 Mar 2024 22:38:04 GMT -->
+<!-- Mirrored from demos.themeselection.com/sneat-bootstrap-html-admin-template/html/vertical-menu-template/app-user-view-account.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 21 Mar 2024 22:38:05 GMT -->
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>User List - Pages | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+    <title>User View - Pages | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
 
 
     <meta name="description" content="Most Powerful &amp; Comprehensive Bootstrap 5 HTML Admin Dashboard Template built for developers!" />
@@ -18,13 +18,13 @@
     <link rel="canonical" href="https://themeselection.com/item/sneat-bootstrap-html-admin-template/">
 
 
-{#    <!-- ? PROD Only: Google Tag Manager (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->#}
-{#    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':#}
-{#                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],#}
-{#            j=d.createElement(s),dl=l!=='dataLayer'?'&l='+l:'';j.async=true;j.src=#}
-{#            '../../../../www.googletagmanager.com/gtm5445.html?id='+i+dl;f.parentNode.insertBefore(j,f);#}
-{#        })(window,document,'script','dataLayer','GTM-5DDHKGP');</script>#}
-{#    <!-- End Google Tag Manager -->#}
+    <!-- ? PROD Only: Google Tag Manager (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            '../../../../www.googletagmanager.com/gtm5445.html?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-5DDHKGP');</script>
+    <!-- End Google Tag Manager -->
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/img/favicon/favicon.ico" />
@@ -41,7 +41,7 @@
 
     <!-- Core CSS -->
     <link rel="stylesheet" href="{{ asset('../../assets/vendor/css/rtl/core.css') }}" class="template-customizer-core-css" />
-{#    <link rel="stylesheet" href="{{ asset('../../assets/vendor/css/rtl/theme-default.css') }}" class="template-customizer-theme-css" />#}
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/css/rtl/theme-default.css') }}" class="template-customizer-theme-css" />
     <link rel="stylesheet" href="{{ asset('../../assets/css/demo.css') }}" />
 
     <!-- Vendors CSS -->
@@ -50,19 +50,22 @@
     <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}">
     <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}">
     <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css') }}">
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/animate-css/animate.css') }}" />
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/sweetalert2/sweetalert2.css') }}" />
     <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/select2/select2.css') }}" />
     <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/%40form-validation/form-validation.css') }}" />
 
     <!-- Page CSS -->
 
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/css/pages/page-user-view.css') }}" />
 
     <!-- Helpers -->
-    <script src="{{ asset('../../assets/vendor/js/helpers.js') }}"></script>
+    <script src="../../assets/vendor/js/helpers.js"></script>
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
-    <script src="{{ asset('../../assets/vendor/js/template-customizer.js') }}"></script>
+    <script src="../../assets/vendor/js/template-customizer.js"></script>
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-    <script src="{{ asset('../../assets/js/config.js') }}"></script>
+    <script src="../../assets/js/config.js"></script>
 
 </head>
 
@@ -89,7 +92,7 @@
 
 
             <div class="app-brand demo ">
-                <a href="" class="app-brand-link">
+                <a href="index.html" class="app-brand-link">
       <span class="app-brand-logo demo">
 
 <svg width="25" viewBox="0 0 25 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -138,6 +141,42 @@
 
 
 
+            <ul class="menu-inner py-1">
+                <!-- Dashboards -->
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons bx bx-home-circle"></i>
+                        <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
+                        <span class="badge badge-center rounded-pill bg-danger ms-auto">5</span>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="dashboards-analytics.html" class="menu-link">
+                                <div class="text-truncate" data-i18n="Analytics">Analytics</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="dashboards-crm.html" class="menu-link">
+                                <div class="text-truncate" data-i18n="CRM">CRM</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="app-ecommerce-dashboard.html" class="menu-link">
+                                <div class="text-truncate" data-i18n="eCommerce">eCommerce</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="app-logistics-dashboard.html" class="menu-link">
+                                <div class="text-truncate" data-i18n="Logistics">Logistics</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="app-academy-dashboard.html" class="menu-link">
+                                <div class="text-truncate" data-i18n="Academy">Academy</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
                 <!-- Layouts -->
                 <li class="menu-item">
@@ -149,17 +188,17 @@
                     <ul class="menu-sub">
 
                         <li class="menu-item">
-                            <a href="" class="menu-link">
+                            <a href="layouts-collapsed-menu.html" class="menu-link">
                                 <div class="text-truncate" data-i18n="Collapsed menu">Collapsed menu</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="" class="menu-link">
+                            <a href="layouts-content-navbar.html" class="menu-link">
                                 <div class="text-truncate" data-i18n="Content navbar">Content navbar</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="" class="menu-link">
+                            <a href="layouts-content-navbar-with-sidebar.html" class="menu-link">
                                 <div class="text-truncate" data-i18n="Content nav + Sidebar">Content nav + Sidebar</div>
                             </a>
                         </li>
@@ -169,27 +208,27 @@
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="" class="menu-link">
+                            <a href="layouts-without-menu.html" class="menu-link">
                                 <div class="text-truncate" data-i18n="Without menu">Without menu</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="" class="menu-link">
+                            <a href="layouts-without-navbar.html" class="menu-link">
                                 <div class="text-truncate" data-i18n="Without navbar">Without navbar</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="" class="menu-link">
+                            <a href="layouts-fluid.html" class="menu-link">
                                 <div class="text-truncate" data-i18n="Fluid">Fluid</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="" class="menu-link">
+                            <a href="layouts-container.html" class="menu-link">
                                 <div class="text-truncate" data-i18n="Container">Container</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="" class="menu-link">
+                            <a href="layouts-blank.html" class="menu-link">
                                 <div class="text-truncate" data-i18n="Blank">Blank</div>
                             </a>
                         </li>
@@ -237,7 +276,7 @@
                     <span class="menu-header-text" data-i18n="Apps & Pages">Apps &amp; Pages</span>
                 </li>
                 <li class="menu-item">
-                    <a href="" class="menu-link">
+                    <a href="app-email.html" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-envelope"></i>
                         <div class="text-truncate" data-i18n="Email">Email</div>
                     </a>
@@ -479,18 +518,18 @@
                         <div class="text-truncate" data-i18n="Users">Users</div>
                     </a>
                     <ul class="menu-sub">
-                        <li class="menu-item active">
+                        <li class="menu-item">
                             <a href="app-user-list.html" class="menu-link">
                                 <div class="text-truncate" data-i18n="List">List</div>
                             </a>
                         </li>
 
-                        <li class="menu-item">
+                        <li class="menu-item active open">
                             <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <div class="text-truncate" data-i18n="View">View</div>
                             </a>
                             <ul class="menu-sub">
-                                <li class="menu-item">
+                                <li class="menu-item active">
                                     <a href="app-user-view-account.html" class="menu-link">
                                         <div class="text-truncate" data-i18n="Account">Account</div>
                                     </a>
@@ -1362,14 +1401,14 @@
                     <span class="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
                       <i class="bx bx-pie-chart-alt-2 fs-4"></i>
                     </span>
-                                            <a href="" class="stretched-link">Dashboard</a>
+                                            <a href="index.html" class="stretched-link">Dashboard</a>
                                             <small class="text-muted mb-0">User Profile</small>
                                         </div>
                                         <div class="dropdown-shortcuts-item col">
                     <span class="dropdown-shortcuts-icon bg-label-secondary rounded-circle mb-2">
                       <i class="bx bx-cog fs-4"></i>
                     </span>
-                                            <a href="" class="stretched-link">Setting</a>
+                                            <a href="pages-account-settings-account.html" class="stretched-link">Setting</a>
                                             <small class="text-muted mb-0">Account Settings</small>
                                         </div>
                                     </div>
@@ -1610,7 +1649,7 @@
                         <li class="nav-item navbar-dropdown dropdown-user dropdown">
                             <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                                 <div class="avatar avatar-online">
-                                    {% block imageUser %}{% endblock %}
+                                    <img src="../../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle">
                                 </div>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -1619,15 +1658,12 @@
                                         <div class="d-flex">
                                             <div class="flex-shrink-0 me-3">
                                                 <div class="avatar avatar-online">
-{#                                                    <img src="../../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle">#}
-                                                    {% block imageUserHabta %} {% endblock %}
+                                                    <img src="../../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle">
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">
-                                                {% block userConnecte %}
-                                                <span class="fw-medium d-block">Jhon Deo</span>
+                                                <span class="fw-medium d-block">John Doe</span>
                                                 <small class="text-muted">Admin</small>
-                                                {% endblock %}
                                             </div>
                                         </div>
                                     </a>
@@ -1675,7 +1711,10 @@
                                     <div class="dropdown-divider"></div>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ path('app_logout') }}" >Log Out</a>
+                                    <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
+                                        <i class="bx bx-power-off me-2"></i>
+                                        <span class="align-middle">Log Out</span>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
@@ -1691,6 +1730,7 @@
                     <input type="text" class="form-control search-input container-xxl border-0" placeholder="Search..." aria-label="Search...">
                     <i class="bx bx-x bx-sm search-toggler cursor-pointer"></i>
                 </div>
+
 
             </nav>
 
@@ -1708,258 +1748,130 @@
                 <div class="container-xxl flex-grow-1 container-p-y">
 
 
-
-                    <div class="row g-4 mb-4">
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card">
+                    <h4 class="py-3 mb-4">
+                        <span class="text-muted fw-light">User / View /</span> Account
+                    </h4>
+                    <div class="row">
+                        <!-- User Sidebar -->
+                        <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
+                            <!-- User Card -->
+                            <div class="card mb-4">
                                 <div class="card-body">
-                                    <div class="d-flex align-items-start justify-content-between">
-                                        <div class="content-left">
-                                            <span>Nombre d'utilisateurs</span>
-                                            <div class="d-flex align-items-end mt-2">
-                                                <h4 class="mb-0 me-2">{% block nbrUsers %} {% endblock %}</h4>
+                                    <div class="user-avatar-section">
+                                        <div class=" d-flex align-items-center flex-column">
+                                            {% set cheminAbsolu = user.image %}
+
+                                            {% set nomFichier = "imagesUser/"~cheminAbsolu|split('\\')|last %}
+
+                                            <img class="img-fluid rounded my-4" src="{{ asset(nomFichier) }}" height="110" width="110" />
+                                            <div class="user-info text-center">
+                                                <h4 class="mb-2">{{ user.nom  ~ " " ~ user.prenom  }}</h4>
+                                                <span class="badge bg-label-secondary">{{ user.role }}</span>
                                             </div>
                                         </div>
-                                        <div class="avatar">
-            <span class="avatar-initial rounded bg-label-primary">
-              <i class="bx bx-user bx-sm"></i>
-            </span>
+                                    </div>
+                                    <div class="d-flex justify-content-around flex-wrap my-4 py-3">
+                                        <div class="d-flex align-items-start me-4 mt-3 gap-3">
+                                            <span class="badge bg-label-primary p-2 rounded"><i class='bx bx-check bx-sm'></i></span>
+
+                                        </div>
+                                        <div class="d-flex align-items-start mt-3 gap-3">
+                                            <span class="badge bg-label-primary p-2 rounded"><i class='bx bx-customize bx-sm'></i></span>
+
+                                        </div>
+                                    </div>
+                                    <h5 class="pb-2 border-bottom mb-4">Details</h5>
+                                    <div class="info-container">
+                                        <ul class="list-unstyled">
+
+                                            <li class="mb-3">
+                                                <span class="fw-medium me-2">Email:</span>
+                                                <span>{{ user.email }}</span>
+                                            </li>
+                                            <li class="mb-3">
+                                                <span class="fw-medium me-2">Statut:</span>
+                                                <span class="badge bg-label-success">{{ user.statut }}</span>
+                                            </li>
+                                            <li class="mb-3">
+                                                <span class="fw-medium me-2">Role:</span>
+                                                <span>{{ user.role }}</span>
+                                            </li>
+
+                                            <li class="mb-3">
+                                                <span class="fw-medium me-2">Contact:</span>
+                                                <span>{{ user.numtel }}</span>
+                                            </li>
+
+                                        </ul>
+                                        <div class="d-flex justify-content-center pt-3">
+                                            <a href="" class="btn btn-primary me-3" data-bs-target="#editUser" data-bs-toggle="modal">Edit</a>
+                                            <a href="javascript:;" class="btn btn-label-danger suspend-user">Suspended</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <!-- /User Card -->
+                            <!-- Plan Card -->
+
+                            <!-- /Plan Card -->
                         </div>
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-start justify-content-between">
-                                        <div class="content-left">
-                                            <span>Nombre d'admins</span>
-                                            <div class="d-flex align-items-end mt-2">
-                                                <h4 class="mb-0 me-2">{% block nbrAdmins %} {% endblock %}</h4>
-                                            </div>
-                                        </div>
-                                        <div class="avatar">
-            <span class="avatar-initial rounded bg-label-danger">
-              <i class="bx bx-user-check bx-sm"></i>
-            </span>
-                                        </div>
+                        <!--/ User Sidebar -->
+
+
+                        <!-- User Content -->
+                        <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
+                            <!-- User Pills -->
+                            <ul class="nav nav-pills flex-column flex-md-row mb-3">
+{#                                <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class="bx bx-user me-1"></i>Account</a></li>#}
+{#                                <li class="nav-item"><a class="nav-link" href="app-user-view-security.html"><i class="bx bx-lock-alt me-1"></i>Security</a></li>#}
+{#                                <li class="nav-item"><a class="nav-link" href="app-user-view-billing.html"><i class="bx bx-detail me-1"></i>Billing & Plans</a></li>#}
+{#                                <li class="nav-item"><a class="nav-link" href="app-user-view-notifications.html"><i class="bx bx-bell me-1"></i>Notifications</a></li>#}
+{#                                <li class="nav-item"><a class="nav-link" href="app-user-view-connections.html"><i class="bx bx-link-alt me-1"></i>Connections</a></li>#}
+                            </ul>
+                            <!--/ User Pills -->
+
+                            <!-- Project table -->
+
+                            <!-- /Project table -->
+
+                            <!-- Activity Timeline -->
+
+                            <!-- /Activity Timeline -->
+
+                            <!-- Invoice table -->
+
+                            <!-- /Invoice table -->
+                        </div>
+                        <!--/ User Content -->
+                    </div>
+
+                    <!-- Modal -->
+                    <!-- Edit User Modal -->
+                    <div class="modal fade" id="editUser" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-simple modal-edit-user">
+                            <div class="modal-content p-3 p-md-5">
+                                <div class="modal-body">
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <div class="text-center mb-4">
+                                        <h3>Edit User Information</h3>
+                                        <p>Updating user details will receive a privacy audit.</p>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-start justify-content-between">
-                                        <div class="content-left">
-                                            <span>Active Users</span>
-                                            <div class="d-flex align-items-end mt-2">
-                                                <h4 class="mb-0 me-2">{% block activeUsers %}{% endblock %}</h4>
-                                            </div>
-                                        </div>
-                                        <div class="avatar">
-            <span class="avatar-initial rounded bg-label-success">
-              <i class="bx bx-group bx-sm"></i>
-            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-start justify-content-between">
-                                        <div class="content-left">
-                                            <span>Utilisateurs désactives</span>
-                                            <div class="d-flex align-items-end mt-2">
-                                                <h4 class="mb-0 me-2">{% block desactiveUsers %}{% endblock %}</h4>
-                                            </div>
-                                        </div>
-                                        <div class="avatar">
-            <span class="avatar-initial rounded bg-label-warning">
-              <i class="bx bx-user-voice bx-sm"></i>
-            </span>
-                                        </div>
-                                    </div>
+{#                            <form id="editUserForm" class="row g-3" onsubmit="return false">#}
+{#                                </form>#}
+                                    {{ include('user/_formModifProfile.html.twig') }}
+
+
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <!--/ Edit User Modal -->
 
+                    <!-- Add New Credit Card Modal -->
 
+                    <!--/ Add New Credit Card Modal -->
 
-
-                    <!-- Users List Table -->
-                    <div class="card-header border-bottom">
-                        <h5 class="card-title">Search Filter</h5>
-                        <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
-                            <div class="col-md-4 user_role">
-                                <select id="UserRole" class="form-select text-capitalize">
-                                    <option value=""> Select Role </option>
-                                    <option value="admin">Admin</option>
-                                    <option value="user">User</option>
-                                </select></div>
-                            <div class="col-md-4 user_status">
-                                <select id="FilterTransaction" class="form-select text-capitalize">
-                                    <option value="">Select Status </option>
-                                    <option value="desactive" class="text-capitalize">desactive</option>
-                                    <option value="active" class="text-capitalize">Active</option>
-                                    <option value="ban" class="text-capitalize">Ban</option>
-                                </select></div>
-                        </div>
-                    </div>
-                    <div class="row mx-2">
-                        <div class="col-md-2">
-                            <div class="me-3">
-                                <div class="dataTables_length" id="DataTables_Table_0_length">
-                                    <label>
-                                        <select name="DataTables_Table_0_length" aria-controls="DataTables_Table_0" class="form-select">
-                                            <option value="10">10</option>
-                                            <option value="25">25</option>
-                                            <option value="50">50</option>
-                                            <option value="100">100</option>
-                                        </select>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-10">
-                            <div class="dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-0">
-                                <div id="DataTables_Table_0_filter" class="dataTables_filter">
-                                    <label>
-                                        <input type="search" id="searchInput" class="form-control" placeholder="Search.." aria-controls="DataTables_Table_0">
-                                    </label>
-                                </div>
-                                <div class="dt-buttons btn-group flex-wrap">
-                                    <div class="btn-group">
-                                        <button class="btn buttons-collection dropdown-toggle btn-label-secondary mx-3" tabindex="0" aria-controls="DataTables_Table_0" type="button" aria-haspopup="dialog" aria-expanded="false">
-                                            <span><i class="bx bx-export me-1"></i>Export</span>
-                                        </button>
-                                    </div>
-                                    <button class="btn btn-secondary add-new btn-primary" tabindex="0" aria-controls="DataTables_Table_0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser">
-                                        <span><i class="bx bx-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Add New User</span></span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                        <div class="card-datatable table-responsive">
-                            <table class=" table border-top" id="myTable">
-
-                                <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Role</th>
-                                    <th>Numéro de télephone</th>
-                                    <th>Date punition</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                                </thead>
-
-                                {% block list %}{% endblock %}
-                            </table>
-                            <<script>
-                                document.addEventListener("DOMContentLoaded", function() {
-                                    const searchInput = document.getElementById('searchInput');
-                                    const table = document.getElementById('myTable'); // Sélectionne le tableau par son ID
-                                    const tableRows = table.querySelectorAll('tbody tr'); // Sélectionne les lignes du tableau
-
-                                    searchInput.addEventListener('input', function() {
-                                        const searchTerm = this.value.trim().toLowerCase();
-
-                                        tableRows.forEach(row => {
-                                            const cells = row.querySelectorAll('td');
-                                            let found = false;
-
-                                            cells.forEach(cell => {
-                                                if (cell.textContent.trim().toLowerCase().includes(searchTerm)) {
-                                                    found = true;
-                                                }
-                                            });
-
-                                            if (found) {
-                                                row.style.display = '';
-                                            } else {
-                                                row.style.display = 'none';
-                                            }
-                                        });
-                                    });
-                                });
-                            </script>
-                            <script>
-                                // Sélectionnez les éléments de filtre
-                                const userRoleSelect = document.getElementById('UserRole');
-                                const userStatusSelect = document.getElementById('FilterTransaction');
-                                const userTable = document.getElementById('userTable');
-
-                                // Ajoutez un gestionnaire d'événements pour le changement de sélection de rôle
-                                userRoleSelect.addEventListener('change', filterUsers);
-                                // Ajoutez un gestionnaire d'événements pour le changement de sélection de statut
-                                userStatusSelect.addEventListener('change', filterUsers);
-
-                                // Fonction pour filtrer les utilisateurs
-                                function filterUsers() {
-                                    const selectedRole = userRoleSelect.value;
-                                    const selectedStatus = userStatusSelect.value;
-
-                                    // Parcourez les lignes de la table et masquez celles qui ne correspondent pas aux critères de filtrage
-                                    Array.from(userTable.getElementsByTagName('tr')).forEach(row => {
-                                        const roleCell = row.querySelector('.role'); // Suppose que la classe de la cellule de rôle est "role"
-                                        const statusCell = row.querySelector('.status'); // Suppose que la classe de la cellule de statut est "status"
-
-                                        const roleMatch = !selectedRole || roleCell.textContent.trim() === selectedRole;
-                                        const statusMatch = !selectedStatus || statusCell.textContent.trim() === selectedStatus;
-
-                                        if (roleMatch && statusMatch) {
-                                            row.style.display = '';
-                                        } else {
-                                            row.style.display = 'none';
-                                        }
-                                    });
-                                }
-                            </script>
-                        </div>
-                    <!-- Votre HTML pour la barre de recherche -->
-
-
-
-                    <!-- Offcanvas to add new user -->
-                        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddUser" aria-labelledby="offcanvasAddUserLabel">
-
-                            <div class="offcanvas-header">
-                                <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Ajouter User</h5>
-                                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                            </div>
-
-                            <div class="offcanvas-body mx-0 flex-grow-0">
-                                    {% block ajoutUser %}
-
-                                    {% endblock %}
-                            </div>
-                        </div>
-                    <!-- Offcanvas to edit  user -->
-                    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEditUser" aria-labelledby="offcanvasAddUserLabel">
-
-                        <div class="offcanvas-header">
-                            <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Edit User</h5>
-                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                        </div>
-
-                        <div class="offcanvas-body mx-0 flex-grow-0">
-                            {% block modificationUser %}
-
-                            {% endblock %}
-                        </div>
-                    </div>
-
-
-
-                    </div>
-
-
+                    <!-- /Modal -->
                 </div>
                 <!-- / Content -->
 
@@ -2011,7 +1923,9 @@
 <!-- / Layout wrapper -->
 
 
-
+<div class="buy-now">
+    <a href="https://themeselection.com/item/sneat-bootstrap-html-admin-template/" target="_blank" class="btn btn-danger btn-buy-now">Buy Now</a>
+</div>
 
 
 
@@ -2033,26 +1947,28 @@
 <!-- Vendors JS -->
 <script src="{{ asset('../../assets/vendor/libs/moment/moment.js') }}"></script>
 <script src="{{ asset('../../assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+<script src="{{ asset('../../assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
+<script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+<script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
 <script src="{{ asset('../../assets/vendor/libs/select2/select2.js') }}"></script>
 <script src="{{ asset('../../assets/vendor/libs/%40form-validation/popular.js') }}"></script>
 <script src="{{ asset('../../assets/vendor/libs/%40form-validation/bootstrap5.js') }}"></script>
 <script src="{{ asset('../../assets/vendor/libs/%40form-validation/auto-focus.js') }}"></script>
-<script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave.js') }}"></script>
-<script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
 
 <!-- Main JS -->
 <script src="{{ asset('../../assets/js/main.js') }}"></script>
 
 
 <!-- Page JS -->
-<script src="{{ asset('../../assets/js/app-user-list.js') }}"></script>
+<script src="{{ asset('../../assets/js/modal-edit-user.js') }}"></script>
+<script src="{{ asset('../../assets/js/app-user-view.js') }}"></script>
+<script src="{{ asset('../../assets/js/app-user-view-account.js') }}"></script>
 
 </body>
 
 
-<!-- Mirrored from demos.themeselection.com/sneat-bootstrap-html-admin-template/html/vertical-menu-template/app-user-list.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 21 Mar 2024 22:38:04 GMT -->
+<!-- Mirrored from demos.themeselection.com/sneat-bootstrap-html-admin-template/html/vertical-menu-template/app-user-view-account.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 21 Mar 2024 22:38:05 GMT -->
 </html>
 
 <!-- beautify ignore:end -->
-
 

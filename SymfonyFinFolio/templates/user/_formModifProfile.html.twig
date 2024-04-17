@@ -1,33 +1,34 @@
 {{ form_start(form) }}
 
-{{ form_row(form.nom, {'attr': {'class': form_errors(form.nom)|default(null) ? 'error-border' : ''}}) }}
+{{ form_row(form.nom, {'errors': 'none'}) }}
 {% if form_errors(form.nom) %}
     <div class="error">{{ form_errors(form.nom) }}</div>
 {% endif %}
 
-{{ form_row(form.prenom, {'attr': {'class': form_errors(form.prenom)|default(null) ? 'error-border' : ''}}) }}
+{{ form_row(form.prenom, {'errors': 'none'}) }}
 {% if form_errors(form.prenom) %}
     <div class="error">{{ form_errors(form.prenom) }}</div>
 {% endif %}
 
-{{ form_row(form.email, {'attr': {'class': form_errors(form.email)|default(null) ? 'error-border' : ''}}) }}
+{{ form_row(form.email, {'errors': 'none'}) }}
 {% if form_errors(form.email) %}
     <div class="error">{{ form_errors(form.email) }}</div>
 {% endif %}
 
-{{ form_row(form.password, {'attr': {'class': form_errors(form.password)|default(null) ? 'error-border' : ''}}) }}
+{{ form_row(form.password, {'errors': 'none'}) }}
 {% if form_errors(form.password) %}
     <div class="error">{{ form_errors(form.password) }}</div>
 {% endif %}
 
-{{ form_row(form.numtel, {'attr': {'class': form_errors(form.numtel)|default(null) ? 'error-border' : ''}}) }}
+{{ form_row(form.numtel, {'errors': 'none'}) }}
 {% if form_errors(form.numtel) %}
     <div class="error">{{ form_errors(form.numtel) }}</div>
 {% endif %}
 
-{{ form_row(form.image, {'attr': {'class': form_errors(form.image)|default(null) ? 'error-border' : ''}}) }}
+{{ form_row(form.image, {'errors': 'none'}) }}
 {% if form_errors(form.image) %}
     <div class="error">{{ form_errors(form.image) }}</div>
+
 {% endif %}
 
 {{ form_end(form) }}
@@ -41,6 +42,37 @@
         var passwordInput = document.getElementById('user_password');
         var form = document.getElementById('user_form');
 
+        // Ajoutez des écouteurs d'événements sur les champs du formulaire pour la validation en temps réel
+        nomInput.addEventListener('input', function() {
+            validateNom();
+        });
+
+        prenomInput.addEventListener('input', function() {
+            validatePrenom();
+        });
+
+        emailInput.addEventListener('input', function() {
+            validateEmail();
+        });
+
+        numtelInput.addEventListener('input', function() {
+            validateNumtel();
+        });
+
+        passwordInput.addEventListener('input', function() {
+            validatePassword();
+        });
+        function validateForm() {
+            // Valider chaque champ du formulaire
+            var nomValid = validateNom();
+            var prenomValid = validatePrenom();
+            var emailValid = validateEmail();
+            var numtelValid = validateNumtel();
+            var passwordValid = validatePassword();
+
+            // Retourner true si tous les champs sont valides, sinon retourner false
+            return nomValid && prenomValid && emailValid && numtelValid && passwordValid;
+        }
         // Fonctions de validation pour chaque champ
         function validateNom() {
             var nomValue = nomInput.value.trim();
@@ -112,7 +144,7 @@
             }
         }
 
-        // Fonction pour afficher les erreurs en rouge et ajouter la classe error-border
+        // Fonction pour afficher les erreurs en rouge
         function showError(input, message) {
             var errorDiv = input.nextElementSibling;
             if (!errorDiv || !errorDiv.classList.contains('error-message')) {
@@ -122,16 +154,14 @@
             }
             errorDiv.textContent = message;
             errorDiv.style.color = 'red'; // Couleur rouge pour les messages d'erreur
-            input.classList.add('error-border'); // Ajoute la classe error-border
         }
 
-        // Fonction pour masquer les erreurs et supprimer la classe error-border
+        // Fonction pour masquer les erreurs
         function hideError(input) {
             var errorDiv = input.nextElementSibling;
             if (errorDiv && errorDiv.classList.contains('error-message')) {
                 errorDiv.textContent = '';
             }
-            input.classList.remove('error-border'); // Supprime la classe error-border
         }
 
         // Fonction pour valider l'email
@@ -152,12 +182,22 @@
             return regex.test(password);
         }
 
-        // Ajoutez des écouteurs d'événements sur les champs du formulaire pour la validation en temps réel
-        nomInput.addEventListener('input', validateNom);
-        prenomInput.addEventListener('input', validatePrenom);
-        emailInput.addEventListener('input', validateEmail);
-        numtelInput.addEventListener('input', validateNumtel);
-        passwordInput.addEventListener('input', validatePassword);
+        // Fonction de validation du formulaire
+        function validateForm() {
+            // Valider chaque champ du formulaire
+            var nomValid = validateNom();
+            var prenomValid = validatePrenom();
+            var emailValid = validateEmail();
+            var numtelValid = validateNumtel();
+            var passwordValid = validatePassword();
+
+            // Retourner true si tous les champs sont valides, sinon retourner false
+            return nomValid && prenomValid && emailValid && numtelValid && passwordValid;
+        }
     });
+
+
+
+
 
 </script>

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Regex;
 
 
-class UserType extends AbstractType
+class UserProfile extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -96,7 +96,6 @@ class UserType extends AbstractType
                     ]),
                 ],
             ])
-
             ->add('image', FileType::class, [
                 'label' => 'Votre image de profil (Des fichiers images uniquement)',
                 // unmapped means that this field is not associated to any entity property
@@ -111,7 +110,7 @@ class UserType extends AbstractType
                 // in the associated entity, so you can use the PHP constraint classes
                 'constraints' => [
                     new File([
-                        'maxSize' => '2048k',
+                        'maxSize' => '1024k',
                         'mimeTypes' => [
                             'image/gif',
                             'image/jpeg',

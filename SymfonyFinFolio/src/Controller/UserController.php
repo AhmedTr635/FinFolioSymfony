@@ -1,11 +1,18 @@
 <?php
 
 namespace App\Controller;
+use App\Form\UserModifType;
+use App\Form\UserProfile;
 use App\Services\QrCodeService;
+use DateTime;
 use Doctrine\ORM\EntityManager;
+use http\Exception\UnexpectedValueException;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\Form\FormError;
 use App\Entity\User;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 use App\Form\UserLogin;
 use App\Form\UserType;
@@ -21,7 +28,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 
 #[Route('/user')]
@@ -29,9 +36,10 @@ class UserController extends AbstractController
 {
 
     #[Route('/', name: 'app_user_index', methods: ['GET', 'POST'])]
-    public function index(UserRepository $userRepository, Request $request, EntityManagerInterface $entityManager, ManagerRegistry $managerRegistry): Response
+    public function index(PaginatorInterface $paginator,UserRepository $userRepository, Request $request, EntityManagerInterface $entityManager, ManagerRegistry $managerRegistry,SluggerInterface $slugger): Response
     {
         $user = new User();
+        $formModifier=$this->createForm(UserModifType::class);
         $form = $this->createForm(UserType::class, $user, [
             'required' => false, // Désactive la validation automatique des champs vides
         ]);
@@ -46,6 +54,26 @@ class UserController extends AbstractController
                     'form' => $form->createView(),
                 ]);
             }
+            else{
+                $image = $form->get('image')->getData();
+
+                if ($image) {
+                $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $image->move(
+                        $this->getParameter('brochures_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                $user->setImage($newFilename);}
 
             $user->setRate(2);
             $user->setNbcredit(0);
@@ -54,14 +82,15 @@ class UserController extends AbstractController
             $user->setRate(2);
             $user->setStatut("active");
             $user->setAdresse("Tunisie");
+
             $user->setPassword(sha1($user->getPassword()));
-            $user->setDatepunition("vide");
+            $user->setDatepunition(new \DateTime('0000-00-00'));
             $user->setTotalTax(0);
             $entityManager->persist($user);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
-        }
+        }}
 
         $repository = $managerRegistry->getRepository(User::class);
 
@@ -69,15 +98,69 @@ class UserController extends AbstractController
         $usersCount = $repository->count(['role' => 'user']);
         $activeCount = $repository->count(['statut' => 'active']);
         $desactiveCount = $repository->count(['statut' => 'desactive']);
+        $users=$userRepository->findAll();
+        $users= $paginator->paginate(
+            $users,
+            $request->query->getInt('page',1)  ,
+            5
+        );
+        $paginationTemplate = '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig';
 
 
         return $this->render('user/index.html.twig', [
-            'users' => $userRepository->findAll(),
+            'users' => $users,
+            'paginationTemplate' => $paginationTemplate,
             'form' => $form->createView() ,
+            //'formModifier' =>$formModifier->createView() ,
             'adminsCount' => $adminsCount ,
             'usersCount' => $usersCount ,
             'activeCount' => $activeCount ,
             'desactiveCount' => $desactiveCount
+        ]);
+    }
+//    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['POST','GET'])]
+//    public function edit(Request $request, User $user,EntityManagerInterface $entityManager): Response
+//    {
+//        // Créez une instance de votre formulaire UserModifType
+//        $form = $this->createForm(UserModifType::class, $user);
+//
+//        // Traitez la soumission du formulaire
+//        $form->handleRequest($request);
+//       // dd($user);
+//        // Vérifiez si le formulaire est soumis et valide
+//        if ($form->isSubmitted() && $form->isValid()) {
+//            dd($user);
+//
+//            $entityManager->flush();
+//
+//            // Redirigez l'utilisateur vers une autre page ou affichez un message de succès
+//            return $this->redirectToRoute('app_user_index'); // Remplacez 'user_list' par le nom de la route vers la liste des utilisateurs
+//        }
+//
+//        // Si le formulaire n'est pas soumis ou n'est pas valide, affichez à nouveau le formulaire avec les erreurs éventuelles
+//        return $this->render('user/edit.html.twig', [
+//            'formM' => $form->createView(),
+//            'user' => $user, // Vous pouvez transmettre l'entité utilisateur au template si nécessaire
+//        ]);
+//    }
+    #[Route('/get_user_info/{id}', name: 'get_user_info', methods: ['GET'])]
+    public function getUserInfo($id, UserRepository $userRepository): JsonResponse
+    {
+        $user = $userRepository->find($id);
+
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], 404);
+        }
+
+        return new JsonResponse([
+            'nom' => $user->getNom(),
+            'prenom' => $user->getPrenom(),
+            'email' => $user->getEmail(),
+            'numtel' => $user->getNumtel(),
+            'statut' => $user->getStatut(),
+            'datepunition' => $user->getDatepunition(),
+
+            // Ajoutez d'autres propriétés de l'utilisateur selon vos besoins
         ]);
     }
 
@@ -87,7 +170,7 @@ class UserController extends AbstractController
     //------------------------SignUp------------------------------------
 
     #[Route('/register', name: 'signup')]
-    public function register(Request $request ,ManagerRegistry $managerRegistry, SessionInterface $session,QrCodeService $qrCode): Response
+    public function register(Request $request ,ManagerRegistry $managerRegistry, SessionInterface $session,QrCodeService $qrCode,SluggerInterface $slugger): Response
     {
 
         $user = new User();
@@ -108,6 +191,31 @@ class UserController extends AbstractController
                 ]);
             }
             else {
+
+                $image = $form->get('image')->getData();
+
+                // this condition is needed because the 'brochure' field is not required
+                // so the PDF file must be processed only when a file is uploaded
+                if ($image) {
+                    $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                    // this is needed to safely include the file name as part of the URL
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+
+                    // Move the file to the directory where brochures are stored
+                    try {
+                        $image->move(
+                            $this->getParameter('brochures_directory'),
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        // ... handle exception if something happens during file upload
+                    }
+
+                    $user->setImage($newFilename);}
+
+
+
                 $code = $this->generateRecoveryCode(5);
                 $qrCode->qrcode($code);
                 $this->envoyerMail($user);
@@ -152,11 +260,14 @@ class UserController extends AbstractController
                 $user->setSolde(2000);
                 $user->setRate(2);
                 $user->setStatut("active");
+
+
                 $user->setAdresse("Tunisie");
                 $user->setPassword(sha1($user->getPassword())); // Note: Consider using modern encryption methods
-                $user->setDatepunition("vide");
+                $user->setDatepunition(new \DateTime('0000-00-00'));
                 $user->setTotalTax(0);
                 $entityManager->persist($user);
+
                 $entityManager->flush();
 
                 // Redirect user to login page after successful verification
@@ -283,46 +394,7 @@ class UserController extends AbstractController
      ****************************************************
      */
 
-    #[Route('/registerBack', name: 'signupback')]
-    public function registerBack(Request $request ,EntityManagerInterface $entityManager,ManagerRegistry $managerRegistry): Response
-    {
 
-        $user = new User();
-        $form = $this->createForm(UserType::class, $user, [
-            'required' => false, // Désactive la validation automatique des champs vides
-        ]);
-        $form->handleRequest($request);
-
-        //dd($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $existingUser = $managerRegistry->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
-
-            if ($existingUser) {
-
-                $form->get('email')->addError(new FormError('Cette adresse e-mail est déjà utilisée. Veuillez en choisir une autre.'));
-                return $this->render('user/new.html.twig', [
-                    'form' => $form->createView(),
-                ]);
-            }
-            $user->setRate(2);
-            $user->setNbcredit(0);
-            $user->setRole("user");
-            $user->setSolde(2000);
-            $user->setRate(2);
-            $user->setStatut("active");
-            $user->setAdresse("Tunisie");
-            $user->setPassword(sha1($user->getPassword()));
-            $user->setDatepunition("vide");
-            $user->setTotalTax(0);
-            $entityManager->persist($user);
-            $entityManager->flush();
-        }
-
-        return $this->renderForm('user/new.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
-    }
 
     //------------------------Login------------------------------------
     //------------------------Login------------------------------------
@@ -333,10 +405,11 @@ class UserController extends AbstractController
 
     #[Route('/frontUser', name:'frontUser')]
     public function template (ManagerRegistry $managerRegistry,EntityManagerInterface $entityManager){
-        $existingUser = $managerRegistry->getRepository(User::class)->findOneBy(['email' => "ahmedtrabelsi103@gmail.com"]);
-        $existingUser->setRate(4);
-        $entityManager->flush();
-        return $this->render('Dashbooard.html.twig');
+
+        return $this->renderForm('user/editProfile.html.twig', [
+
+
+        ]);
 
     }
 
@@ -349,7 +422,7 @@ class UserController extends AbstractController
 
 
 
-    #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
+    #[Route('/{id}/show', name: 'app_user_show', methods: ['GET'])]
     public function show(User $user): Response
     {
         return $this->render('user/show.html.twig', [
@@ -360,13 +433,23 @@ class UserController extends AbstractController
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserModifType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+
+if ($form->isSubmitted() && $form->isValid()) {
+            $statut = $user->getStatut();
+            $datepunition = $user->getDatePunition();
+            if ($statut === 'desactive' && $datepunition <= new \DateTime()) {
+                // Si la validation échoue, ajoutez un message d'erreur
+                $this->addFlash('error', 'La date de punition doit être postérieure à la date actuelle pour desactiver le statut');
+                // Rediriger vers la page du formulaire avec le message d'erreur
+            }else{
+                if($user->getStatut()==='active'||$user->getStatut()==='ban' )
+                    $user->setDatepunition(new \DateTime('0000-00-00'));
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);}
         }
 
         return $this->renderForm('user/edit.html.twig', [
@@ -374,13 +457,86 @@ class UserController extends AbstractController
             'form' => $form,
         ]);
     }
+    #[Route("/editUserJson/{id}", methods: ["POST"])]
+    public function editUser(Request $request, $id, UserRepository $userRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $userRepository->find($id);
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not found'], JsonResponse::HTTP_NOT_FOUND);
+        }
 
-    #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
+        $statut = $request->request->get("statut");
+        $datepunition = $request->request->get("datepunition");
+
+        // Mettez à jour les propriétés de l'utilisateur
+        $user->setStatut($statut);
+        $user->setDatePunition(new \DateTime($datepunition));
+
+        // Validez les données, en fonction de vos besoins
+        // Exemple : vous pouvez ajouter des contraintes de validation pour le statut et la date de punition
+
+        // Enregistrez les modifications dans la base de données
+        $entityManager->flush();
+
+        // Renvoyez une réponse JSON avec les données mises à jour de l'utilisateur
+        return new JsonResponse($user);
+    }
+
+
+    #[Route('/{id}/editp', name: 'app_user_edit_Profile', methods: ['GET', 'POST'])]
+    public function editProfile(Request $request, User $user, EntityManagerInterface $entityManager,SluggerInterface $slugger): Response
+    {
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $image = $form->get('image')->getData();
+
+            // this condition is needed because the 'brochure' field is not required
+            // so the PDF file must be processed only when a file is uploaded
+            if ($image) {
+                $originalFilename = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$image->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $image->move(
+                        $this->getParameter('brochures_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    dd("Erreur");
+                }
+
+                $user->setImage($newFilename);
+
+            $entityManager->flush();}
+
+            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('user/editProfile.html.twig', [
+            'user' => $user,
+            'form' => $form,
+        ]);
+    }
+
+
+
+
+
+
+
+    #[Route('/{id}', name: 'app_user_delete', methods: ['POST','GET'])]
     public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
             $entityManager->remove($user);
+           // dd("dali");
             $entityManager->flush();
+
         }
 
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
