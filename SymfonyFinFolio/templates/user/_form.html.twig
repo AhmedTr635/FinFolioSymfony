@@ -1,34 +1,22 @@
 {{ form_start(form) }}
 
-{{ form_row(form.nom, {'attr': {'class': form_errors(form.nom)|default(null) ? 'error-border' : ''}}) }}
-{% if form_errors(form.nom) %}
-    <div class="error">{{ form_errors(form.nom) }}</div>
-{% endif %}
+{{ form_row(form.nom) }}
+
 
 {{ form_row(form.prenom, {'attr': {'class': form_errors(form.prenom)|default(null) ? 'error-border' : ''}}) }}
-{% if form_errors(form.prenom) %}
-    <div class="error">{{ form_errors(form.prenom) }}</div>
-{% endif %}
+
 
 {{ form_row(form.email, {'attr': {'class': form_errors(form.email)|default(null) ? 'error-border' : ''}}) }}
-{% if form_errors(form.email) %}
-    <div class="error">{{ form_errors(form.email) }}</div>
-{% endif %}
+
 
 {{ form_row(form.password, {'attr': {'class': form_errors(form.password)|default(null) ? 'error-border' : ''}}) }}
-{% if form_errors(form.password) %}
-    <div class="error">{{ form_errors(form.password) }}</div>
-{% endif %}
+
 
 {{ form_row(form.numtel, {'attr': {'class': form_errors(form.numtel)|default(null) ? 'error-border' : ''}}) }}
-{% if form_errors(form.numtel) %}
-    <div class="error">{{ form_errors(form.numtel) }}</div>
-{% endif %}
+
 
 {{ form_row(form.image, {'attr': {'class': form_errors(form.image)|default(null) ? 'error-border' : ''}}) }}
-{% if form_errors(form.image) %}
-    <div class="error">{{ form_errors(form.image) }}</div>
-{% endif %}
+
 
 {{ form_end(form) }}
 
@@ -158,6 +146,7 @@
         emailInput.addEventListener('input', validateEmail);
         numtelInput.addEventListener('input', validateNumtel);
         passwordInput.addEventListener('input', validatePassword);
+
     });
 
 </script>

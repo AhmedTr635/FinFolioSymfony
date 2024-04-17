@@ -1,0 +1,76 @@
+{{ form_start(form, {'attr': {'id': 'user-form-container'}}) }}
+
+{{ form_row(form.nom,  {'attr': {'class': 'form-control'}}) }}
+<div id="nomError" class="error-message"></div>
+
+{{ form_row(form.prenom,  {'attr': {'class': 'form-control'}}) }}
+<div id="prenomError" class="error-message"></div>
+
+{{ form_row(form.email,  {'attr': {'class': 'form-control'}}) }}
+<div id="emailError" class="error-message"></div>
+
+{{ form_row(form.numtel,  {'attr': {'class': 'form-control'}}) }}
+<div id="numtelError" class="error-message"></div>
+
+{{ form_row(form.image,  {'attr': {'class': 'form-control'}}) }}
+<div id="imageError" class="error-message"></div>
+
+{{ form_end(form) }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+        var form = document.getElementById('user-form-container');
+        if (form) {
+        var nomInput = document.getElementById('user_nomM');
+        var prenomInput = document.getElementById('user_prenomM');
+        var emailInput = document.getElementById('user_emailM');
+        var numtelInput = document.getElementById('user_numtelM');
+        var imageInput = document.getElementById('user_imageM');
+
+        var nomError = document.getElementById('nomError');
+        var prenomError = document.getElementById('prenomError');
+        var emailError = document.getElementById('emailError');
+        var numtelError = document.getElementById('numtelError');
+        var imageError = document.getElementById('imageError');
+
+        function validateForm() {
+        var nomValue = nomInput.value.trim();
+        var prenomValue = prenomInput.value.trim();
+        var emailValue = emailInput.value.trim();
+        var numtelValue = numtelInput.value.trim();
+        var imageValue = imageInput.files.length;
+
+        nomError.textContent = nomValue === '' ? 'Merci de saisir votre nom.' : '';
+        prenomError.textContent = prenomValue === '' ? 'Merci de saisir votre prénom.' : '';
+        emailError.textContent = emailValue === '' ? 'L\'email est obligatoire.' : '';
+        emailError.textContent = !isValidEmail(emailValue) ? 'L\'email n\'est pas valide.' : '';
+        numtelError.textContent = numtelValue === '' ? 'Merci de saisir votre numéro de téléphone.' : '';
+        numtelError.textContent = !isValidPhoneNumber(numtelValue) ? 'Entrez un numéro de téléphone valide.' : '';
+        imageError.textContent = imageValue === 0 ? 'Veuillez sélectionner une image.' : '';
+
+        var isValid = nomValue !== '' && prenomValue !== '' && emailValue !== '' && isValidEmail(emailValue) && numtelValue !== '' && isValidPhoneNumber(numtelValue) && imageValue !== 0;
+        document.getElementById('user_submit').disabled = !isValid;
+    }
+
+        function isValidEmail(email) {
+        var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    }
+
+        function isValidPhoneNumber(numtel) {
+        var regex = /^(\+216)?[2459]\d{7}$/;
+        return regex.test(numtel);
+    }
+
+        // Ajoutez des écouteurs d'événements sur les champs du formulaire pour la validation en temps réel
+        nomInput.addEventListener('input', validateForm);
+        prenomInput.addEventListener('input', validateForm);
+        emailInput.addEventListener('input', validateForm);
+        numtelInput.addEventListener('input', validateForm);
+        imageInput.addEventListener('change', validateForm);
+
+        validateForm(); // Appel initial pour la validation au chargement de la page
+    }
+    });
+
+</script>

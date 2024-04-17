@@ -28,7 +28,7 @@ class UserProfile extends AbstractType
         $builder
             ->add('nom', TextType::class, [
                 'attr' => [
-                    'id' => 'user_nom'
+                    'id' => 'user_nomM'
                 ],
                 'constraints' => [
                     new Assert\NotBlank([
@@ -56,7 +56,7 @@ class UserProfile extends AbstractType
             ])
             ->add('email', TextType::class, [
                 'attr' => [
-                    'id' => 'user_email'
+                    'id' => 'user_emailM'
                 ],
                 'constraints' => [
                     new Assert\NotBlank([
@@ -69,7 +69,7 @@ class UserProfile extends AbstractType
             ])
             ->add('numtel', TextType::class, [
                 'attr' => [
-                    'id' => 'user_numtel'
+                    'id' => 'user_numtelM'
                 ],
                 'constraints' => [
                     new Assert\NotBlank([
@@ -81,27 +81,13 @@ class UserProfile extends AbstractType
                     ]),
                 ],
             ])
-            ->add('password', PasswordType::class, [
-                'attr' => [
-                    'id' => 'user_password'
-                ],
-                'label' => 'Password',
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => "Le mot de passe est obligatoire",
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s:])([^\s]){8,}$/',
-                        'message' => 'minimum 8 caractères, un majuscule, un minuscule, un chiffre et un caractère spécial',
-                    ]),
-                ],
-            ])
+
             ->add('image', FileType::class, [
                 'label' => 'Votre image de profil (Des fichiers images uniquement)',
                 // unmapped means that this field is not associated to any entity property
                 'mapped' => false,
                 'attr' => [
-                    'id' => 'user_image'
+                    'id' => 'user_imageM'
                 ],
                 // make it optional so you don't have to re-upload the PDF file
                 // every time you edit the Product details

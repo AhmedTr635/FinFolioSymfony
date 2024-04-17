@@ -18,13 +18,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\IsTrue;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
+
 
 
 class UserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+
         $builder
             ->add('nom', TextType::class, [
                 'attr' => [
@@ -76,7 +79,7 @@ class UserType extends AbstractType
                         'message' => 'Merci de saisir votre numéro',
                     ]),
                     new Assert\Regex([
-                        'pattern' => '/^(\+216)?[2459]\d{7}$/',
+                        'pattern' => '/^[2459]\d{7}$/',
                         'message' => 'Entrez un numéro valide',
                     ]),
                 ],
@@ -110,6 +113,9 @@ class UserType extends AbstractType
                 // unmapped fields can't define their validation using annotations
                 // in the associated entity, so you can use the PHP constraint classes
                 'constraints' => [
+                    new NotBlank([
+                        'message' => 'Veuillez sélectionner une image.',
+                    ]),
                     new File([
                         'maxSize' => '2048k',
                         'mimeTypes' => [
@@ -118,10 +124,13 @@ class UserType extends AbstractType
                             'image/png',
                             'image/jpg',
                         ],
+
                         'mimeTypesMessage' => 'Please upload a valid Image',
                     ])
                 ],
             ])
+
+
             ->add('Enregistrer', SubmitType::class, [
                 'attr' => [
                     'id' => 'user_submit'

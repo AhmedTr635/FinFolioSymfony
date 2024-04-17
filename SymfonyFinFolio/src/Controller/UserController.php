@@ -405,8 +405,10 @@ class UserController extends AbstractController
 
     #[Route('/frontUser', name:'frontUser')]
     public function template (ManagerRegistry $managerRegistry,EntityManagerInterface $entityManager){
-
-        return $this->renderForm('user/editProfile.html.twig', [
+        $user=new  User();
+             $form = $this->createForm(UserProfile::class, $user);
+        return $this->renderForm('user/base.html.twig', [
+            "form" => $form
 
 
         ]);
@@ -447,6 +449,7 @@ if ($form->isSubmitted() && $form->isValid()) {
             }else{
                 if($user->getStatut()==='active'||$user->getStatut()==='ban' )
                     $user->setDatepunition(new \DateTime('0000-00-00'));
+                if($user->getStatut()!='active'&& $user->getStatut()!='ban'&& $user->getStatut()!='desactive' )
             $entityManager->flush();
 
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);}
@@ -484,9 +487,12 @@ if ($form->isSubmitted() && $form->isValid()) {
 
 
     #[Route('/{id}/editp', name: 'app_user_edit_Profile', methods: ['GET', 'POST'])]
-    public function editProfile(Request $request, User $user, EntityManagerInterface $entityManager,SluggerInterface $slugger): Response
+    public function editProfile(UserRepository $userRepository,Request $request, User $user, EntityManagerInterface $entityManager,SluggerInterface $slugger): Response
     {
-        $form = $this->createForm(UserType::class, $user);
+        $user2 = $userRepository->findOneBy(["email" => $user->getEmail()]);
+
+        $form = $this->createForm(UserProfile::class, $user);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -512,13 +518,13 @@ if ($form->isSubmitted() && $form->isValid()) {
 
                 $user->setImage($newFilename);
 
-            $entityManager->flush();}
-
+            }
+            $entityManager->flush();
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('user/editProfile.html.twig', [
-            'user' => $user,
+            'user' => $user2,
             'form' => $form,
         ]);
     }

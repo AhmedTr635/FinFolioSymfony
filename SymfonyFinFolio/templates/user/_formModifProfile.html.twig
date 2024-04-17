@@ -1,203 +1,76 @@
 {{ form_start(form) }}
 
-{{ form_row(form.nom, {'errors': 'none'}) }}
-{% if form_errors(form.nom) %}
-    <div class="error">{{ form_errors(form.nom) }}</div>
-{% endif %}
+{{ form_row(form.nom, {'attr': {'id': 'user_nomM'}}) }}
+<div id="nomError" class="error-message"></div>
 
-{{ form_row(form.prenom, {'errors': 'none'}) }}
-{% if form_errors(form.prenom) %}
-    <div class="error">{{ form_errors(form.prenom) }}</div>
-{% endif %}
+{{ form_row(form.prenom, {'attr': {'id': 'user_prenomM'}}) }}
+<div id="prenomError" class="error-message"></div>
 
-{{ form_row(form.email, {'errors': 'none'}) }}
-{% if form_errors(form.email) %}
-    <div class="error">{{ form_errors(form.email) }}</div>
-{% endif %}
+{{ form_row(form.email, {'attr': {'id': 'user_emailM'}}) }}
+<div id="emailError" class="error-message"></div>
 
-{{ form_row(form.password, {'errors': 'none'}) }}
-{% if form_errors(form.password) %}
-    <div class="error">{{ form_errors(form.password) }}</div>
-{% endif %}
+{{ form_row(form.numtel, {'attr': {'id': 'user_numtelM'}}) }}
+<div id="numtelError" class="error-message"></div>
 
-{{ form_row(form.numtel, {'errors': 'none'}) }}
-{% if form_errors(form.numtel) %}
-    <div class="error">{{ form_errors(form.numtel) }}</div>
-{% endif %}
-
-{{ form_row(form.image, {'errors': 'none'}) }}
-{% if form_errors(form.image) %}
-    <div class="error">{{ form_errors(form.image) }}</div>
-
-{% endif %}
+{{ form_row(form.image, {'attr': {'id': 'user_imageM'}}) }}
+<div id="imageError" class="error-message"></div>
 
 {{ form_end(form) }}
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        var nomInput = document.getElementById('user_nom');
-        var prenomInput = document.getElementById('user_prenom');
-        var emailInput = document.getElementById('user_email');
-        var numtelInput = document.getElementById('user_numtel');
-        var passwordInput = document.getElementById('user_password');
-        var form = document.getElementById('user_form');
 
-        // Ajoutez des écouteurs d'événements sur les champs du formulaire pour la validation en temps réel
-        nomInput.addEventListener('input', function() {
-            validateNom();
-        });
+        var form = document.getElementById('user-form-container');
+        if (form) {
+            var nomInput = document.getElementById('user_nomM');
+            var prenomInput = document.getElementById('user_prenomM');
+            var emailInput = document.getElementById('user_emailM');
+            var numtelInput = document.getElementById('user_numtelM');
+            var imageInput = document.getElementById('user_imageM');
 
-        prenomInput.addEventListener('input', function() {
-            validatePrenom();
-        });
+            var nomError = document.getElementById('nomError');
+            var prenomError = document.getElementById('prenomError');
+            var emailError = document.getElementById('emailError');
+            var numtelError = document.getElementById('numtelError');
+            var imageError = document.getElementById('imageError');
 
-        emailInput.addEventListener('input', function() {
-            validateEmail();
-        });
+            function validateForm() {
+                var nomValue = nomInput.value.trim();
+                var prenomValue = prenomInput.value.trim();
+                var emailValue = emailInput.value.trim();
+                var numtelValue = numtelInput.value.trim();
+                var imageValue = imageInput.files.length;
 
-        numtelInput.addEventListener('input', function() {
-            validateNumtel();
-        });
+                nomError.textContent = nomValue === '' ? 'Merci de saisir votre nom.' : '';
+                prenomError.textContent = prenomValue === '' ? 'Merci de saisir votre prénom.' : '';
+                emailError.textContent = emailValue === '' ? 'L\'email est obligatoire.' : '';
+                emailError.textContent = !isValidEmail(emailValue) ? 'L\'email n\'est pas valide.' : '';
+                numtelError.textContent = numtelValue === '' ? 'Merci de saisir votre numéro de téléphone.' : '';
+                numtelError.textContent = !isValidPhoneNumber(numtelValue) ? 'Entrez un numéro de téléphone valide.' : '';
+                imageError.textContent = imageValue === 0 ? 'Veuillez sélectionner une image.' : '';
 
-        passwordInput.addEventListener('input', function() {
-            validatePassword();
-        });
-        function validateForm() {
-            // Valider chaque champ du formulaire
-            var nomValid = validateNom();
-            var prenomValid = validatePrenom();
-            var emailValid = validateEmail();
-            var numtelValid = validateNumtel();
-            var passwordValid = validatePassword();
-
-            // Retourner true si tous les champs sont valides, sinon retourner false
-            return nomValid && prenomValid && emailValid && numtelValid && passwordValid;
-        }
-        // Fonctions de validation pour chaque champ
-        function validateNom() {
-            var nomValue = nomInput.value.trim();
-            if (nomValue === '') {
-                showError(nomInput, 'Merci de saisir votre nom.');
-                return false; // Validation échoue
-            } else if (nomValue.length < 3) {
-                showError(nomInput, 'Le nom doit avoir au moins 3 caractères.');
-                return false; // Validation échoue
-            } else {
-                hideError(nomInput);
-                return true; // Validation réussie
+                var isValid = nomValue !== '' && prenomValue !== '' && emailValue !== '' && isValidEmail(emailValue) && numtelValue !== '' && isValidPhoneNumber(numtelValue) && imageValue !== 0;
+                document.getElementById('user_submit').disabled = !isValid;
             }
-        }
 
-        function validatePrenom() {
-            var prenomValue = prenomInput.value.trim();
-            if (prenomValue === '') {
-                showError(prenomInput, 'Merci de saisir votre prénom.');
-                return false; // Validation échoue
-            } else if (prenomValue.length < 3) {
-                showError(prenomInput, 'Le prénom doit avoir au moins 3 caractères.');
-                return false; // Validation échoue
-            } else {
-                hideError(prenomInput);
-                return true; // Validation réussie
+            function isValidEmail(email) {
+                var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return regex.test(email);
             }
-        }
 
-        function validateEmail() {
-            var emailValue = emailInput.value.trim();
-            if (emailValue === '') {
-                showError(emailInput, "L'email est obligatoire.");
-                return false; // Validation échoue
-            } else if (!isValidEmail(emailValue)) {
-                showError(emailInput, "L'email n'est pas valide.");
-                return false; // Validation échoue
-            } else {
-                hideError(emailInput);
-                return true; // Validation réussie
+            function isValidPhoneNumber(numtel) {
+                var regex = /^(\+216)?[2459]\d{7}$/;
+                return regex.test(numtel);
             }
-        }
 
-        function validateNumtel() {
-            var numtelValue = numtelInput.value.trim();
-            if (numtelValue === '') {
-                showError(numtelInput, 'Merci de saisir votre numéro de téléphone.');
-                return false; // Validation échoue
-            } else if (!isValidPhoneNumber(numtelValue)) {
-                showError(numtelInput, 'Entrez un numéro de téléphone valide.');
-                return false; // Validation échoue
-            } else {
-                hideError(numtelInput);
-                return true; // Validation réussie
-            }
-        }
+            // Ajoutez des écouteurs d'événements sur les champs du formulaire pour la validation en temps réel
+            nomInput.addEventListener('input', validateForm);
+            prenomInput.addEventListener('input', validateForm);
+            emailInput.addEventListener('input', validateForm);
+            numtelInput.addEventListener('input', validateForm);
+            imageInput.addEventListener('change', validateForm);
 
-        function validatePassword() {
-            var passwordValue = passwordInput.value.trim();
-            if (passwordValue === '') {
-                showError(passwordInput, "Le mot de passe est obligatoire.");
-                return false; // Validation échoue
-            } else if (!isValidPassword(passwordValue)) {
-                showError(passwordInput, 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.');
-                return false; // Validation échoue
-            } else {
-                hideError(passwordInput);
-                return true; // Validation réussie
-            }
-        }
-
-        // Fonction pour afficher les erreurs en rouge
-        function showError(input, message) {
-            var errorDiv = input.nextElementSibling;
-            if (!errorDiv || !errorDiv.classList.contains('error-message')) {
-                errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
-                input.parentNode.insertBefore(errorDiv, input.nextElementSibling);
-            }
-            errorDiv.textContent = message;
-            errorDiv.style.color = 'red'; // Couleur rouge pour les messages d'erreur
-        }
-
-        // Fonction pour masquer les erreurs
-        function hideError(input) {
-            var errorDiv = input.nextElementSibling;
-            if (errorDiv && errorDiv.classList.contains('error-message')) {
-                errorDiv.textContent = '';
-            }
-        }
-
-        // Fonction pour valider l'email
-        function isValidEmail(email) {
-            var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return regex.test(email);
-        }
-
-        // Fonction pour valider le numéro de téléphone
-        function isValidPhoneNumber(numtel) {
-            var regex = /^(\+216)?[2459]\d{7}$/;
-            return regex.test(numtel);
-        }
-
-        // Fonction pour valider le mot de passe
-        function isValidPassword(password) {
-            var regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s:])([^\s]){8,}$/;
-            return regex.test(password);
-        }
-
-        // Fonction de validation du formulaire
-        function validateForm() {
-            // Valider chaque champ du formulaire
-            var nomValid = validateNom();
-            var prenomValid = validatePrenom();
-            var emailValid = validateEmail();
-            var numtelValid = validateNumtel();
-            var passwordValid = validatePassword();
-
-            // Retourner true si tous les champs sont valides, sinon retourner false
-            return nomValid && prenomValid && emailValid && numtelValid && passwordValid;
+            validateForm(); // Appel initial pour la validation au chargement de la page
         }
     });
-
-
-
-
-
 </script>
