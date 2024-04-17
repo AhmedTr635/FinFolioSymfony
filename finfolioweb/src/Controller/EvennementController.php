@@ -48,7 +48,16 @@ class EvennementController extends AbstractController
         $form = $this->createForm(EvennementType::class, $evennement);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {  $imageFile = $form->get('imageData')->getData();
+            if ($imageFile) {
+                $imageName = md5(uniqid()) . '.' . $imageFile->guessExtension();
+                $imageFile->move(
+                    $this->getParameter('images_directory'),
+                    $imageName
+                );
+                // Set the image filename in the entity
+                $evennement->setImageData('uploads/images/' . $imageName);
+            }
             $entityManager->persist($evennement);
             $entityManager->flush();
 
@@ -70,10 +79,24 @@ class EvennementController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $evennement = new Evennement();
+        if ($evennement->getDate() === null) {
+            $evennement->setDate(new \DateTime());
+        }
+
         $form = $this->createForm(EvennementType::class, $evennement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('imageData')->getData();
+            if ($imageFile) {
+                $imageName = md5(uniqid()) . '.' . $imageFile->guessExtension();
+                $imageFile->move(
+                    $this->getParameter('images_directory'),
+                    $imageName
+                );
+                // Set the image filename in the entity
+                $evennement->setImageData('uploads/images/' . $imageName);
+            }
             $entityManager->persist($evennement);
             $entityManager->flush();
 
@@ -120,9 +143,19 @@ class EvennementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('imageData')->getData();
+            if ($imageFile) {
+                $imageName = md5(uniqid()) . '.' . $imageFile->guessExtension();
+                $imageFile->move(
+                    $this->getParameter('images_directory'),
+                    $imageName
+                );
+                // Set the image filename in the entity
+                $evennement->setImageData('uploads/images/' . $imageName);
+            }
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_evennement_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_evennement_admin', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('evennement/edit.html.twig', [
@@ -140,7 +173,7 @@ class EvennementController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_evennement_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_evennement_admin', [], Response::HTTP_SEE_OTHER);
     }
 
 

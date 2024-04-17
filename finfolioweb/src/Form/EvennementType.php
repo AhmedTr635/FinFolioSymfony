@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Evennement;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -22,15 +23,7 @@ class EvennementType extends AbstractType
                 'attr' => [
                     'id' => 'event_nom'
                 ],
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'Merci de saisir le nom de l evennement',
-                    ]),
-                    new Assert\Length([
-                        'min' => 3,
-                        'minMessage' => 'Le nom doit avoir au moins {{ limit }} caractères',
-                    ]),
-                ],
+
             ])
             ->add('montant', NumberType::class, [
                 'attr' => ['class' => 'form-control'],
@@ -41,6 +34,7 @@ class EvennementType extends AbstractType
                 'attr' => ['class' => 'form-control'],
                 'label' => 'Date',
                 'widget' => 'single_text', // To use HTML5 date input
+                'required' => true,
             ])
             ->add('adresse', TextType::class, [
                 'attr' => ['class' => 'form-control'],
@@ -49,7 +43,13 @@ class EvennementType extends AbstractType
             ->add('description', TextareaType::class, [
                 'attr' => ['class' => 'form-control'],
                 'label' => 'Description'
-            ]);
+            ])
+            ->add('imageData', FileType::class, [
+                'label' => 'Image (JPEG, PNG, GIF)',
+                'required' => false,
+                'mapped' => false, // This field is not mapped to a property of the entity
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

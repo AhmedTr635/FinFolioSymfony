@@ -10,35 +10,66 @@
 <div class="form-group">
     {{ form_label(form.nom_event) }}
     {{ form_widget(form.nom_event, {'attr': {'class': 'form-control js-input', 'id': 'evennement_nom_event'}}) }}
+
     <span id="evennement_nom_event-error" class="error-message"></span>
+    {% if form_errors(form.nom_event) %}
+        <div class="error">{{ form_errors(form.nom_event) }}</div>
+    {% endif %}
 
 </div>
 
 <div class="form-group">
     {{ form_label(form.montant) }}
     {{ form_widget(form.montant, {'attr': {'class': 'form-control js-input', 'type': 'number', 'id': 'evennement_montant'}}) }}
+
     <span id="evennement_montant-error" class="error-message"></span>
+    {% if form_errors(form.montant) %}
+        <div class="error">{{ form_errors(form.montant) }}</div>
+    {% endif %}
 </div>
 
 <div class="form-group">
     {{ form_label(form.date) }}
-    {{ form_widget(form.date, {'attr': {'class': 'form-control js-input js-datepicker', 'type': 'date', 'id': 'evennement_date'}}) }}
+    {{ form_widget(form.date, {'attr': {'class': 'form-control js-input js-datepicker', 'type': 'date', 'id': 'evennement_date', 'required': 'required'}}) }}
+
+
     <span id="evennement_date-error" class="error-message"></span>
+    {% if form_errors(form.date) %}
+        <div class="error">{{ form_errors(form.date) }}</div>
+    {% endif %}
 
 </div>
 
 <div class="form-group">
     {{ form_label(form.adresse) }}
     {{ form_widget(form.adresse, {'attr': {'class': 'form-control js-input', 'id': 'evennement_adresse'}}) }}
+
     <span id="evennement_adresse-error" class="error-message"></span>
+    {% if form_errors(form.adresse) %}
+        <div class="error">{{ form_errors(form.adresse) }}</div>
+    {% endif %}
 
 </div>
 
 <div class="form-group">
     {{ form_label(form.description) }}
     {{ form_widget(form.description, {'attr': {'class': 'form-control js-input', 'id': 'evennement_description'}}) }}
-    <span id="evennement_description-error" class="error-message"></span>
 
+    <span id="evennement_description-error" class="error-message"></span>
+    {% if form_errors(form.description) %}
+        <div class="error">{{ form_errors(form.description) }}</div>
+    {% endif %}
+
+</div>
+
+<div class="form-group">
+    {{ form_label(form.imageData) }}
+    {{ form_widget(form.imageData, {'attr': {'class': 'form-control js-input', 'id': 'evennement_imageData'}}) }}
+
+    <span id="evennement_imageData-error" class="error-message"></span>
+    {% if form_errors(form.imageData) %}
+        <div class="error">{{ form_errors(form.imageData) }}</div>
+    {% endif %}
 </div>
 
 <div class="form-group">

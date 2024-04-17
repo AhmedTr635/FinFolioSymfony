@@ -77,7 +77,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <img class="img-fluid" src="../../assets/img/backgrounds/event.jpg" alt="Card image cap" />
+                            {% if evennement.imageData %}
+                                <img class="card-img-top" src="{{ asset(evennement.imageData) }}" alt="Card image cap" />
+                            {% else %}
+                                <img class="card-img-top" src="{{ asset('uploads/images/noimage.jpg') }}" alt="Card image cap" />
+                            {% endif %}
                             <div class="featured-date mt-n4 ms-4 bg-white rounded w-px-50 shadow text-center p-1">
                                 <h5 class="mb-0 text-dark">{{ evennement.date ? evennement.date|date('d') : '' }}</h5>
                                 <span class="text-primary">{{ evennement.date ? evennement.date|date('M') : '' }}</span>

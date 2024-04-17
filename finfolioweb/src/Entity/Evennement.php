@@ -28,18 +28,30 @@ class Evennement
 
     private ?float $montant = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: "datetime")]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(length: 255)]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 5000, nullable: true)]
-
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $rating = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imageData = null;
+
+    public function getImageData(): ?string
+    {
+        return $this->imageData;
+    }
+
+    public function setImageData(?string $imageData): void
+    {
+        $this->imageData = $imageData;
+    }
 
     #[ORM\OneToMany(mappedBy: 'evenement_id', targetEntity: Don::class)]
     private Collection $dons;
