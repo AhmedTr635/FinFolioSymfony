@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Your Request Credits{% endblock %}
+
+{% block content %}
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="row g-4 mb-4">
+            <!-- Cards and other content -->
+        </div>
+        <!-- Search Filter Card -->
+        <div class="card">
+            <div class="card-header border-bottom">
+                <h5 class="card-title">Search Filter</h5>
+                <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+                    <div class="col-md-4 user_role"></div>
+                    <div class="col-md-4 user_plan"></div>
+                    <div class="col-md-4 user_status"></div>
+                </div>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables-users table border-top dataTable no-footer dtr-column" id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
+                    <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Montant ($)</th>
+                        <th>Interest (%)</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for offre in offres %}
+                        <tr>
+                            <td>{{ offre.getUserId().getId() }}</td>
+                            <td>${{ offre.getMontant() }}</td>
+                            <td>{{ offre.getInteret() }}%</td>
+                            <td>
+                                <a href="{{ path('app_offre_edit', {'id': offre.getId()}) }}" class="btn btn-danger btn-sm refuse-btn">edit</a>
+                                <a href="{{ path('app_offre_delete', {'id': offre.getId()}) }}" class="btn btn-danger btn-sm refuse-btn">delete</a>
+                            </td>
+                        </tr>s
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div class="row mx-2">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">Showing 0 to 0 of 0 entries</div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+                            <ul class="pagination">
+                                <li class="paginate_button page-item previous disabled" id="DataTables_Table_0_previous"><a aria-controls="DataTables_Table_0" aria-disabled="true" role="link" data-dt-idx="previous" tabindex="-1" class="page-link">Previous</a></li>
+                                <li class="paginate_button page-item next disabled" id="DataTables_Table_0_next"><a aria-controls="DataTables_Table_0" aria-disabled="true" role="link" data-dt-idx="next" tabindex="-1" class="page-link">Next</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

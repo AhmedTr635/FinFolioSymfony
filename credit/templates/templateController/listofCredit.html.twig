@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Your Request Credits{% endblock %}
+
+{% block content %}
+
+    <style>
+        /* Add this CSS for card animation */
+        .ico-icon {
+        }
+
+        .ico-icon:hover {
+            transform: rotate(10deg) translateY(-3px);
+        }
+
+        .credit-card {
+            margin-bottom: 20px; /* Add margin at the bottom of each card */
+            cursor: auto;
+        }
+    </style>
+
+
+    <div style="margin: 50px;" class="container-fluid">
+    <div class="container-fluid mt-3" style="margin: 50px;" >
+        <input style="width: 80%; padding: 10px" type="text" id="searchInput" class="form-control" placeholder="Search credits">
+    </div>
+    <!-- Row -->
+    <div class="row" id="creditCardContainer">
+        {% for credit in credits %}
+            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 credit-card" id="creditCard{{ loop.index }}">
+                <div class="card pull-up"> <!-- Removed "credit-card" class here -->
+                    <div class="card-body align-items-center" style="padding: 15px;">
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="javascript:void(0)" class="ico-icon">
+                                <img src="/images/avatar/1.png" alt="Avatar" class="rounded" style="width: 50px; height: 50px;">
+                            </a>
+                            <div class="ms-2">
+                                {# <a href="javascript:void(0)"><h4 class="card-title mb-0">{{ credit.name }}</h4></a> #}
+                                {# <span>{{ credit.fullName }}</span> #}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <label for="loanAmount" class="mb-0 fs-12 text-dark font-w600">Amount Loan:</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <p id="loanAmount" class="mb-0 fs-12 text-dark font-w600">{{ credit.montant }}</p>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <label for="loanPeriod" class="mb-0 fs-12 text-dark font-w600">Loan Period:</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <p id="loanPeriod" class="mb-0 fs-12 text-dark font-w600">{{ credit.dateD ? credit.dateD|date('Y-m-d') : '' }} - {{ credit.dateF ? credit.dateF|date('Y-m-d') : '' }}</p>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <label for="interestMax" class="mb-0 fs-12 text-dark font-w600">Interest Max:</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <p id="interestMax" class="mb-0 fs-12 text-dark font-w600">{{ credit.interetMax }}%</p>
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <label for="interestMin" class="mb-0 fs-12 text-dark font-w600">Interest Min:</label>
+                            </div>
+                            <div class="col-sm-6">
+                                <p id="interestMin" class="mb-0 fs-12 text-dark font-w600">{{ credit.interetMin }}%</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <button type="button" class="btn btn-primary send-offer-btn" data-amount="{{ credit.montant }}" datamax="{{ credit.interetMax }}" datamin="{{ credit.interetMin }}" data-user-id="{{ credit.getUserId().getId() }}" data-credit-id="{{ credit.getId() }}">Send Offer</button>
+                            <a href="{{ path('app_chat', {'user_id': 113, 'credit_id': credit.id}) }}" class="btn btn-secondary" id="contactButton">Contact</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+    {# Include the offer popup within a block #}
+    {% block offer_popup %}
+        {% include 'templateController/offer_popup.html.twig' %}
+    {% endblock %}
+
+
+
+
+    <script>
+
+
+        document.querySelectorAll('.send-offer-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const amount = this.getAttribute('data-amount');
+                const intM = this.getAttribute('datamax');
+                const intMi = this.getAttribute('datamin');
+                const creditId = this.getAttribute('data-credit-id');
+                const userId = this.getAttribute('data-user-id');
+                const interest = `[%${intM}...${intMi}%]`;
+                // $('#offerPopup').find('.modal-body').html(`<p>Amount: ${amount}</p><p>Interest: ${interest}</p><p>Credit ID: ${creditId}</p><p>User ID: ${userId}</p>`);
+                $('#offerPopup').modal('show');
+
+                // Pass credit_id and user_id to hidden input fields in the modal
+                $('#creditIdInput').val(creditId);
+                $('#userIdInput').val(userId);
+                $('#interestLabel').text(`Interest: ${interest}`);
+            });
+        });
+    </script>
+
+    <script>
+        // JavaScript for live search
+        const searchInput = document.getElementById('searchInput');
+        const creditCards = document.querySelectorAll('.credit-card');
+
+        searchInput.addEventListener('input', function(event) {
+            const searchQuery = event.target.value.trim().toLowerCase();
+
+            creditCards.forEach(card => {
+                const cardAmount = card.querySelector('#loanAmount').textContent.trim().toLowerCase();
+
+                if (cardAmount.includes(searchQuery)) {
+                    card.style.display = 'block'; // Show matching card
+                } else {
+                    card.style.display = 'none'; // Hide non-matching card
+                }
+            });
+        });
+    </script>
+
+
+{% endblock %}

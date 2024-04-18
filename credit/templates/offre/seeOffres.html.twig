@@ -1,0 +1,151 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Your Request Credits{% endblock %}
+
+{% block content %}
+    <div class="container-xxl flex-grow-1 container-p-y">
+
+
+
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div class="content-left">
+                                <span>offers received</span>
+                                <div class="d-flex align-items-end mt-2">
+                                    <h4 class="mb-0 me-2">5</h4>
+                                    <small class="text-success">(+29%)</small>
+                                </div>
+                                <p class="mb-0"></p>
+                            </div>
+                            <div class="avatar">
+            <span class="avatar-initial rounded bg-label-primary">
+              <i class="bx bx-user bx-sm"></i>
+            </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-title d-flex align-items-start justify-content-between">
+                            <div class="avatar flex-shrink-0">
+                                <img src="../../assets/img/icons/unicons/cc-warning.png" alt="Credit Card" class="rounded">
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn p-0" type="button" id="cardOpt5" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="bx bx-dots-vertical-rounded"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="cardOpt5">
+                                    <a class="dropdown-item" href="javascript:void(0);">View More</a>
+                                    <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="d-block mb-1">Solde</span>
+                        <h3 class="card-title text-nowrap mb-2">$42,389</h3>
+                        <small class="text-success fw-medium"><i class="bx bx-up-arrow-alt"></i> +52.18%</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div class="content-left">
+                                <span>offers accepted</span>
+                                <div class="d-flex align-items-end mt-2">
+                                    <h4 class="mb-0 me-2">2</h4>
+                                    <small class="text-danger">(-14%)</small>
+                                </div>
+                                <p class="mb-0">Last week analytics</p>
+                            </div>
+                            <div class="avatar">
+            <span class="avatar-initial rounded bg-label-success">
+              <i class="bx bx-group bx-sm"></i>
+            </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div class="content-left">
+                                <span>offers pending</span>
+                                <div class="d-flex align-items-end mt-2">
+                                    <h4 class="mb-0 me-2">237</h4>
+                                    <small class="text-success">(+42%)</small>
+                                </div>
+                                <p class="mb-0">Last week analytics</p>
+                            </div>
+                            <div class="avatar">
+            <span class="avatar-initial rounded bg-label-warning">
+              <i class="bx bx-user-voice bx-sm"></i>
+            </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Users List Table -->
+        <!-- Users List Table -->
+        <div class="card">
+            <div class="card-header border-bottom">
+                <h5 class="card-title">Search Filter</h5>
+                <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0">
+                    <div class="col-md-4 user_role"></div>
+                    <div class="col-md-4 user_plan"></div>
+                    <div class="col-md-4 user_status"></div>
+                </div>
+            </div>
+            <div class="card-datatable table-responsive">
+                <table class="datatables-users table border-top dataTable no-footer dtr-column" id="DataTables_Table_0" aria-describedby="DataTables_Table_0_info">
+                    <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Montant ($)</th>
+                        <th>Interest (%)</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for offre in offres %}
+                        <tr>
+                            <td>{{ offre.getUserId()}}</td>
+                            <td>${{ offre.getMontant() }}</td>
+                            <td>{{ offre.getInteret() }}%</td>
+                            <td>
+                                <button class="btn btn-success btn-sm accept-btn">Accept</button>
+                                <button class="btn btn-danger btn-sm refuse-btn">Refuse</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <!-- Add more rows as needed -->
+                    </tbody>
+                </table>
+                <div class="row mx-2">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">Showing 0 to 0 of 0 entries</div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+                            <ul class="pagination">
+                                <li class="paginate_button page-item previous disabled" id="DataTables_Table_0_previous"><a aria-controls="DataTables_Table_0" aria-disabled="true" role="link" data-dt-idx="previous" tabindex="-1" class="page-link">Previous</a></li>
+                                <li class="paginate_button page-item next disabled" id="DataTables_Table_0_next"><a aria-controls="DataTables_Table_0" aria-disabled="true" role="link" data-dt-idx="next" tabindex="-1" class="page-link">Next</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

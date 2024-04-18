@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Your Request Credits{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title text-center">Your Credit Requests</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="DataTables_Table_0">
+                                <thead>
+                                <tr>
+                                    <th>Montant</th>
+                                    <th>InteretMax</th>
+                                    <th>InteretMin</th>
+                                    <th>Date Debut</th>
+                                    <th>Date Fin</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for credit in credits %}
+                                    <tr>
+                                        <td>{{ credit.montant }}</td>
+                                        <td>{{ credit.interetMax }}</td>
+                                        <td>{{ credit.interetMin }}</td>
+                                        <td>{{ credit.dateD ? credit.dateD|date('Y-m-d') : '' }}</td>
+                                        <td>{{ credit.dateF ? credit.dateF|date('Y-m-d') : '' }}</td>
+                                        <td>
+                                            <a href="{{ path('app_credit_show', {'id': credit.id}) }}" class="btn btn-sm btn-primary">Show</a>
+                                            <a href="{{ path('app_credit_edit', {'id': credit.id}) }}" class="btn btn-sm btn-success">Edit</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="dataTables_info" id="DataTables_Table_0_info" role="status" aria-live="polite">Showing 1 to {{ credits|length }} of {{ credits|length }} entries</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="dataTables_paginate paging_simple_numbers" id="DataTables_Table_0_paginate">
+                                    <ul class="pagination justify-content-end">
+                                        <li class="paginate_button page-item previous disabled" id="DataTables_Table_0_previous"><a aria-controls="DataTables_Table_0" aria-disabled="true" role="link" data-dt-idx="previous" tabindex="-1" class="page-link">Previous</a></li>
+                                        <li class="paginate_button page-item next disabled" id="DataTables_Table_0_next"><a aria-controls="DataTables_Table_0" aria-disabled="true" role="link" data-dt-idx="next" tabindex="-1" class="page-link">Next</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

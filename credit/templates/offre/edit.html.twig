@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Credit{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Edit offre</h5>
+                    </div>
+                    <div class="card-body">
+                        {% include 'offre/_form.html.twig' with {
+                            'button_label': 'Update',
+                            'hide_inputs': true
+                        } %}
+
+                        <a href="{{ path('app_offre_index') }}" class="btn btn-secondary">Back to list</a>
+
+                        {{ include('offre/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
