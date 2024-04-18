@@ -1,0 +1,494 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ActifCourant index{% endblock %}
+
+{% block body %}
+    <h1>ActifCourant index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>Name</th>
+                <th>Montant</th>
+                <th>Type</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for actif_courant in actif_courants %}
+            <tr>
+
+                <td>{{ actif_courant.name }}</td>
+                <td>{{ actif_courant.montant }}</td>
+                <td>{{ actif_courant.type }}
+                    {% if actif_courant.type == 'Voiture' %}
+                        <i class="fas fa-car"></i> <!-- Font Awesome car icon -->
+                    {% endif %}
+                    {% if actif_courant.type == 'Stocks' %}
+                        <i class="fas fa-chart-bar"></i> <!-- Font Awesome stocks icon -->
+                    {% endif %}</td>
+                <td>
+
+                    <!-- Edit Icon/Button -->
+                    <button class="btn btn-link" onclick="openEditActifModal('{{ actif_courant.id }}')">
+                        <i class="fas fa-edit" style="color: #007bff;"></i>
+                    </button>
+                    <!-- Delete Icon -->
+                    <button class="btn btn-link" onclick="confirmDelete({{ actif_courant.id }}, '{{ actif_courant.name }}')">
+                        <i class="fas fa-trash-alt" style="color: #dc3545;"></i>
+                    </button>
+
+
+
+
+
+
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <!-- Button to Open Add ActifCourant Modal -->
+    <button class="btn btn-primary" onclick="openAddActifModal()">Add ActifCourant</button>
+
+    <!-- Modal HTML for Add ActifCourant Form -->
+    <div id="addActifModal" class="modal" style="display: none;
+    justify-content: center; /* Horizontally center the modal content */
+    align-items: center; /* Vertically center the modal content */
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;">
+        <div class="modal-content" id="addActifModalContent"
+             style=" margin: 10% auto; margin-right: 20%; padding: 20px; border: 1px solid #888;
+
+             width: 40%; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            <span class="error" id="nameError"></span>
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmationModal" class="modal" style="display: none;
+         justify-content: center;
+         align-items: center;
+         background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;">
+        <div class="modal-content" id="deleteConfirmationContent"
+             style="margin: 10% auto;
+                    padding: 20px;
+                    background-color: #fff; /* White background */
+                    border: 1px solid #888;
+                    width: 40%;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+    <!-- Modal HTML for Edit Actif Form -->
+    <div id="editActifModal" class="modal" style="display: none;">
+        <div class="modal-content" id="editActifModalContent">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script>
+        function openAddActifModal() {
+            const modal = document.getElementById('addActifModal');
+            modal.style.display = 'block';
+
+            // Load the form content dynamically into the modal
+            const modalContent = document.getElementById('addActifModalContent');
+            modalContent.innerHTML = '';
+            fetch("{{ path('app_actif_courant_new') }}")
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+
+                })
+                .catch(error => {
+                    console.error('Error loading form:', error);
+                });
+        }
+
+        function closeAddActifModal() {
+            const modal = document.getElementById('addActifModal');
+            modal.style.display = 'none';
+        }
+        function confirmDelete(actifId, actifName) {
+            const modal = document.getElementById('deleteConfirmationModal');
+            modal.style.display = 'block';
+
+            // Load the delete confirmation form dynamically into the modal
+            const modalContent = document.getElementById('deleteConfirmationContent');
+            modalContent.innerHTML = '';
+
+            // Generate the delete URL with the actual actifId
+            const deleteUrl = "{{ path('app_actif_courant_delete', {'id': '__actif_id__'})|replace({'__actif_id__': 'actifId'}) }}".replace('actifId', actifId);
+
+            fetch(deleteUrl)
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+                    const actifNameElement = document.getElementById('actifNameToDelete');
+                    actifNameElement.textContent = actifName; // Set actif name in the confirmation message
+                })
+                .catch(error => {
+                    console.error('Error loading delete form:', error);
+                });
+        }
+
+        function closeDeleteConfirmationModal() {
+            const modal = document.getElementById('deleteConfirmationModal');
+            modal.style.display = 'none';
+        }
+
+        function openEditActifModal(actifId) {
+            const modal = document.getElementById('editActifModal');
+            modal.style.display = 'block';
+
+            // Load the edit form content dynamically into the modal
+            const modalContent = document.getElementById('editActifModalContent');
+            modalContent.innerHTML = '';
+
+            // Generate the edit URL with the actual actifId
+            const editUrl = "{{ path('app_actif_courant_edit', {'id': '__actif_id__'})|replace({'__actif_id__': 'actifId'}) }}".replace('actifId', actifId);
+
+            fetch(editUrl)
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading edit form:', error);
+                });
+        }
+
+        function closeEditActifModal() {
+            const modal = document.getElementById('editActifModal');
+            modal.style.display = 'none';
+        }
+
+        function attachFormSubmissionListener() {
+            const form = document.getElementById('newActifForm');
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault(); // Prevent default form submission
+
+                try {
+                    const formData = new FormData(form);
+
+                    const response = await fetch(form.action, {
+                        method: form.method,
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        // Form submitted successfully, close the modal
+                        closeAddActifModal();
+                        // Optionally, refresh or update the UI after successful submission
+                    } else {
+                        // Form submission failed, handle errors
+                        const responseData = await response.json();
+                        // Display error messages based on response data
+                        // Example: Update error elements in the loaded form content
+                        document.getElementById('nameError').textContent = responseData.errors.name || '';
+                        document.getElementById('montantError').textContent = responseData.errors.montant || '';
+                        document.getElementById('typeError').textContent = responseData.errors.type || '';
+                    }
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                }
+            });}
+
+
+    </script>
+
+
+<!-- Confirmation Modal (Hidden by Default) -->
+
+
+    {% block stylesheets %}
+        <style>
+        /* Custom CSS for table rows */
+        table.table {
+            width: 100%; /* Make the table fill its container */
+            border-collapse: collapse; /* Collapse table borders */
+            margin-bottom: 20px; /* Add spacing below the table */
+        }
+
+        table.table thead th {
+            background-color: rgba(0, 123, 255, 0.5); /* Header background color with reduced opacity */
+            color: #fff; /* Header text color */
+            padding: 15px; /* Header padding */
+            text-align: left;
+            font-weight: bold; /* Make header text bold */
+            font-size: 18px; /* Font size for headers *//* Header text alignment */
+        }
+
+        table.table tbody tr {
+            height: 80px; /* Row height */
+        }
+
+        table.table tbody tr td {
+            padding: 15px; /* Cell padding */
+            font-size: 18px; /* Font size */
+            text-align: left; /* Text alignment */
+            border-bottom: 1px solid #ddd; /* Bottom border for each row */
+        }
+
+        /* Custom font styles */
+        body {
+            font-family: 'Arial', sans-serif; /* Specify your preferred font */
+            font-size: 16px; /* Base font size */
+            line-height: 1.5; /* Line height for readability */
+            color: #333; /* Text color */
+        }
+
+        h1 {
+            font-size: 24px; /* Heading 1 font size */
+            margin-bottom: 20px; /* Bottom margin for headings */
+        }
+
+        /* Links */
+        a {
+            color: #007bff; /* Link color */
+            text-decoration: none; /* Remove underline */
+        }
+
+        a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+        #editActifModal {
+            display: none;
+            justify-content: center; /* Horizontally center the modal */
+            align-items: center; /* Vertically center the modal */
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Vertically center the modal */
+        }
+
+        #editActifModalContent {
+            width: 50%; /* Adjust the width of the modal content */
+            padding: 20px;
+            border: 1px solid #888;
+            background-color: #fff; /* White background for modal content */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            justify-content: center; /* Horizontally center the modal */
+            align-items: center;
+        }
+    </style>
+    {% endblock %}
+
+
+
+
+
+
+
+{% endblock %}
+{% block body2  %}
+    <h1>ActifNonCourant index</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+
+            <th>Name</th>
+            <th>Type</th>
+            <th>valeur</th>
+            <th>prix d'achat</th>
+            <th>actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for actif_non_courant in actif_non_courants %}
+            <tr>
+
+                <td>{{ actif_non_courant.name }}</td>
+
+                <td>{{ actif_non_courant.type }}
+                    {% if actif_non_courant.type == 'Voiture' %}
+                        <i class="fas fa-car"></i> <!-- Font Awesome car icon -->
+                    {% endif %}
+                    {% if actif_non_courant.type == 'Stocks' %}
+                        <i class="fas fa-chart-bar"></i> <!-- Font Awesome stocks icon -->
+                    {% endif %}</td>
+                <td>{{ actif_non_courant.valeur }}</td>
+
+
+                <td>
+                    <!-- Edit Icon/Button -->
+                    <button class="btn btn-link" onclick="openEditActifModal('{{ actif_non_courant.id }}')">
+                        <i class="fas fa-edit" style="color: #007bff;"></i>
+                    </button>
+                    <!-- Delete Icon -->
+                    <button class="btn btn-link" onclick="confirmDelete({{ actif_non_courant.id }}, '{{ actif_non_courant.name }}')">
+                        <i class="fas fa-trash-alt" style="color: #dc3545;"></i>
+                    </button>
+
+
+
+
+
+
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <!-- Button to Open Add ActifCourant Modal -->
+    <button class="btn btn-primary" onclick="openAddActifModal()">Add ActifNonCourant</button>
+
+    <!-- Modal HTML for Add ActifCourant Form -->
+    <div id="addActifModal" class="modal" style="display: none;
+    justify-content: center; /* Horizontally center the modal content */
+    align-items: center; /* Vertically center the modal content */
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;">
+        <div class="modal-content" id="addActifModalContent"
+             style=" margin: 10% auto; margin-right: 20%; padding: 20px; border: 1px solid #888;
+
+             width: 40%; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmationModal" class="modal" style="display: none;
+         justify-content: center;
+         align-items: center;
+         background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;">
+        <div class="modal-content" id="deleteConfirmationContent"
+             style="margin: 10% auto;
+                    padding: 20px;
+                    background-color: #fff; /* White background */
+                    border: 1px solid #888;
+                    width: 40%;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+    <!-- Modal HTML for Edit Actif Form -->
+    <div id="editActifModal" class="modal" style="display: none;">
+        <div class="modal-content" id="editActifModalContent">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script>
+        function openAddActifModal() {
+            const modal = document.getElementById('addActifModal');
+            modal.style.display = 'block';
+
+            // Load the form content dynamically into the modal
+            const modalContent = document.getElementById('addActifModalContent');
+            modalContent.innerHTML = '';
+            fetch("{{ path('app_actif_non_courant_new') }}")
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading form:', error);
+                });
+        }
+
+        function closeAddActifModal() {
+            const modal = document.getElementById('addActifModal');
+            modal.style.display = 'none';
+        }
+        function confirmDelete(actifId, actifName) {
+            const modal = document.getElementById('deleteConfirmationModal');
+            modal.style.display = 'block';
+
+            // Load the delete confirmation form dynamically into the modal
+            const modalContent = document.getElementById('deleteConfirmationContent');
+            modalContent.innerHTML = '';
+
+            // Generate the delete URL with the actual actifId
+            const deleteUrl = "{{ path('app_actif_non_courant_delete', {'id': '__actif_id__'})|replace({'__actif_id__': 'actifId'}) }}".replace('actifId', actifId);
+
+            fetch(deleteUrl)
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+                    const actifNameElement = document.getElementById('actifNameToDelete');
+                    actifNameElement.textContent = actifName; // Set actif name in the confirmation message
+                })
+                .catch(error => {
+                    console.error('Error loading delete form:', error);
+                });
+        }
+
+        function closeDeleteConfirmationModal() {
+            const modal = document.getElementById('deleteConfirmationModal');
+            modal.style.display = 'none';
+        }
+
+        function openEditActifModal(actifId) {
+            const modal = document.getElementById('editActifModal');
+            modal.style.display = 'block';
+
+            // Load the edit form content dynamically into the modal
+            const modalContent = document.getElementById('editActifModalContent');
+            modalContent.innerHTML = '';
+
+            // Generate the edit URL with the actual actifId
+            const editUrl = "{{ path('app_actif_non_courant_edit', {'id': '__actif_id__'})|replace({'__actif_id__': 'actifId'}) }}".replace('actifId', actifId);
+
+            fetch(editUrl)
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading edit form:', error);
+                });
+        }
+
+        function closeEditActifModal() {
+            const modal = document.getElementById('editActifModal');
+            modal.style.display = 'none';
+        }
+
+
+    </script>
+
+
+    <!-- Confirmation Modal (Hidden by Default) -->
+
+
+
+
+
+
+
+
+
+
+{% endblock %}
