@@ -3,25 +3,22 @@
 namespace App\Form;
 
 use App\Entity\User;
-use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
-use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 
-
-class UserProfile extends AbstractType
+class UserProfileType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+
         $builder
             ->add('nom', TextType::class, [
                 'attr' => [
@@ -78,7 +75,21 @@ class UserProfile extends AbstractType
                     ]),
                 ],
             ])
-
+            ->add('password', PasswordType::class, [
+                'attr' => [
+                    'id' => 'user_password'
+                ],
+                'label' => 'Password',
+                'constraints' => [
+                    new Assert\NotBlank([
+                        'message' => "Le mot de passe est obligatoire",
+                    ]),
+                    new Assert\Regex([
+                        'pattern' => '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s:])([^\s]){8,}$/',
+                        'message' => 'minimum 8 caractères, un majuscule, un minuscule, un chiffre et un caractère spécial',
+                    ]),
+                ],
+            ])
 
             ->add('image', FileType::class, [
                 'label' => 'Votre image de profil (Des fichiers images uniquement)',

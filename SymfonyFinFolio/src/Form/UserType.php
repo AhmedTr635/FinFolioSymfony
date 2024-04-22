@@ -33,71 +33,32 @@ class UserType extends AbstractType
                 'attr' => [
                     'id' => 'user_nom'
                 ],
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'Merci de saisir votre nom',
-                    ]),
-                    new Assert\Length([
-                        'min' => 3,
-                        'minMessage' => 'Le nom doit avoir au moins {{ limit }} caractères',
-                    ]),
-                ],
+
             ])
             ->add('prenom', TextType::class, [
                 'attr' => [
                     'id' => 'user_prenom'
                 ],
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'Merci de saisir votre prénom',
-                    ]),
-                    new Assert\Length([
-                        'min' => 3,
-                        'minMessage' => 'Le prénom doit avoir au moins {{ limit }} caractères',
-                    ]),
-                ],
+
             ])
             ->add('email', TextType::class, [
                 'attr' => [
                     'id' => 'user_email'
                 ],
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => "L'email est obligatoire",
-                    ]),
-                    new Assert\Email([
-                        'message' => "L'email n'est pas valide ",
-                    ])
-                ],
+
             ])
             ->add('numtel', TextType::class, [
                 'attr' => [
                     'id' => 'user_numtel'
                 ],
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => 'Merci de saisir votre numéro',
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/^[2459]\d{7}$/',
-                        'message' => 'Entrez un numéro valide',
-                    ]),
-                ],
+
             ])
             ->add('password', PasswordType::class, [
                 'attr' => [
                     'id' => 'user_password'
                 ],
                 'label' => 'Password',
-                'constraints' => [
-                    new Assert\NotBlank([
-                        'message' => "Le mot de passe est obligatoire",
-                    ]),
-                    new Assert\Regex([
-                        'pattern' => '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s:])([^\s]){8,}$/',
-                        'message' => 'minimum 8 caractères, un majuscule, un minuscule, un chiffre et un caractère spécial',
-                    ]),
-                ],
+
             ])
 
             ->add('image', FileType::class, [

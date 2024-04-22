@@ -4,10 +4,13 @@ namespace App\Entity;
 
 use App\Controller\MailService;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -17,29 +20,88 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
     #[ORM\Column(length: 50)]
+    /**
+     * @Assert\NotBlank(message="Le nom est obligatoire")
+     * @Assert\Length(min=3, minMessage="Le nom doit avoir au moins {{ limit }} caractères")
+     */
     private ?string $nom = null;
 
     #[ORM\Column(length: 50)]
+    /**
+     * @Assert\NotBlank(message="Le prénom est obligatoire")
+     * @Assert\Length(min=3, minMessage="Le prénom doit avoir au moins {{ limit }} caractères")
+     */
     private ?string $prenom = null;
 
     #[ORM\Column(length: 100, unique: true)]
+    /**
+     * @Assert\NotBlank(message="L'email est obligatoire")
+     * @Assert\Email(message="L'email n'est pas valide")
+     */
     private ?string $email = null;
 
-    private array $roles = [];
-
-    /**
-     * @var string The hashed password
-     */
-    #[ORM\Column(length: 100)]
-    private ?string $password = null;
     #[ORM\Column(length: 20)]
+    /**
+     * @Assert\NotBlank(message="Merci de saisir votre numéro")
+     * @Assert\Regex(
+     *     pattern="/^[2459]\d{7}$/",
+     *     message="Entrez un numéro valide"
+     * )
+     */
     private ?string $numtel = null;
+
+    #[ORM\Column(length: 100)]
+    /**
+     * @Assert\NotBlank(message="Le mot de passe est obligatoire")
+     * @Assert\Regex(
+     *     pattern="/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s:])([^\s]){8,}$/",
+     *     message="minimum 8 caractères, un majuscule, un minuscule, un chiffre et un caractère spécial"
+     * )
+     */
+    private ?string $password = null;
+
+    #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: Commande::class)]
+    private Collection $commandes;
+
+    public function __construct()
+    {
+        $this->commandes = new ArrayCollection();
+    }
+
+    public function getCommandes(): Collection
+    {
+        return $this->commandes;
+    }
+
+    public function addCommandes(Commande $commande): static
+    {
+        if (!$this->commandes->contains($commande)) {
+            $this->commandes->add($commande);
+            $commande->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDepense(Commande $commande): static
+    {
+        if ($this->commandes->removeElement($commande)) {
+            // set the owning side to null (unless already changed)
+            if ($commande->getUser() === $this) {
+                $commande->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 
 
 
 
     #[ORM\Column(length: 100)]
     private ?string $adresse = null;
+
+
 
     #[ORM\Column]
     private ?int $nbcredit = null;
@@ -65,6 +127,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?float $total_tax = null;
 
+
+
+
+
     public function getDatepunition(): ?\DateTimeInterface
     {
         return $this->datepunition;
@@ -77,6 +143,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 
     private ?string $code = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $typeCompte = null;
 
     public function getCode(): ?string
     {
@@ -310,6 +379,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTotalTax(float $total_tax): static
     {
         $this->total_tax = $total_tax;
+
+        return $this;
+    }
+
+    public function getTypeCompte(): ?string
+    {
+        return $this->typeCompte;
+    }
+
+    public function setTypeCompte(?string $typeCompte): static
+    {
+        $this->typeCompte = $typeCompte;
 
         return $this;
     }

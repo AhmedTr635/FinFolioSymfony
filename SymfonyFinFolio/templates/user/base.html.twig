@@ -1,76 +1,130 @@
-{{ form_start(form, {'attr': {'id': 'user-form-container'}}) }}
+<!DOCTYPE html>
+<html lang="en" class="light-style layout-navbar-fixed layout-menu-fixed layout-compact " dir="ltr" data-theme="theme-default" data-assets-path="{{ asset('assets/') }}" data-template="vertical-menu-template">
 
-{{ form_row(form.nom,  {'attr': {'class': 'form-control'}}) }}
-<div id="nomError" class="error-message"></div>
 
-{{ form_row(form.prenom,  {'attr': {'class': 'form-control'}}) }}
-<div id="prenomError" class="error-message"></div>
+<!-- Mirrored from demos.themeselection.com/sneat-bootstrap-html-admin-template/html/vertical-menu-template/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 21 Mar 2024 22:37:10 GMT -->
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-{{ form_row(form.email,  {'attr': {'class': 'form-control'}}) }}
-<div id="emailError" class="error-message"></div>
+    <title>Payement FinFolio </title>
 
-{{ form_row(form.numtel,  {'attr': {'class': 'form-control'}}) }}
-<div id="numtelError" class="error-message"></div>
 
-{{ form_row(form.image,  {'attr': {'class': 'form-control'}}) }}
-<div id="imageError" class="error-message"></div>
+    <meta name="description" content="Most Powerful &amp; Comprehensive Bootstrap 5 HTML Admin Dashboard Template built for developers!" />
+    <meta name="keywords" content="dashboard, bootstrap 5 dashboard, bootstrap 5 design, bootstrap 5">
+    <!-- Canonical SEO -->
+    <link rel="canonical" href="https://themeselection.com/item/sneat-bootstrap-html-admin-template/">
 
-{{ form_end(form) }}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
 
-        var form = document.getElementById('user-form-container');
-        if (form) {
-        var nomInput = document.getElementById('user_nomM');
-        var prenomInput = document.getElementById('user_prenomM');
-        var emailInput = document.getElementById('user_emailM');
-        var numtelInput = document.getElementById('user_numtelM');
-        var imageInput = document.getElementById('user_imageM');
+    <!-- ? PROD Only: Google Tag Manager (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
+    {#    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':#}
+    {#                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],#}
+    {#            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=#}
+    {#            '../../../../www.googletagmanager.com/gtm5445.html?id='+i+dl;f.parentNode.insertBefore(j,f);#}
+    {#        })(window,document,'script','dataLayer','GTM-5DDHKGP');</script>#}
+    {#    <!-- End Google Tag Manager -->#}
 
-        var nomError = document.getElementById('nomError');
-        var prenomError = document.getElementById('prenomError');
-        var emailError = document.getElementById('emailError');
-        var numtelError = document.getElementById('numtelError');
-        var imageError = document.getElementById('imageError');
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/img/favicon/favicon.ico" />
 
-        function validateForm() {
-        var nomValue = nomInput.value.trim();
-        var prenomValue = prenomInput.value.trim();
-        var emailValue = emailInput.value.trim();
-        var numtelValue = numtelInput.value.trim();
-        var imageValue = imageInput.files.length;
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&amp;display=swap" rel="stylesheet">
 
-        nomError.textContent = nomValue === '' ? 'Merci de saisir votre nom.' : '';
-        prenomError.textContent = prenomValue === '' ? 'Merci de saisir votre prénom.' : '';
-        emailError.textContent = emailValue === '' ? 'L\'email est obligatoire.' : '';
-        emailError.textContent = !isValidEmail(emailValue) ? 'L\'email n\'est pas valide.' : '';
-        numtelError.textContent = numtelValue === '' ? 'Merci de saisir votre numéro de téléphone.' : '';
-        numtelError.textContent = !isValidPhoneNumber(numtelValue) ? 'Entrez un numéro de téléphone valide.' : '';
-        imageError.textContent = imageValue === 0 ? 'Veuillez sélectionner une image.' : '';
+    <!-- Icons -->
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/fonts/boxicons.css') }}" />
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/fonts/fontawesome.css') }}" />
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/fonts/flag-icons.css') }}" />
 
-        var isValid = nomValue !== '' && prenomValue !== '' && emailValue !== '' && isValidEmail(emailValue) && numtelValue !== '' && isValidPhoneNumber(numtelValue) && imageValue !== 0;
-        document.getElementById('user_submit').disabled = !isValid;
-    }
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/css/rtl/core.css') }}" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/css/rtl/theme-default.css') }}" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="{{ asset('../../assets/css/demo.css') }}" />
 
-        function isValidEmail(email) {
-        var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-    }
+    <!-- Vendors CSS -->
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/typeahead-js/typeahead.css') }}" />
+    <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/apex-charts/apex-charts.css') }}" />
 
-        function isValidPhoneNumber(numtel) {
-        var regex = /^(\+216)?[2459]\d{7}$/;
-        return regex.test(numtel);
-    }
+    <!-- Page CSS -->
 
-        // Ajoutez des écouteurs d'événements sur les champs du formulaire pour la validation en temps réel
-        nomInput.addEventListener('input', validateForm);
-        prenomInput.addEventListener('input', validateForm);
-        emailInput.addEventListener('input', validateForm);
-        numtelInput.addEventListener('input', validateForm);
-        imageInput.addEventListener('change', validateForm);
 
-        validateForm(); // Appel initial pour la validation au chargement de la page
-    }
-    });
+    <!-- Helpers -->
+    <script src="{{ asset('../../assets/vendor/js/helpers.js') }}"></script>
+    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+    <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+    <script src="{{ asset('../../assets/vendor/js/template-customizer.js') }}"></script>
+    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+    <script src="{{ asset('../../assets/js/config.js') }}"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        /**
+         * The CSS shown here will not be introduced in the Quickstart guide, but shows
+         * how you can use CSS to style your Element's container.
+         */
+        .StripeElement {
+            box-sizing: border-box;
+            height: 40px;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background-color: white;
+            box-shadow: 0 1px 3px 0 #e6ebf1;
+            -webkit-transition: box-shadow 150ms ease;
+            transition: box-shadow 150ms ease;
+        }
 
-</script>
+        .StripeElement--focus {
+            box-shadow: 0 1px 3px 0 #cfd7df;
+        }
+
+        .StripeElement--invalid {
+            border-color: #0A9B01;
+        }
+
+        .StripeElement--webkit-autofill {
+            background-color: #fefde5 !important;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-dark bg-dark-red static-top">
+    <div class="container">
+        <a class="navbar-brand btn btn-primary" href=""> {{ "Dashboard" }} </a>
+
+        <div class="form-inline my-2 my-lg-0">
+            {% if app.user %}
+                <a href="" class="btn btn-primary btn-sm mt-3 mr-3 white">
+                    <i class="fa fa-card"></i> {{ 'Achats' }}
+                </a>
+
+
+            {% else %}
+
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+{% block body %}{% endblock %}
+
+<!-- Bootstrap core JavaScript -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" crossorigin="anonymous"></script>
+<script src="https://getbootstrap.com/docs/4.0/assets/js/vendor/popper.min.js"></script>
+<script src="https://getbootstrap.com/docs/4.0/dist/js/bootstrap.min.js"></script>
+<script src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
+
+{#<script type="text/javascript">#}
+{#    $(function () {#}
+{#        $('.datepicker').datepicker();#}
+{#    });#}
+{#</script>#}
+{% block javascripts %}{% endblock %}
+</body>
+</html>

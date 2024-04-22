@@ -19,11 +19,11 @@
 
 
     <!-- ? PROD Only: Google Tag Manager (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            '../../../../www.googletagmanager.com/gtm5445.html?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-5DDHKGP');</script>
+{#    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':#}
+{#                new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],#}
+{#            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=#}
+{#            '../../../../www.googletagmanager.com/gtm5445.html?id='+i+dl;f.parentNode.insertBefore(j,f);#}
+{#        })(window,document,'script','dataLayer','GTM-5DDHKGP');</script>#}
     <!-- End Google Tag Manager -->
 
     <!-- Favicon -->
@@ -1649,7 +1649,10 @@
                         <li class="nav-item navbar-dropdown dropdown-user dropdown">
                             <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                                 <div class="avatar avatar-online">
-                                    <img src="../../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle">
+                                    {% set cheminAbsolu = app.user.image %}
+
+                                    {% set nomFichier = "imagesUser/"~cheminAbsolu|split('\\')|last %}
+                                    <img src="{{ asset(nomFichier) }}" alt class="w-px-40 h-auto rounded-circle">
                                 </div>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -1658,12 +1661,16 @@
                                         <div class="d-flex">
                                             <div class="flex-shrink-0 me-3">
                                                 <div class="avatar avatar-online">
-                                                    <img src="../../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle">
+                                                    {% set cheminAbsolu = app.user.image %}
+
+                                                    {% set nomFichier = "imagesUser/"~cheminAbsolu|split('\\')|last %}
+
+                                                    <img src="{{ asset(nomFichier) }}" alt class="w-px-40 h-auto rounded-circle">
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <span class="fw-medium d-block">John Doe</span>
-                                                <small class="text-muted">Admin</small>
+                                                <span class="fw-medium d-block">{{ app.user.nom  ~ " " ~ app.user.prenom  }}</span>
+                                                <small class="text-muted">{{ app.user.role }}</small>
                                             </div>
                                         </div>
                                     </a>
@@ -1759,7 +1766,7 @@
                                 <div class="card-body">
                                     <div class="user-avatar-section">
                                         <div class=" d-flex align-items-center flex-column">
-                                            {% set cheminAbsolu = user.image %}
+                                            {% set cheminAbsolu = app.user.image %}
 
                                             {% set nomFichier = "imagesUser/"~cheminAbsolu|split('\\')|last %}
 
@@ -1805,7 +1812,6 @@
                                         </ul>
                                         <div class="d-flex justify-content-center pt-3">
                                             <a href="" class="btn btn-primary me-3" data-bs-target="#editUser" data-bs-toggle="modal">Edit</a>
-                                            <a href="javascript:;" class="btn btn-label-danger suspend-user">Suspended</a>
                                         </div>
                                     </div>
                                 </div>
@@ -1822,8 +1828,8 @@
                         <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
                             <!-- User Pills -->
                             <ul class="nav nav-pills flex-column flex-md-row mb-3">
-{#                                <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class="bx bx-user me-1"></i>Account</a></li>#}
-{#                                <li class="nav-item"><a class="nav-link" href="app-user-view-security.html"><i class="bx bx-lock-alt me-1"></i>Security</a></li>#}
+                                <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class="bx bx-user me-1"></i>Account</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{{ path('abb') }}"><i class="bx bx-lock-alt me-1"></i>Security</a></li>
 {#                                <li class="nav-item"><a class="nav-link" href="app-user-view-billing.html"><i class="bx bx-detail me-1"></i>Billing & Plans</a></li>#}
 {#                                <li class="nav-item"><a class="nav-link" href="app-user-view-notifications.html"><i class="bx bx-bell me-1"></i>Notifications</a></li>#}
 {#                                <li class="nav-item"><a class="nav-link" href="app-user-view-connections.html"><i class="bx bx-link-alt me-1"></i>Connections</a></li>#}

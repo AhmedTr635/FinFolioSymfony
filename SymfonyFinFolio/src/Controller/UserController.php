@@ -3,6 +3,8 @@
 namespace App\Controller;
 use App\Form\UserModifType;
 use App\Form\UserProfile;
+use App\Form\UserProfileType;
+use App\Repository\CommandeRepository;
 use App\Services\QrCodeService;
 use DateTime;
 use Doctrine\ORM\EntityManager;
@@ -28,18 +30,33 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Twilio\Rest\Client;
 
 
 #[Route('/user')]
 class UserController extends AbstractController
 {
-
+    private $accountSid;
+    private $authToken;
+    private $twilioPhoneNumber;
+    private $twilioClient;
+    private TokenStorageInterface $tokenStorage;
+    public function __construct(TokenStorageInterface $tokenStorage, string $accountSid, string $authToken, string $twilioPhoneNumber)
+    {
+        $this->tokenStorage = $tokenStorage;
+        $this->accountSid = $accountSid;
+        $this->authToken = $authToken;
+        $this->twilioPhoneNumber = $twilioPhoneNumber;
+        $this->twilioClient = new Client($accountSid, $authToken);
+    }
     #[Route('/', name: 'app_user_index', methods: ['GET', 'POST'])]
     public function index(PaginatorInterface $paginator,UserRepository $userRepository, Request $request, EntityManagerInterface $entityManager, ManagerRegistry $managerRegistry,SluggerInterface $slugger): Response
     {
         $user = new User();
-        $formModifier=$this->createForm(UserModifType::class);
+        $formModifier=$this->createForm(UserType::class);
         $form = $this->createForm(UserType::class, $user, [
             'required' => false, // Désactive la validation automatique des champs vides
         ]);
@@ -77,7 +94,7 @@ class UserController extends AbstractController
 
             $user->setRate(2);
             $user->setNbcredit(0);
-            $user->setRole("user");
+            $user->setRole("admin");
             $user->setSolde(2000);
             $user->setRate(2);
             $user->setStatut("active");
@@ -341,6 +358,14 @@ class UserController extends AbstractController
             $existingUser = $managerRegistry->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
             $existingUser->setPassword(sha1($submittedPassword));
             $entityManager->flush();
+//            $this->twilioClient->messages->create(
+//                "+21653604045",
+//                [
+//                    'from' => $this->twilioPhoneNumber,
+//                    'body' => "Ton mot de passe  a été changé avec succes."
+//                ]
+//            );
+            $this->addFlash('success', 'Mot de passe changé avec succes.');
 
 
             return $this->redirectToRoute('app_login');
@@ -404,14 +429,49 @@ class UserController extends AbstractController
 
 
     #[Route('/frontUser', name:'frontUser')]
-    public function template (ManagerRegistry $managerRegistry,EntityManagerInterface $entityManager){
-        $user=new  User();
-             $form = $this->createForm(UserProfile::class, $user);
-        return $this->renderForm('user/base.html.twig', [
-            "form" => $form
+    public function template (Request $request,ManagerRegistry $managerRegistry,EntityManagerInterface $entityManager){
+//        $this->twilioClient->messages->create(
+//                "+21653604045",
+//                [
+//                    'from' => $this->twilioPhoneNumber,
+//                    'body' => "Ton mot de passe  a été changé avec succes."
+//                ]
+//            );
+        if ($request->isMethod('POST')) {
+            // Retrieve submitted verification code from the request
+            $submittedVerificationCode = $request->request->get('verif');
+dd($submittedVerificationCode);
 
 
-        ]);
+        }
+
+            return $this->renderForm('user/SMS.html.twig'
+
+        );
+
+    }
+    #[Route('/abb', name:'abb')]
+    public function templatetest (Request $request,ManagerRegistry $managerRegistry,EntityManagerInterface $entityManager,Security $security){
+        if ($request->isMethod('POST')) {
+            // Retrieve submitted verification code from the request
+            $user = $security->getUser();
+            // Faire quelque chose avec l'utilisateur connecté
+            if ($user) {
+                $submittedPassword = $request->request->get('confirm-password');
+                $existingUser = $managerRegistry->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
+                $existingUser->setPassword(sha1($submittedPassword));
+                $entityManager->flush();
+//
+                $this->addFlash('success', 'Mot de passe changé avec succes.');
+
+            }
+
+
+        }
+
+        return $this->renderForm('user/securityProfile.html.twig'
+
+        );
 
     }
 
@@ -432,14 +492,16 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST','PUT'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(UserModifType::class, $user);
-        $form->handleRequest($request);
+        $form = $this->createForm(UserModifType::class, $user, array(
+            'method'=>'put'
+));        $form->handleRequest($request);
 
 
 if ($form->isSubmitted() && $form->isValid()) {
+    dd('cbn');
             $statut = $user->getStatut();
             $datepunition = $user->getDatePunition();
             if ($statut === 'desactive' && $datepunition <= new \DateTime()) {
@@ -449,8 +511,11 @@ if ($form->isSubmitted() && $form->isValid()) {
             }else{
                 if($user->getStatut()==='active'||$user->getStatut()==='ban' )
                     $user->setDatepunition(new \DateTime('0000-00-00'));
-                if($user->getStatut()!='active'&& $user->getStatut()!='ban'&& $user->getStatut()!='desactive' )
-            $entityManager->flush();
+//          if($user->getStatut()!='active'&& $user->getStatut()!='ban'&& $user->getStatut()!='desactive' )
+//          { $user->setStatut("active");
+//                $user->setDatepunition(new \DateTime('0000-00-00'));}
+
+                $entityManager->flush();
 
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);}
         }
@@ -485,13 +550,14 @@ if ($form->isSubmitted() && $form->isValid()) {
         return new JsonResponse($user);
     }
 
-
+//------------------Edit Profile--------------------------------------------------------
+//--------------------------------------------------------------------------------------
     #[Route('/{id}/editp', name: 'app_user_edit_Profile', methods: ['GET', 'POST'])]
     public function editProfile(UserRepository $userRepository,Request $request, User $user, EntityManagerInterface $entityManager,SluggerInterface $slugger): Response
     {
         $user2 = $userRepository->findOneBy(["email" => $user->getEmail()]);
 
-        $form = $this->createForm(UserProfile::class, $user);
+        $form = $this->createForm(UserType::class, $user);
 
         $form->handleRequest($request);
 
@@ -532,6 +598,58 @@ if ($form->isSubmitted() && $form->isValid()) {
 
 
 
+//----------------------------------------------------------
+//----------------------------Stripe-------------------------
+
+    #[Route('/payer', name: 'app_user_payer', methods: ['GET', 'POST'])]
+    public function payer(Request $request,CommandeRepository $commandeRepository ,Security $security): Response
+    {
+        // Récupérer d'autres données du formulaire si nécessaire
+        $choosePlan = $request->request->get('choosePlan');
+        $prix = 0; // Prix par défaut
+        $abonnement="abonnement";
+
+        if ($choosePlan === 'standard') {
+            $prix = 99;
+        } elseif ($choosePlan === 'exclusive') {
+            $prix = 299;
+        }
+
+        return $this->render('user/payer.html.twig', [
+            'prix' => $prix,
+            'user' => $security->getUser(),
+            'intentSecret' => $commandeRepository->intentSecret($prix),
+            'abonnement' =>$abonnement
+
+            // Autres données à passer au modèle Twig si nécessaire
+        ]);
+    }
+    #[Route('/payer/subscription', name: 'app_user_payer_subscription', methods: ['GET', 'POST'])]
+
+    public function subscription( Request $request, CommandeRepository $commandeRepository,Security $security,EntityManagerInterface $em){
+        $user = $this->getUser();
+        $prix=99;
+        $abonnement="abonnement";
+        if($request->getMethod() === "POST") {
+//            dd($commandeRepository->stripe($_POST, $prix,$abonnement));
+            $resource = $commandeRepository->stripe($_POST, $prix,$abonnement);
+
+            if(null !== $resource) {
+                $commandeRepository->create_subscription($resource, $user,$prix,$em);
+
+                return $this->render('user/responsePayement.html.twig', [
+                    'prix' => $prix,
+                    'abonnement' =>$abonnement
+                ]);
+            }
+        }
+
+        return $this->redirectToRoute('app_user_payer',
+        );
+    }
+//----------------------------------------------------------
+//<!----------------------------Stripe------------------------->
+
 
 
 
@@ -548,6 +666,37 @@ if ($form->isSubmitted() && $form->isValid()) {
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
     }
 
+//    #[Route('/changerPasswordProfile', name: 'mdpCh_profil_page')]
+//    public function passwordProfileChanger(Request $request,ManagerRegistry $managerRegistry,  EntityManagerInterface $entityManager ,Security $security )
+//    {
+//
+//
+//
+//        // Comparer les codes de vérification
+//        if ($request->isMethod('POST')) {
+//            // Retrieve submitted verification code from the request
+//            //$user = $security->getUser();
+//$user = new User();
+//            // Faire quelque chose avec l'utilisateur connecté
+//            if ($user) {
+//                $submittedPassword = $request->request->get('newPassword');
+//                $existingUser = $managerRegistry->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
+//                $existingUser->setPassword(sha1($submittedPassword));
+//                $entityManager->flush();
+////
+//                $this->addFlash('success', 'Mot de passe changé avec succes.');
+//
+//            }
+//            else dd('tehche');
+//
+//
+//        }
+//
+//        return $this->renderForm('user/securityProfile.html.twig',[
+//        ]);
+//
+//
+//    }
 
 
 ///////////////////////////////////////////////////
