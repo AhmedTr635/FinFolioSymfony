@@ -21,6 +21,7 @@ class ActifCourantController extends AbstractController
         return $this->render('actif_courant/index.html.twig', [
             'actif_courants' => $actifCourantRepository->findAll(),
             'actif_non_courants' => $actifNonCourantRepository->findAll(),
+            ->attach($pdfContent, 'actif_courant_report.pdf', 'application/pdf');
         ]);
     }
     #[Route('/psdf', name: 'test', methods: ['GET'])]
