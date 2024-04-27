@@ -27,7 +27,7 @@ class EvennementType extends AbstractType
             ])
             ->add('montant', NumberType::class, [
                 'attr' => ['class' => 'form-control'],
-                'label' => 'Amount',
+                'label' => 'Montant',
                 'required' => false
             ])
             ->add('date', DateTimeType::class, [

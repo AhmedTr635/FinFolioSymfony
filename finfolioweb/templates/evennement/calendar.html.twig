@@ -1,0 +1,148 @@
+
+{% extends 'sidebar.html.twig' %}
+{% block container %}
+    {% block the_navbar %}
+
+        <!-- Core CSS -->
+        <link rel="stylesheet" href="../../assets/vendor/css/rtl/core.css" class="template-customizer-core-css" />
+        <link rel="stylesheet" href="../../assets/vendor/css/rtl/theme-default.css" class="template-customizer-theme-css" />
+        <link rel="stylesheet" href="../../assets/css/demo.css" />
+
+        <!-- Vendors CSS -->
+        <link rel="stylesheet" href="../../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+        <link rel="stylesheet" href="../../assets/vendor/libs/typeahead-js/typeahead.css" />
+        <link rel="stylesheet" href="../../assets/vendor/libs/fullcalendar/fullcalendar.css" />
+
+        {% block body %}
+            <div id="calendar" class="custom-calendar"></div>
+        {% endblock %}
+
+        {% block javascripts %}
+            <script>
+
+                // assets/calendar.js
+
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+            <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+            <script>
+
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    var calendarEl = document.getElementById('calendar');
+
+                    var calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: 'dayGridMonth', // Display the month view initially
+                        headerToolbar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        },
+                        events: {
+                            url: '/event/fetch', // Endpoint to fetch events
+                            method: 'GET',
+                            failure: function() {
+                                alert('Failed to load events.');
+                            }
+                        }
+                    });
+                    function assignRandomColors() {
+                        $('.fc-event').each(function() {
+                            // Generate a random color in hexadecimal format
+                            var randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+                            // Apply the random color to the background
+                            $(this).css('background-color', randomColor);
+                        });
+                    }
+
+// Call the function when the document is ready
+                    $(document).ready(function() {
+                        assignRandomColors();
+                    });
+
+                    calendar.render();
+                });
+
+
+
+            </script>
+
+            <style>
+                /* Custom styles for the calendar */
+                .custom-calendar {
+                    width: 80%;
+                    margin: auto;
+                    font-family: Arial, sans-serif;
+                    border-radius: 10px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    background-color: #fff;
+                    padding: 20px;
+                    box-sizing: content-box;
+                }
+
+                /* Style for the header */
+                .fc-header-toolbar {
+                    background-color: #f0f0f0;
+                    border-bottom: 1px solid #ddd;
+                }
+
+                /* Style for the buttons */
+                .fc-button {
+                    background-color: #fff;
+                    color: #666;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    margin: 0 5px;
+                    padding: 6px 10px;
+                    font-size: 14px;
+                    cursor: pointer;
+                }
+
+                .fc-button:hover {
+                    background-color: #f5f5f5;
+                }
+
+                /* Style for the today button */
+                .fc-button-today {
+                    background-color: #007bff;
+                    color: #fff;
+                }
+
+                .fc-button-today:hover {
+                    background-color: #0056b3;
+                }
+
+                /* Style for the event dots */
+                .fc-event-dot {
+                    background-color: #007bff;
+                    border-radius: 50%;
+                    width: 8px;
+                    height: 8px;
+                }
+
+                /* Style for the event title */
+                .fc-event-title {
+                    font-size: 14px;
+                    font-weight: bold;
+                }
+
+                /* Style for the event time */
+                .fc-event-time {
+                    font-size: 12px;
+                    color: #666;
+                }
+
+                /* Style for the event details */
+                .fc-event-details {
+                    margin-top: 5px;
+                    font-size: 12px;
+                    color: #888;
+                }
+
+
+
+
+            </style>
+        {% endblock %}
+    {% endblock %}
+{% endblock %}

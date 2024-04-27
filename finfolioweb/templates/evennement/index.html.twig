@@ -8,19 +8,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 
-    {% block body %}
 
+    {% block body %}
 
         <div class="container-xxl flex-grow-1 container-p-y">
             <div class="row align-items-center">
-                <div class="col-md-6 mb-4">
+                <div class="col-md-6 mb-4 mr-md-1"> <!-- Add smaller margin to the right -->
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
                         <input type="text" id="eventSearch" placeholder="Search..." class="form-control border-start-0 rounded-end">
                     </div>
+
                 </div>
+                <!-- Button column -->
+                <div class="col-md-6 mb-4 d-flex justify-content-md-end">
+                    <div class="col-md-6 mb-4 d-flex justify-content-md-end">
+                        <button id="myEventsBtn" class="btn btn-primary" data-url="{{ path('my_donated_events') }}">Mes événements</button>
+                    </div>
+                    <div class="col-md-6 mb-4 d-flex justify-content-md-end">
+                        <!-- Add the "Calendrier" button here -->
+                        <a href="{{ path('app_event_calendar') }}" class="btn btn-primary">Calendrier</a>
+                    </div>
+                </div>
+                </div>
+
+
             </div>
         </div>
+
 
 
 
@@ -33,10 +48,10 @@
                 <div id="upcomingEvent">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title">Upcoming Event</h5>
+                            <h5 class="card-title">Evenement à venir</h5>
                         </div>
                         <div class="card-body">
-                            <h5>{{ upcomingEvent.nomEvent }}</h5>
+                            <h5>{{ upcomingEvent.nomEvent|trans|raw }}</h5>
                             <p>{{ upcomingEvent.date ? upcomingEvent.date|date('d M Y \\a\\t h:i A') : '' }}</p>
                             <!-- Add more details if needed -->
                         </div>
@@ -69,10 +84,18 @@
                                                 <i class="bx bx-chevron-down"></i>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="eventList">
-                                                <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>
-                                                <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
-                                                <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
+                                                <a class="dropdown-item" id="voirDetailsBtn{{ evennement.id }}">Voir Details</a>
                                             </div>
+
+                                            <!-- Modal for Event Description -->
+                                            <div id="eventDescriptionModal{{ evennement.id }}" class="modal">
+                                                <div class="modal-content">
+                                                    <span class="close" onclick="closeEventDescriptionPopup({{ evennement.id }})">&times;</span>
+                                                    <h2>{{ evennement.nomEvent }}</h2>
+                                                    <p>{{ evennement.description }}</p>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -105,7 +128,7 @@
                                     </div>
 
 
-                                    <button class="btn-give-donation btn-primary ms-auto" data-event-id="{{ evennement.id }}">Give Donation</button> <!-- Add data-event-id attribute -->
+                                    <button class="btn-give-donation btn-primary ms-auto" id="donation_button" data-event-id="{{ evennement.id }}">Faire un don</button>
 
                                 </div>
                                 <div class="d-flex align-items-center justify-content-between">
@@ -120,14 +143,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="dropup d-none d-sm-block">
 
-                                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sharedList">
-                                            <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>
-                                            <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
-                                            <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
-                                        </div>
-                                    </div>
 
                                     <div id="donationModal{{ evennement.id }}" class="modal"> <!-- Append evennement.id to the id -->
                                         <div class="modal-content">
@@ -135,6 +151,7 @@
                                             <h2>Give Donation</h2>
                                             <p>Enter the donation amount:</p>
                                             <form id="donationForm{{ evennement.id }}" action="{{ path('app_don_give_donation', {'id': evennement.id}) }}" method="POST" novalidate>
+                                                <input type="hidden" name="user_id" value="118"> <!-- Replace '118' with the actual user ID -->
                                                 <input type="text" id="donationAmount" name="montant" placeholder="Enter amount" required>
                                                 <div id="amountValidationMessage" class="validation-message"></div>
                                                 <button type="submit">Submit</button>
@@ -155,8 +172,12 @@
 
 
 
-
-
+        <div id="myEventsModal" class="modal">
+            <div class="modal-content" id="myEventsContent">
+                <span class="close">&times;</span>
+                <!-- Content will be loaded here dynamically -->
+            </div>
+        </div>
 
 
 
@@ -180,35 +201,60 @@
 
 
 
+    ////////////////////////////////////Voir Details////////////////////////////////////////////////////////
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const donationAmountInput = document.getElementById('donationAmount');
-        const amountValidationMessage = document.getElementById('amountValidationMessage');
 
-        donationAmountInput.addEventListener('input', function () {
-            validateAmountInput(this.value);
-        });
+        // Function to open the event description modal
+        function openEventDescriptionPopup(eventId) {
+        const modal = document.getElementById('eventDescriptionModal' + eventId);
+        modal.style.display = 'block';
+    }
 
-        function validateAmountInput(amount) {
-            // Check if the amount is a valid number
-            if (!isNaN(amount) && amount >= 0) {
-                // Reset validation message if the input is valid
-                amountValidationMessage.textContent = '';
-                return true;
-            } else {
-                // Display validation message if the input is invalid
-                amountValidationMessage.textContent = 'Please enter a valid amount';
-                return false;
-            }
-        }
+        // Function to close the event description modal
+        function closeEventDescriptionPopup(eventId) {
+        const modal = document.getElementById('eventDescriptionModal' + eventId);
+        modal.style.display = 'none';
+    }
+
+        document.addEventListener('DOMContentLoaded', function () {
+        // Add event listeners to all "Voir Details" buttons
+        const voirDetailsButtons = document.querySelectorAll('[id^="voirDetailsBtn"]');
+        voirDetailsButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+        const eventId = button.getAttribute('id').replace('voirDetailsBtn', '');
+        openEventDescriptionPopup(eventId);
+    });
+    });
     });
 
+    //////////////////////////////////////////Donation/////////////////////////////////////////////////////////////
+document.addEventListener('DOMContentLoaded', function () {
+    const donationAmountInput = document.getElementById('donationAmount');
+    const amountValidationMessage = document.getElementById('amountValidationMessage');
+
+    donationAmountInput.addEventListener('input', function () {
+        validateAmountInput(this.value);
+    });
+
+    function validateAmountInput(amount) {
+        // Check if the amount is a valid number
+        if (!isNaN(amount) && amount >= 0) {
+            // Reset validation message if the input is valid
+            amountValidationMessage.textContent = '';
+            return true;
+        } else {
+            // Display validation message if the input is invalid
+            amountValidationMessage.textContent = 'Please enter a valid amount';
+            return false;
+        }
+    }
+});
 
 
 
 
 
-    // Get the input field and event cards
+
     const searchInput = document.getElementById('eventSearch');
     const eventCards = document.querySelectorAll('.events');
 
@@ -297,7 +343,7 @@
                 const eventAmount = upcomingEvent.querySelector('.event-montant ').textContent.trim();
 
                 // Create HTML markup for the upcoming event
-                                const eventHTML = `
+                const eventHTML = `
                             <div class="upcoming-event" style="background-color: #ffffff; border-radius: 10px; padding: 20px; margin: 0 auto; max-width: 95%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-bottom: 20px">
                     <h4 style="margin-top: 0;">${eventName}</h4>
                     <p class="event-info" style="margin-top: 10px;"><strong>Date:</strong> ${eventDate} | <strong>Address:</strong> ${eventAddress} | <strong>Amount:</strong> ${eventAmount}</p>
@@ -327,8 +373,36 @@
     });
 
 
+    //MyEvents
+// Get the button and modal elements
+const myEventsBtn = document.getElementById('myEventsBtn');
+const myEventsModal = document.getElementById('myEventsModal');
+const myEventsContent = document.getElementById('myEventsContent');
 
-    // date filter
+// Add click event listener to the button
+myEventsBtn.addEventListener('click', function() {
+    // Fetch the URL from the data attribute
+    const url = myEventsBtn.getAttribute('data-url');
+
+    // Fetch the content of the modal using AJAX
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            // Set the fetched content as the inner HTML of the modal content element
+            myEventsContent.innerHTML = data;
+            // Show the modal
+            myEventsModal.style.display = 'block';
+        })
+        .catch(error => console.error('Error fetching my donated events:', error));
+});
+
+// Add click event listener to the close button of the modal
+document.querySelector('.close').addEventListener('click', function() {
+    // Close the modal when the close button is clicked
+    myEventsModal.style.display = 'none';
+});
+
+
 
 </script>
 

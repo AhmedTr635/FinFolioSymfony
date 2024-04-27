@@ -21,27 +21,56 @@ class Evennement
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-
+    #[Assert\NotBlank(message: "Le nom est obligatoire")]
+    #[Assert\Regex(
+        pattern: "/^[a-zA-Z\s]*$/",
+        message: "Le nom doit contenir que des lettres"
+    )]
     private ?string $nom_event = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\NotBlank(message: "Le montant est obligatoire")]
+    #[Assert\Type(
+        type: "numeric",
+        message: "le montant doit etre une valeur numerique"
+    )]
+    #[Assert\Positive(
 
+        message: "Le montant ne doit pas etre negatif"
+    )]
     private ?float $montant = null;
 
     #[ORM\Column(type: "datetime")]
+    #[Assert\NotBlank(message: "La date est obligatoire")]
+    #[Assert\GreaterThanOrEqual(
+        value: "today",
+        message: "La date doit etre une date future"
+    )]
     private ?\DateTimeInterface $date = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "L adresse est obligatoire")]
+    #[Assert\Length(
+        min: 10,
+        minMessage: "L adresse doit contenir au moins 10 charateres"
+    )]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 5000, nullable: true)]
+    #[Assert\NotBlank(message: "La descripton est obligatoire")]
+    #[Assert\Length(
+        min: 20,
+        minMessage: "La description doit contenir  au moins 20 charateres"
+    )]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $rating = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageData = null;
+
+
+
 
     public function getImageData(): ?string
     {
@@ -56,9 +85,14 @@ class Evennement
     #[ORM\OneToMany(mappedBy: 'evenement_id', targetEntity: Don::class)]
     private Collection $dons;
 
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'evennements')]
+    private Collection $user;
+
     public function __construct()
     {
         $this->dons = new ArrayCollection();
+        $this->user = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -164,6 +198,30 @@ class Evennement
                 $don->setEvenementId(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUser(): Collection
+    {
+        return $this->user;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->user->contains($user)) {
+            $this->user->add($user);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        $this->user->removeElement($user);
 
         return $this;
     }

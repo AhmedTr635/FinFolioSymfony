@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Don;
 use App\Entity\Evennement;
+use App\Entity\User;
 use App\Form\DonType;
 use App\Repository\DonRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -87,19 +88,31 @@ class DonController extends AbstractController
         // Retrieve the submitted donation amount from the request
         $amount = $request->request->get('montant');
 
+        // Get the user by ID (replace 118 with the ID you choose)
+        $userId = 118;
+        $entityManager = $this->getDoctrine()->getManager();
+        $user = $entityManager->getRepository(User::class)->find($userId);
+
         // Create a new Don entity and set its properties
         $donation = new Don();
         $donation->setMontantUser($amount);
         $donation->setEvenementId($evennement);
 
+        // Set the user for the donation
+        $donation->setUserId($user);
+
         // Persist the donation entity to the database
-        $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($donation);
         $entityManager->flush();
 
         // Optionally, redirect the user to a different page
         return $this->redirectToRoute('app_evennement_index');
     }
+
+
+
+
+
 
 
     #[Route('/donations', name: 'donations')]

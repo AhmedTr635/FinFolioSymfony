@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Don;
 use App\Entity\Evennement;
+use App\Entity\User;
 use App\Form\EvennementType;
 use App\Repository\DonRepository;
 use App\Repository\EvennementRepository;
@@ -11,9 +12,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 
 #[Route('/event')]
 class EvennementController extends AbstractController
@@ -22,20 +26,56 @@ class EvennementController extends AbstractController
      * @throws NonUniqueResultException
      */
     #[Route('/', name: 'app_evennement_index', methods: ['GET'])]
-    public function index(EvennementRepository $evennementRepository): Response
+    public function index(EvennementRepository $evennementRepository, Request $request): Response
+
     {
+
+        dump($request->getLocale());
         // Fetch all events
         $evennements = $evennementRepository->findAll();
 
         // Fetch upcoming event
         $upcomingEvent = $evennementRepository->findUpcomingEvent();
 
+
+
         // Render the template with both the list of events and the upcoming event
         return $this->render('evennement/index.html.twig', [
             'evennements' => $evennements,
             'upcomingEvent' => $upcomingEvent,
+
+
         ]);
     }
+
+
+
+
+
+
+    #[Route('/fetch', name: 'app_evennement_fetch', methods: ['GET'])]
+    public function fetch(EvennementRepository $evennementRepository): JsonResponse
+    {
+        // Fetch all events
+        $events = $evennementRepository->findAll();
+
+        // Format events for FullCalendar
+        $formattedEvents = [];
+        foreach ($events as $event) {
+            $formattedEvents[] = [
+                'title' => $event->getNomEvent(),
+                'start' => $event->getDate()->format('Y-m-d'),
+                // Add other event properties as needed
+            ];
+        }
+
+        // Return events as JSON response
+        return new JsonResponse($formattedEvents);
+    }
+
+
+
+
 
 
     #[Route('/admin', name: 'app_evennement_admin', methods: ['GET'])]
@@ -195,6 +235,32 @@ class EvennementController extends AbstractController
         ]);
     }
 
+    #[Route('/my-donated-events', name: 'my_donated_events')]
+    public function myDonatedEvents(): Response
+    {
+        // Fetch the user by ID (replace '118' with the actual user ID)
+        $userId = 118;
+        $user = $this->getDoctrine()->getRepository(User::class)->find($userId);
+
+        // Get the donations made by the user
+        $donations = $user->getDons();
+
+        // Extract the event IDs from the donations
+        $eventIds = [];
+        foreach ($donations as $donation) {
+            $eventId = $donation->getEvenementId()->getId();
+            $eventIds[] = $eventId;
+
+        }
+
+        // Fetch the events associated with the event IDs
+        $events = $this->getDoctrine()->getRepository(Evennement::class)->findBy(['id' => $eventIds]);
+
+        // Render the template to display the list of events
+        return $this->render('evennement/index.html.twig', [
+            'events' => $events,
+        ]);
+    }
 
 
 

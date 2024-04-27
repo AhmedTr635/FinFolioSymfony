@@ -18,7 +18,7 @@
                     <input type="text" id="searchInput" placeholder="Search... " class="form-control">
                 </div>
                 <div class="col-md-2 mb-4">
-                    <button  class=" add-event-button btn btn-primary" id="add-event-button">Add</button>
+                    <button  class=" add-event-button btn btn-primary" id="add-event-button">Ajouter</button>
                 </div>
             </div>
         </div>
@@ -70,11 +70,11 @@
                         <td>{{ evennement.description }}</td>
                         <td>
                             <div class="btn-group">
-                                <button class="edit-event-button btn btn-primary" data-id="{{ evennement.id }}">Edit</button>
+                                <button class="edit-event-button btn btn-primary" data-id="{{ evennement.id }}">Modifier</button>
                                 <form action="{{ path('app_evennement_delete', {'id': evennement.id}) }}" method="post" class="delete-form" style="display: inline-block;">
                                     <input type="hidden" name="_method" value="DELETE">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evennement.id) }}">
-                                    <button type="submit" class="btn btn-danger confirm-delete confirm-delete" >Delete</button>
+                                    <button type="submit" class="btn btn-danger confirm-delete confirm-delete" >Supprimer</button>
                                 </form>
                             </div>
                         </td>
@@ -90,7 +90,7 @@
 
 
         <div id="event-popup" class="popup">
-            <div class="popup-content">
+            <div class="popup-content" >
                 <!-- Content of the popup -->
                 <div id="form-container"></div>
                 <span id="close-popup" class="close-button">&times;</span>
@@ -203,139 +203,6 @@
                     popup.style.display = 'none';
                 });
             });
-            function setupFormValidation(form) {
-                const nameInput = form.querySelector('#evennement_nom_event');
-                const montantInput = form.querySelector('#evennement_montant');
-                const dateInput =form.querySelector('#evennement_date');
-                const adresseInput =form.querySelector('#evennement_adresse');
-                const descriptionInput =form.querySelector('#evennement_description');
-
-
-                nameInput.addEventListener('input', function() {
-                    validateName(nameInput);
-                });
-
-                montantInput.addEventListener('input', function() {
-                    validatemontant(montantInput);
-                });
-
-                dateInput.addEventListener('input', function() {
-                    validatedate(dateInput);
-                });
-
-                adresseInput.addEventListener('input', function() {
-                    validateadresse(adresseInput);
-                });
-
-                descriptionInput.addEventListener('input', function() {
-                    validatedescription(descriptionInput);
-                });
-
-            }
-
-            function validateForm(form) {
-                const nameInput = form.querySelector('#evennement_nom_event');
-                const montantInput = form.querySelector('#evennement_montant');
-                const dateInput =form.querySelector('#evennement_date');
-                const adresseInput =form.querySelector('#evennement_adresse');
-                const descriptionInput =form.querySelector('#evennement_description');
-
-                const isNameValid = validateName(nameInput);
-                const isMontantValid = validatemontant(montantInput);
-                const isDateValid = validatedate(dateInput);
-                const isAdresseValid = validateadresse(adresseInput);
-                const isDescriptionValid = validatedescription(descriptionInput);
-
-                return isNameValid && isMontantValid && isDateValid && isAdresseValid && isDescriptionValid;
-            }
-
-            function validateName(input) {
-                const errorElement = document.getElementById(input.id + '-error');
-                const name = input.value.trim();
-                if (!/^[a-zA-Z\s]*$/.test(name)) {
-                    showError(input, errorElement, 'Name must contain only alphabetic characters');
-                    return false;
-                } else if (name === '') {
-                    showError(input, errorElement, 'Name is required');
-                    return false;
-                } else {
-                    hideError(input, errorElement);
-                    return true;
-                }
-            }
-
-            function validatemontant(input) {
-                const errorElement = document.getElementById(input.id + '-error');
-                const montant = input.value.trim();
-                if (!montant) {
-                    showError(input, errorElement, 'Amount is required');
-                    return false;
-                } else if (!/^\d+(\.\d+)?$/.test(montant)) {
-                    showError(input, errorElement, 'Amount must be a numeric value');
-                    return false;
-                } else {
-                    hideError(input, errorElement);
-                    return true;
-                }
-            }
-
-            function validatedate(input) {
-                const errorElement = document.getElementById(input.id + '-error');
-                const date = input.value.trim();
-                if (!date) {
-                    showError(input, errorElement, 'Date is required');
-                    return false;
-                } else if (new Date(date) <= new Date()) {
-                    showError(input, errorElement, 'Date must be a future date');
-                    return false;
-                } else {
-                    hideError(input, errorElement);
-                    return true;
-                }
-            }
-
-            function validateadresse(input) {
-                const errorElement = document.getElementById(input.id + '-error');
-                const adresse = input.value.trim();
-                if (!adresse) {
-                    showError(input, errorElement, 'Address is required');
-                    return false;
-                } else if (adresse.length < 10) {
-                    showError(input, errorElement, 'Address must be at least 10 characters');
-                    return false;
-                } else {
-                    hideError(input, errorElement);
-                    return true;
-                }
-            }
-
-            function validatedescription(input) {
-                const errorElement = document.getElementById(input.id + '-error');
-                const description = input.value.trim();
-                if (!description) {
-                    showError(input, errorElement, 'Description is required');
-                    return false;
-                } else if (description.length < 20) {
-                    showError(input, errorElement, 'Description must be at least 20 characters');
-                    return false;
-                } else {
-                    hideError(input, errorElement);
-                    return true;
-                }
-            }
-
-            function showError(input, errorElement, message) {
-                errorElement.textContent = message;
-                input.classList.add('is-invalid');
-                input.classList.remove('is-valid');
-            }
-
-            function hideError(input, errorElement) {
-                errorElement.textContent = '';
-                input.classList.add('is-valid');
-                input.classList.remove('is-invalid');
-            }
-
 
 
 
@@ -471,10 +338,10 @@
                 const errorElement = document.getElementById(input.id + '-error');
                 const name = input.value.trim();
                 if (!/^[a-zA-Z\s]*$/.test(name)) {
-                    showError(input, errorElement, 'Name must contain only alphabetic characters');
+                    showError(input, errorElement, 'Le nom doit contenir que des lettres');
                     return false;
                 } else if (name === '') {
-                    showError(input, errorElement, 'Name is required');
+                    showError(input, errorElement, 'Le nom est obligatoire');
                     return false;
                 } else {
                     hideError(input, errorElement);
@@ -486,10 +353,13 @@
                 const errorElement = document.getElementById(input.id + '-error');
                 const montant = input.value.trim();
                 if (!montant) {
-                    showError(input, errorElement, 'Amount is required');
+                    showError(input, errorElement, 'Le montant est obligatoire');
                     return false;
-                } else if (!/^\d+(\.\d+)?$/.test(montant)) {
-                    showError(input, errorElement, 'Amount must be a numeric value');
+                }  else if (parseFloat(montant) <= 0) {
+                    showError(input, errorElement, 'Le montant ne doit pas etre negatif');
+                    return false;
+                }else if (!/^\d+(\.\d+)?$/.test(montant)) {
+                    showError(input, errorElement, 'le montant doit etre une valeur numerique');
                     return false;
                 } else {
                     hideError(input, errorElement);
@@ -501,10 +371,10 @@
                 const errorElement = document.getElementById(input.id + '-error');
                 const date = input.value.trim();
                 if (!date) {
-                    showError(input, errorElement, 'Date is required');
+                    showError(input, errorElement, 'La date est obligatoire');
                     return false;
                 } else if (new Date(date) <= new Date()) {
-                    showError(input, errorElement, 'Date must be a future date');
+                    showError(input, errorElement, 'La date doit etre une date future');
                     return false;
                 } else {
                     hideError(input, errorElement);
@@ -516,10 +386,10 @@
                 const errorElement = document.getElementById(input.id + '-error');
                 const adresse = input.value.trim();
                 if (!adresse) {
-                    showError(input, errorElement, 'Address is required');
+                    showError(input, errorElement, 'L adresse est obligatoire');
                     return false;
                 } else if (adresse.length < 10) {
-                    showError(input, errorElement, 'Address must be at least 10 characters');
+                    showError(input, errorElement, 'L adresse doit etre au moins 10 charateres');
                     return false;
                 } else {
                     hideError(input, errorElement);
@@ -531,10 +401,10 @@
                 const errorElement = document.getElementById(input.id + '-error');
                 const description = input.value.trim();
                 if (!description) {
-                    showError(input, errorElement, 'Description is required');
+                    showError(input, errorElement, 'La descripton est obligatoire');
                     return false;
                 } else if (description.length < 20) {
-                    showError(input, errorElement, 'Description must be at least 20 characters');
+                    showError(input, errorElement, 'La description doit contenir  au moins 20 charateres');
                     return false;
                 } else {
                     hideError(input, errorElement);
@@ -557,23 +427,23 @@
 
             //delete
 
-            // document.addEventListener('DOMContentLoaded', function() {
-            //     // Add event listeners to all delete buttons
-            //     var deleteButtons = document.querySelectorAll('.confirm-delete');
-            //     deleteButtons.forEach(function(button) {
-            //         button.addEventListener('click', function() {
-            //             var form = this.closest('.delete-form');
-            //             if (form) {
-            //                 // Show the confirmation dialog
-            //                 Swal.fire({title:"êtes vous sûr?",text:"Vous ne pourrez plus recupérer ces données!",icon:"warning",showCancelButton:!0,confirmButtonText:"Oui,je suis sûr",customClass:{confirmButton:"btn btn-danger me-3",cancelButton:"btn btn-label-secondary"},buttonsStyling:!1}).then((result) => {
-            //                     if (result.isConfirmed) {
-            //                         // If confirmed, submit the corresponding form
-            //                     }
-            //                 });
-            //             }
-            //         });
-            //     });
-            // });
+            document.addEventListener('DOMContentLoaded', function() {
+                // Add event listeners to all delete buttons
+                var deleteButtons = document.querySelectorAll('.confirm-delete');
+                deleteButtons.forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        var form = this.closest('.delete-form');
+                        if (form) {
+                            // Show the confirmation dialog
+                            Swal.fire({title:"êtes vous sûr?",text:"Vous ne pourrez plus recupérer ces données!",icon:"warning",showCancelButton:!0,confirmButtonText:"Oui,je suis sûr",customClass:{confirmButton:"btn btn-danger me-3",cancelButton:"btn btn-label-secondary"},buttonsStyling:!1}).then((result) => {
+                                if (result.isConfirmed) {
+                                    // If confirmed, submit the corresponding form
+                                }
+                            });
+                        }
+                    });
+                });
+            });
 
 
             // search
@@ -770,7 +640,7 @@
                 z-index: 10000; /* Set a high z-index value */
                 padding: 20px;
                 width: 50%; /* Adjust the maximum width as needed */
-                height: 90vh; /* Adjust the maximum height as needed */
+                height: 750px; /* Adjust the maximum height as needed */
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             }
 

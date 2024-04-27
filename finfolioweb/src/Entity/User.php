@@ -60,14 +60,23 @@ class User
     #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: Don::class)]
     private Collection $dons;
 
+    #[ORM\ManyToMany(targetEntity: Evennement::class, mappedBy: 'user')]
+    private Collection $evennements;
+
     public function __construct()
     {
         $this->dons = new ArrayCollection();
+        $this->evennements = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
     }
 
     public function getNom(): ?string
@@ -263,6 +272,33 @@ class User
             if ($don->getUserId() === $this) {
                 $don->setUserId(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Evennement>
+     */
+    public function getEvennements(): Collection
+    {
+        return $this->evennements;
+    }
+
+    public function addEvennement(Evennement $evennement): static
+    {
+        if (!$this->evennements->contains($evennement)) {
+            $this->evennements->add($evennement);
+            $evennement->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvennement(Evennement $evennement): static
+    {
+        if ($this->evennements->removeElement($evennement)) {
+            $evennement->removeUser($this);
         }
 
         return $this;
