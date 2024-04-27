@@ -47,21 +47,18 @@
 {#            </div>#}
 {#        </div>#}
 {#    </div>#}
-
-    <div class="col-md-6 col-lg-4 col-xl-4 order-0 mb-4">
+<div class="row">
+    <div class="col-md-5 col-lg-8 col-xl-4 order-0 mb-4" style="margin-left: 50px">
         <div class="card h-100">
             <div class="card-header d-flex align-items-center justify-content-between pb-0">
                 <div class="card-title mb-0">
-                    <h5 class="m-0 me-2">Tax</h5>
+                    <h5 class="m-0 me-2">Statistique de vos taxes</h5>
                 </div>
             </div>
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col">
-                        <div class="d-flex flex-column align-items-center gap-2">
-                            <h4 class="mb-4">{{ sommeTax }}$</h4>
-                            <span>Total tax</span>
-                        </div>
+
                     </div>
                     <div class="col">
                         <div id="chartTax"></div>
@@ -88,36 +85,75 @@
         </div>
     </div>
 
+    <div class="col-md-12 col-lg-4 mb-4">
+        <div class="card">
+            <div class="d-flex align-items-end row">
+                <div class="col-8">
+                    <div class="card-body">
+                        <h6 class="card-title mb-1 text-nowrap">Votre Taxe s'éléve à </h6>
+                        <small class="d-block mb-3 text-nowrap"></small>
 
-    <div class="card">
-    <div id="tableau-container" class="table-responsive text-nowrap">
-    <table id="taxTable" class="table table-borderless">
-        <thead>
-            <tr>
-                <th>Montant</th>
-                <th>Type</th>
-                <th>Optimisation</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for tax in taxes %}
-            <tr>
-                <td>{{ tax.montant }}</td>
-                <td>{{ tax.type }}</td>
-                <td>{{ tax.optimisation }}</td>
+                        <h5 class="card-title text-primary mb-1">{{ sommeTax2 }}$</h5>
+                        <small class="d-block mb-4 pb-1 text-muted"></small>
 
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+{#                        <a href="{{ path('app_tax_index') }}" class="btn btn-sm btn-primary">voir listes des taxes </a>#}
+                    </div>
+                </div>
+                <div class="col-4 pt-3 ps-0">
+                    <img src="../../assets/img/illustrations/prize-light.png" width="90" height="140" class="rounded-start" alt="View Sales">
+                </div>
+            </div>
+        </div>
+        <style>
+            /* Define styles for different tax types */
+            .tax-type {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 4px;
+                color: rgba(255, 255, 255, 0.92);
+                font-weight: bold;
+            }
+
+            /* Define background colors for different tax types */
+            .tax-type.Depense { background-color: rgba(3, 195, 236, 0.6); }
+            .tax-type.Crédit { background-color: rgba(113, 221, 55, 0.66); }
+            .tax-type.Investissement { background-color: rgba(177, 147, 248, 0.61); }
+            .tax-type.Banque { background-color: rgba(113, 221, 55, 0.66); }
+
+            /* Add more classes for other tax types as needed */
+        </style>
+        <div class="card" style="margin-top: 40px; width: 800px;">
+            <div id="tableau-container" class="table-responsive text-nowrap">
+                <table id="taxTable" class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Montant</th>
+                        <th>Type</th>
+                        <th>Optimisation</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for tax in taxes %}
+                        <tr>
+                            <td>{{ tax.montant }}</td>
+                            <td><span class="tax-type {{ tax.type }}">{{ tax.type }}</span></td>
+                            <td>{{ tax.optimisation }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3">No records found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <!-- Pagination container -->
+                <div class="pagination-container" style="float: right; margin-top: 20px;">
+                    {{ knp_pagination_render(taxes, paginationTemplate) }}
+                </div>
+            </div>
+             </div>
     </div>
-
-
+</div>
     <script>
         let input = document.getElementById('searchInput');
         let table = document.getElementById('taxTable');
@@ -142,7 +178,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             var chartLabels = JSON.parse('{{ chartData.labels|raw }}');
             var chartDataValues = JSON.parse('{{ chartData.data|raw }}');
-            var seriesColors = ['#b193f8', '#71dd37', '#03c3ec','#ff378d']; // Define colors for each series
+            var seriesColors = ['rgba(177,147,248,0.61)', 'rgba(113,221,55,0.66)', 'rgba(3,195,236,0.6)','rgba(255,55,141,0.63)']; // Define colors for each series
             var totalExpense = {{ sommeTax }}; // Calculate total expense
 
             new ApexCharts(document.querySelector("#chartTax"), {
@@ -158,15 +194,20 @@
                             labels: {
                                 show: true,
                                 total: {
-                                    show: true,
+                                    show: false,
                                     fontSize: "0.8125rem",
                                     label: "",
-                                    formatter: function (w) {
-                                        return ""; // Return empty string if percentage is not available
 
-                                    }
                                 }
                             }
+                        }
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    y: {
+                        formatter: function(value) {
+                            return parseFloat(value).toFixed(1)+"%"; // Format tooltip value to two decimal places
                         }
                     }
                 },

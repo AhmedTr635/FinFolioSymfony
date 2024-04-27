@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\Entity\Tax;
 use App\Form\TaxType;
 use App\Repository\TaxRepository;
+use App\Repository\TotalTaxRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,9 +17,15 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/tax')]
 class TaxController extends AbstractController
 {
+    /**
+     * @throws NonUniqueResultException
+     */
     #[Route('/', name: 'app_tax_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager,TaxRepository $taxRepository): Response
+    public function index(PaginatorInterface $paginator,Request $request, EntityManagerInterface $entityManager,TotalTaxRepository $totalTaxRepository,TaxRepository $taxRepository): Response
     {
+        $totalTax = $this->sommeTax();
+        $currentTaxTotale =$totalTax + $totalTaxRepository->getTotalTaxValue();
+
         $taxByType = $taxRepository->getExpensesByTaxType();
         $sommeTax=$this->sommeTax();
 
@@ -26,24 +35,30 @@ class TaxController extends AbstractController
             $labels[] = $type; // Month names
         }
         foreach ($taxByType['total'] as $total) {
-            $data1[] = ($total * 100)/$sommeTax; // Total expenses for each month
+            $data1[] = round(($total * 100) / $sommeTax, 1); // Total expenses for each month
         }
 
         // Create your form
         $form = $this->createForm(TaxType::class);
-        $data = $taxRepository->findAll(); // Fetch your data (e.g., from Doctrine)
+
+        // Fetch your data (e.g., from Doctrine)
         $chartData = [
             'labels' => json_encode($labels), // Convert labels array to JSON
             'data' => json_encode($data1) // Convert data array to JSON
         ];
         ///
-        $taxes = $taxRepository->findAll();
-
+        $taxes2 = $taxRepository->findAll();
+        $taxes= $paginator->paginate(
+            $taxes2,
+            $request->query->getInt('page',1)  ,
+            4
+        );
+        $paginationTemplate = '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig';
         // Initialize an array to store taxes grouped by type
         $taxesByType = [];
 
         // Iterate through each tax and group them by type
-        foreach ($taxes as $tax) {
+        foreach ($taxes2 as $tax) {
             $type = $tax->getType();
             if (!isset($taxesByType[$type])) {
                 // If type is not yet in the array, initialize it
@@ -89,11 +104,14 @@ class TaxController extends AbstractController
 //        ];
 
         return $this->render('tax/index.html.twig', [
-            'taxes' => $taxRepository->findAll(),
+            'paginationTemplate' => $paginationTemplate,
+
+            'taxes' => $taxes,
             'sommeTax' => $sommeTax,
             'chartData' => $chartData,// Pass the chart data directly
             'taxesByType' => $taxesByType,
             'sumsByType' => $sumsByType,
+            'sommeTax2' =>$currentTaxTotale,
 
 
         ]);

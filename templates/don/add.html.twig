@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Donation{% endblock %}
+
+{% block body %}
+    <h1>Add Donation</h1>
+
+    <div class="donation-form">
+        <form id="donationForm" action="{{ path('app_give_donation', {'id': evennement.id}) }}" method="POST">
+            <input type="hidden" name="id" value="{{ evennement.id }}">
+            <input type="number" name="montant" placeholder="Enter amount" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+{% endblock %}

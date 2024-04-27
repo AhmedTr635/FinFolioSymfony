@@ -11,29 +11,38 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: DepenseRepository::class)]
 class Depense
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Assert\NotBlank(message: "The date cannot be empty.")]
+    #[Assert\NotBlank(message: "La date est obligatoire.")]
     private ?\DateTimeInterface $date = null ;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "le Type ne doit pas être null.")]
+    #[Assert\NotBlank(message: "le type est obligatoire.")]
 
-    #[Assert\Length(
-        max: 225,
-        maxMessage: "Le type ne doit pas exceder {{ limit }} caractere."
+
+    #[Assert\Regex(
+        pattern: "/^[a-zA-Z\s]*$/",
+        message: "Le type ne doit contenir que des lettres"
     )]
     private ?string $type = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank(message: "le montant ne doit pas être null.")]
+    #[Assert\NotBlank(message: "le montant est obligatoire.")]
     #[Assert\Length(
         max: 225,
         maxMessage: "Le montant ne doit pas exceder {{ limit }} caractére."
+    )]
+    #[Assert\Positive(
+        message: "Le montant doit être supérieur à zéro"
+    )]
+    #[Assert\Type(
+        type: "numeric",
+        message: "Le montant ne doit contenir que des chiffres"
     )]
     private ?float $montant = null;
 

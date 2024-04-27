@@ -7,8 +7,10 @@ use App\Entity\Tax;
 use App\Entity\User;
 use App\Form\DepenseType;
 use App\Repository\DepenseRepository;
+use App\Repository\TotalTaxRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Knp\Component\Pager\PaginatorInterface;
 use League\Csv\Writer;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -25,10 +27,18 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 #[Route('/depense')]
 class DepenseController extends AbstractController
 {
+    /**
+     * @throws NonUniqueResultException
+     */
     #[Route('/', name: 'app_depense_index', methods: ['GET', 'POST'])]
-    public function index(Request $request, DepenseRepository $depenseRepository, PaginatorInterface $paginator): Response
+    public function index(PaginatorInterface $paginator,Request $request,TotalTaxRepository $totalTaxRepository, DepenseRepository $depenseRepository,TaxController $taxC): Response
     {
+        $totalTax = $taxC->sommeTax();
+        $currentTaxTotale =$totalTax + $totalTaxRepository->getTotalTaxValue();
 
+
+        // Retrieve the updated total tax sum from the request parameters
+        $updatedTotalTax = $request->query->get('updatedTotalTax');
         $expensesByMonth = $depenseRepository->getExpensesByMonth();
 
         // Prepare data for the chart
@@ -44,7 +54,12 @@ class DepenseController extends AbstractController
         // Create your form
         $form = $this->createForm(DepenseType::class);
         $data = $depenseRepository->findAll(); // Fetch your data (e.g., from Doctrine)
-
+        $depenses= $paginator->paginate(
+            $data,
+            $request->query->getInt('page',1)  ,
+            5
+        );
+        $paginationTemplate = '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig';
         // Calculate total montant
         $totalMontant = $this->sommeDep();
 
@@ -58,11 +73,16 @@ class DepenseController extends AbstractController
 //        die();
         // Render the template with paginated data
         return $this->render('depense/index.html.twig', [
-            'depenses' => $data, // Pass the pagination object instead of the raw data
+            'paginationTemplate' => $paginationTemplate,
+
+            'depenses' => $depenses, // Pass the pagination object instead of the raw data
             'totalMontant' => $totalMontant,
             'totalByMonth' => $totalByMonth,
             'expensesByMonth' => $expensesByMonth,
             'chartData' => $chartData,
+            'totalTax' =>$currentTaxTotale,
+//            'totalTax' => $currentTaxTotale,
+
             'form' => $form->createView()
 
         ]);
@@ -84,11 +104,11 @@ class DepenseController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $tax= new Tax();
             $tax->setMontant($depense->getMontant()*0.14);
-            $tax->setType("depense");
-            $tax->setOptimisation("depense");
+            $tax->setType("Depense");
+            $tax->setOptimisation("Depense");
 
-//        $entityManager->persist($tax);
-//        $entityManager->flush();
+       $entityManager->persist($tax);
+        $entityManager->flush();
             $depense->setTax($tax);
             $entityManager->persist($depense);
 
@@ -183,6 +203,7 @@ class DepenseController extends AbstractController
 
         return $totalMontant;
     }
+
 
 
 //    public function generateExcel(): Response

@@ -54,25 +54,7 @@ class DepenseRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findPaginatedData($page = 1, $limit = 10)
-    {
-        // Calculer l'offset en fonction de la page et de la limite
-        $offset = ($page - 1) * $limit;
 
-        // Créer une requête pour récupérer les données paginées
-        $query = $this->createQueryBuilder('e')
-            // Vous pouvez ajouter d'autres conditions de requête ici si nécessaire
-            ->orderBy('e.id', 'ASC')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
-            ->getQuery();
-
-        // Utiliser l'objet Paginator pour paginer les résultats de la requête
-        $paginator = new Paginator($query, $fetchJoinCollection = true);
-
-        // Retourner l'objet Paginator, contenant les données paginées
-        return $paginator;
-    }
 
     public function getTotalItemCount()
     {

@@ -54,8 +54,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
   {%block title %}
-  <title>Dashboard - Analytics | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
-{% endblock %}
+    <title>Dashboard - Analytics | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+  {% endblock %}
   <meta name="description" content="Most Powerful &amp; Comprehensive Bootstrap 5 HTML Admin Dashboard Template built for developers!" />
   <meta name="keywords" content="dashboard, bootstrap 5 dashboard, bootstrap 5 design, bootstrap 5">
   <!-- Canonical SEO -->
@@ -122,9 +122,8 @@
 
 
 
-
-
    {% block menu %} <!-- Menu -->
+
 
     <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
 
@@ -166,8 +165,7 @@
   </g>
 </svg>
 
-</span>
-          <span class="app-brand-text demo menu-text fw-bold ms-2">Finfolio</span>
+</span>    <span class="app-brand-text demo menu-text fw-bold ms-2">Finfolio</span>
         </a>
 
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
@@ -181,60 +179,82 @@
 
       <ul class="menu-inner py-1">
 
-
-        <!-- Front Pages -->
+      <!-- Front Pages -->
 
 
 
         <!-- Apps & Pages -->
 
+
         <li class="menu-item">
           <a href="app-email.html" class="menu-link">
-            <i class="menu-icon tf-icons bx bx-envelope"></i>
-            <div class="text-truncate" data-i18n="Email">Dashboard</div>
+            <i class="menu-icon fas fa-university"></i>
+            <div class="text-truncate" data-i18n="Dashboard">Dashboard</div>
           </a>
         </li>
 
         <li class="menu-item">
           <a href="app-chat.html" class="menu-link">
-            <i class="menu-icon tf-icons bx bx-chat"></i>
-            <div class="text-truncate" data-i18n="Chat">Credit</div>
+            <i class=" menu-icon fas fa-handshake"></i>
+            <div class="text-truncate" data-i18n="Crédit">Crédit</div>
           </a>
         </li>
 
         <li class="menu-item">
-          <a href="javascript:void(0);" class="menu-link menu-toggle" onclick="toggleSubMenu()">
-            <i class='menu-icon tf-icons bx bx-store'></i>
-            <div class="text-truncate" data-i18n="Front Pages">Investissement</div>
+          <a href="javascript:void(0);" class="menu-link menu-toggle" >
+            <i class=" menu-icon fas fa-chart-line"></i>
+            <div class="text-truncate" data-i18n="Investissement">Investissement</div>
           </a>
           <ul class="menu-sub submenu-hidden" id="submenu-investissement">
             <li class="menu-item">
               <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/front-pages/landing-page.html" class="menu-link" target="_blank">
-                <div class="text-truncate" data-i18n="Landing">Real state </div>
+                <div class="text-truncate" data-i18n="Real State">Real State </div>
               </a>
             </li>
             <li class="menu-item">
               <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/front-pages/pricing-page.html" class="menu-link" target="_blank">
-                <div class="text-truncate" data-i18n="Pricing">trading</div>
+                <div class="text-truncate" data-i18n="Trading">Trading</div>
               </a>
             </li>
           </ul>
         </li>
 
         <li class="menu-item">
-          <a href="{{ path('app_user_index') }}" class="menu-link">
-            <i class="menu-icon tf-icons bx bx-grid"></i>
-            <div class="text-truncate" data-i18n="Kanban">Evenement</div>
+          <a href="{{ path('app_evennement_index') }}" class="menu-link">
+            <i class="menu-icon fas fa-donate"></i>
+            <div class="text-truncate" data-i18n="Evenement">Evenement</div>
           </a>
         </li>
 
         <li class="menu-item">
           <a href="{{ path('app_depense_index') }}" class="menu-link">
-            <i class="menu-icon tf-icons bx bx-grid"></i>
-            <div class="text-truncate" data-i18n="Kanban">Depense</div>
+            <i class="menu-icon fas fa-money-bill"></i>
+            <div class="text-truncate" data-i18n="Depense">Depense</div>
           </a>
         </li>
+        <li class="menu-item">
+          <a href="{{ path('app_tax_index') }}" class="menu-link">
+            <i class="menu-icon fas fa-file-invoice-dollar"></i>
+            <div class="text-truncate" data-i18n="Taxe">Taxe</div>
+          </a>
+        </li>
+        <li>
+        <li class="menu-item">
+          <a href="{{ path('app_tax_index') }}" class="menu-link">
 
+            <i class=" menu-icon fas fa-gear"></i>
+            <div class="text-truncate" data-i18n="Paramétre">Paramétre</div>
+
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="{{ path('app_tax_index') }}" class="menu-link">
+
+            <i class=" menu-icon fas fa-sign-out"></i>
+            <div class="text-truncate" data-i18n="Se déconnecter">Se déconnecter</div>
+
+          </a>
+        </li>
       </ul>
     </aside>
 
@@ -272,12 +292,7 @@
 
         <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
 
-          <script>
-            function toggleSubMenu() {
-              var submenu = document.getElementById('submenu-investissement');
-              submenu.style.display = (submenu.style.display === 'none') ? 'block' : 'none';
-            }
-          </script>
+
 
 {% block searchBar %}
 
@@ -685,7 +700,7 @@
                 <li>
                   <a class="dropdown-item" href="auth-login-cover.html" target="_blank">
                     <i class="bx bx-power-off me-2"></i>
-                    <span class="align-middle">Log Out</span>
+                    <span class="align-middle"> Se déconnecter</span>
                   </a>
                 </li>
               </ul>
@@ -1736,16 +1751,9 @@
         {% endblock %}
 
         <script>
-          window.__shulexConfig = {
-            id: 12963,
-            token: "66085BD3E4B00005AAD867B7",
-            layout: {
-              backgroundColor: "#1618ff",
-              actionColor: "#1618ff",
-            },
-          };
+          !(function(){const sc=document.createElement('script');sc.src="https://apps.voc.ai/api_v2/gpt/bots/livechat/embed.js?id=13863&token=66195FF3E4B0330D5ACB1645";sc.async=true;sc.defer=true;document.body.appendChild(sc);})()
         </script>
-        <script src="https://apps.voc.ai/api_v2/gpt/bots/livechat/embed.js" async defer></script>
+        <script src="https://apps.voc.ai/live-chat?id=13863&token=66195FF3E4B0330D5ACB1645" async defer></script>
 {%block footer %}
         <footer class="content-footer footer bg-footer-theme">
           <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">

@@ -10,7 +10,7 @@
 
 
 {% block content %}
-    <link rel="stylesheet" href="../../assets/css/depense/depensedash.css">
+    <link rel="stylesheet" href="../../assets/css/depense/deps.css">
 {#    {% block js %}{%endblock %}#}
 {#    {%block js0 %}{%endblock %}#}
     <style>
@@ -88,9 +88,16 @@
                             </tr>
                         {% endfor %}
                         </tbody>
+
                     </table>
 
                 </div>
+
+            </div>
+            <div class="pagination-container" style="float: right; width: 30%;margin-top: 20px">
+                {{ knp_pagination_render(depenses, paginationTemplate) }}
+            </div>
+
                 <div id="expense-popup" class="popup">
                     <div class="popup-content">
                         <!-- Content of the popup -->
@@ -143,6 +150,7 @@
                         </div>
                     </div>
                 </div>
+
                 <script>
 
 
@@ -344,7 +352,10 @@
                         if (!montant) {
                             showError(input, errorElement, 'Le montant est obligatoire');
                             return false;
-                        } else if (!/^\d+(\.\d+)?$/.test(montant)) {
+                        }  else if (parseFloat(montant) <= 0) {
+                            showError(input, errorElement, 'Le montant doit être supérieur à zéro');
+                            return false;
+                        }else if (!/^\d+(\.\d+)?$/.test(montant)) {
                             showError(input, errorElement, 'Le montant ne doit contenir que des chiffres');
                             return false;
                         } else {
@@ -352,6 +363,7 @@
                             return true;
                         }
                     }
+
 
                     function showError(input, errorElement, message) {
                         errorElement.textContent = message;
@@ -457,7 +469,7 @@
                                     // Show the confirmation dialog
                                     Swal.fire({title:"êtes vous sûr?",text:"Vous ne pourrez plus recupérer ces données!",icon:"warning",showCancelButton:!0,confirmButtonText:"Oui,je suis sûr",customClass:{confirmButton:"btn btn-danger me-3",cancelButton:"btn btn-label-secondary"},buttonsStyling:!1}).then((result) => {
                                         if (result.isConfirmed) {
-                                            // If confirmed, submit the corresponding form
+                                            form.submit();
                                         }
                                     });
                                 }
@@ -540,22 +552,22 @@
     </script>
 
 
-    <script src="{{ asset('../../assets/vendor/libs/moment/moment.js') }}"></script>
-    <script src="{{ asset('../../assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
-    <script src="{{ asset('../../assets/vendor/libs/select2/select2.js') }}"></script>
-    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/popular.js') }}"></script>
-    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/bootstrap5.js') }}"></script>
-    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/auto-focus.js') }}"></script>
-    <script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave.js') }}"></script>
-    <script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+{#    <script src="{{ asset('../../assets/vendor/libs/moment/moment.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/select2/select2.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/popular.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/bootstrap5.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/auto-focus.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave.js') }}"></script>#}
+{#    <script src="{{ asset('../../assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>#}
 
-    <!-- Main JS -->
-    <script src="{{ asset('../../assets/js/main.js') }}"></script>
+{#    <!-- Main JS -->#}
+{#    <script src="{{ asset('../../assets/js/main.js') }}"></script>#}
 
 
-    <!-- Page JS -->
-    <script src="{{ asset('../../assets/js/app-user-list.js') }}"></script>
-    <script src="{{asset('../../public/assets/js/depense/depensedash.js') }}" ></script>
+{#    <!-- Page JS -->#}
+{#    <script src="{{ asset('../../assets/js/app-user-list.js') }}"></script>#}
+{#    <script src="{{asset('../../public/assets/js/depense/depensedash.js') }}" ></script>#}
 
 
 {% endblock %}
