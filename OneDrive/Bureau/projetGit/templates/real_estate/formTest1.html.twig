@@ -1,0 +1,38 @@
+{% extends 'base-front.html.twig' %}
+{% block body %}
+
+<form id="realEstateForm" method="post" action="{{ path('app_real_estate_new') }}">
+
+
+    {{ form_widget(form.name) }}
+    <span id="name-error" class="error-message"></span>
+
+    {{ form_widget(form.emplacement) }}
+    <span id="emplacement-error" class="error-message"></span>
+
+    {{ form_widgeet(form.ROI) }}
+    <span id="ROI-error" class="error-message"></span>
+
+    {{ form_row(form.valeur) }}
+    <span id="valeur-error" class="error-message"></span>
+
+    {{ form_row(form.nbrchambres) }}
+    <span id="nbrchambres-error" class="error-message"></span>
+
+    {{ form_row(form.superficie) }}
+    <span id="superficie-error" class="error-message"></span>
+
+    {{ form_row(form.nbrclick) }}
+    <span id="nbrclick-error" class="error-message"></span>
+
+    {{ form_row(form.virtualTourLink) }}
+    <span id="virtual-tour-link-error" class="error-message"></span>
+
+    {{ form_row(form.imageData) }}
+    <span id="image-data-error" class="error-message"></span>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+
+
+</form>
+{% endblock %}

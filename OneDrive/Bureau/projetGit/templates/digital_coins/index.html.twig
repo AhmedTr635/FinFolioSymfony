@@ -1,0 +1,260 @@
+{% extends 'base-front.html.twig' %}
+
+{% block title %}DigitalCoins index{% endblock %}
+
+{% block body %}
+
+
+
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        #chart {
+            width: 810px;
+            height: 522px;
+        }
+        .custoom-card {
+            width: 290px;
+            margin-left: 290px;
+
+        }
+        .stCard{
+            width: 850px;
+            height: 550px;
+            margin-left: 50px;
+
+        }
+        .choice{
+            width: 150px;
+
+        }
+        .faza{
+            width: 100px;
+        }
+    </style>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card stCard">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="coin-select" class="form-label">Choose Coin:</label>
+                            <select class="form-select choice" id="coin-select">
+                                <option value="BTC">BTC - Bitcoin</option>
+                                <option value="ETH">ETH - Ethereum</option>
+                                <option value="USDT">USDT - TetherUS</option>
+                                <option value="BNB">BNB - BNB</option>
+                                <option value="SOL">SOL - Solana</option>
+                                <option value="USDC">USDC - USD Coin</option>
+                                <option value="XRP">XRP - Ripple</option>
+                                <option value="DOGE">DOGE - Dogecoin</option>
+                                <option value="ADA">ADA - Cardano</option>
+                                <option value="SHIB">SHIB - SHIBA INU</option>
+                                <option value="AVAX">AVAX - Avalanche</option>
+                                <option value="TRX">TRX - TRON</option>
+                                <option value="DOT">DOT - Polkadot</option>
+                                <option value="WBTC">WBTC - Wrapped Bitcoin</option>
+                                <option value="BCH">BCH - Bitcoin Cash</option>
+                                <option value="LINK">LINK - ChainLink</option>
+                                <option value="MATIC">MATIC - Polygon</option>
+                                <option value="LTC">LTC - Litecoin</option>
+                                <option value="NEAR">NEAR - NEAR Protocol</option>
+                                <option value="ICP">ICP - Internet Computer</option>
+                                <option value="DAI">DAI - Dai</option>
+                                <option value="UNI">UNI - Uniswap</option>
+                                <option value="APT">APT - Aptos</option>
+                                <option value="FDUSD">FDUSD - First Digital USD</option>
+                                <option value="ETC">ETC - Ethereum Classic</option>
+                                <option value="STX">STX - Stacks</option>
+                                <option value="FIL">FIL - Filecoin</option>
+                                <option value="ATOM">ATOM - Cosmos</option>
+                                <option value="XLM">XLM - Stellar Lumens</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="interval-select" class="form-label">Choose Interval:</label>
+                            <select class="form-select choice" id="interval-select">
+                                <option value="1m">1m</option>
+                                <option value="3m">3m</option>
+                                <option value="15m">15m</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="chart"></div>
+                    <div id="lastOpenPrice"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card custoom-card">
+                <div class="card-body ">
+                    <form id="buy-form" method="post">
+                        <div class="mb-3">
+                            <label for="montant" class="form-label">Montant</label>
+                            <input type="text" class="form-control" id="montant" name="montant" placeholder="Enter montant">
+                        </div>
+                        <div class="mb-3">
+                            <label for="stopLoss" class="form-label">Stoploss</label>
+                            <input type="text" class="form-control" id="stopLoss" name="stopLoss" placeholder="Enter stoploss">
+                        </div>
+                        <div class="mb-3">
+                            <label for="leverage" class="form-label">Leverage</label>
+                            <input type="text" class="form-control" id="leverage" name="leverage" placeholder="Enter leverage">
+                        </div>
+                        <button type="submit" class="btn btn-success faza">Buy</button>
+                        <button type="reset" class="btn btn-danger faza">Reset</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script>
+        const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+            width: 800,
+            height: 400,
+            priceScale: {
+                scaleMargins: {
+                    top: 0.3,
+                    bottom: 0.2
+                }
+            },
+            timeScale: {
+                visible: false,
+                timeVisible: true,
+                secondsVisible: false,
+                tickMarkType: 'timestamp'
+            }
+        });
+
+        const candleSeries = chart.addCandlestickSeries();
+        let lastOpenPrice = null;
+
+        function parseCandlestickData(data) {
+            const candlestickData = [];
+            for (let i = 0; i < data.length; i++) {
+                const time = new Date(data[i][0]).getTime();
+                const open = parseFloat(data[i][1]);
+                const high = parseFloat(data[i][2]);
+                const low = parseFloat(data[i][3]);
+                const close = parseFloat(data[i][4]);
+
+                if (!isNaN(open) && !isNaN(high) && !isNaN(low) && !isNaN(close)) {
+                    candlestickData.push({ time, open, high, low, close });
+                } else {
+                    console.warn("Skipping data point due to missing or invalid values:", { time, open, high, low, close });
+                }
+            }
+            return candlestickData;
+        }
+
+        function filterData(data) {
+            for (let i = 1; i < data.length; i++) {
+                if (data[i].open === null || isNaN(data[i].open)) {
+                    data[i].open = data[i - 1].open;
+                }
+                if (data[i].high === null || isNaN(data[i].high)) {
+                    data[i].high = data[i - 1].high;
+                }
+                if (data[i].low === null || isNaN(data[i].low)) {
+                    data[i].low = data[i - 1].low;
+                }
+                if (data[i].close === null || isNaN(data[i].close)) {
+                    data[i].close = data[i - 1].close;
+                }
+            }
+            return data;
+        }
+
+        function displayFilteredData(symbol, interval) {
+            fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}USDT&interval=${interval}`)
+                .then(response => response.json())
+                .then(newData => {
+                    const parsedData = parseCandlestickData(newData);
+                    const filteredData = filterData(parsedData);
+                    candleSeries.setData(filteredData);
+
+                    if (filteredData.length > 0) {
+                        lastOpenPrice = filteredData[filteredData.length - 1].open;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        // Event listener for coin selection change
+        document.getElementById('coin-select').addEventListener('change', function(event) {
+            const selectedCoin = event.target.value;
+            const selectedInterval = document.getElementById('interval-select').value;
+            displayFilteredData(selectedCoin, selectedInterval);
+        });
+
+        // Event listener for interval selection change
+        document.getElementById('interval-select').addEventListener('change', function(event) {
+            const selectedInterval = event.target.value;
+            const selectedCoin = document.getElementById('coin-select').value;
+            displayFilteredData(selectedCoin, selectedInterval);
+        });
+
+        // Call the function initially with default values
+    </script>
+
+
+
+    {# <h1>DigitalCoins index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>RecentValue</th>
+                <th>DateAchat</th>
+                <th>DateVente</th>
+                <th>Montant</th>
+                <th>Leverage</th>
+                <th>StopLoss</th>
+                <th>UserId</th>
+                <th>ROI</th>
+                <th>PrixAchat</th>
+                <th>Tax</th>
+                <th>Code</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for digital_coin in digital_coins %}
+            <tr>
+                <td>{{ digital_coin.id }}</td>
+                <td>{{ digital_coin.recentValue }}</td>
+                <td>{{ digital_coin.dateAchat ? digital_coin.dateAchat|date('Y-m-d') : '' }}</td>
+                <td>{{ digital_coin.dateVente ? digital_coin.dateVente|date('Y-m-d') : '' }}</td>
+                <td>{{ digital_coin.montant }}</td>
+                <td>{{ digital_coin.leverage }}</td>
+                <td>{{ digital_coin.stopLoss }}</td>
+                <td>{{ digital_coin.userId }}</td>
+                <td>{{ digital_coin.ROI }}</td>
+                <td>{{ digital_coin.prixAchat }}</td>
+                <td>{{ digital_coin.tax }}</td>
+                <td>{{ digital_coin.code }}</td>
+                <td>
+                    <a href="{{ path('app_digital_coins_show', {'id': digital_coin.id}) }}">show</a>
+                    <a href="{{ path('app_digital_coins_edit', {'id': digital_coin.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="13">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_digital_coins_new') }}">Create new</a> #}
+
+{% endblock %}

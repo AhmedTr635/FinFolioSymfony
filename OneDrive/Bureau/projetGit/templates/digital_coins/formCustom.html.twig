@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create new DigitalCoins</title>
+    <style>
+        .error-message {
+            color: red;
+        }
+        .valid-input {
+            border-color: green;
+        }
+        .invalid-input {
+            border-color: red;
+        }
+    </style>
+</head>
+<body>
+<h1>Create new DigitalCoins</h1>
+
+<form id="digitalCoinsForm" method="post" action="{{ path('app_digital_coins_new') }}">
+    <div class="form-group">
+        <label for="recentValue">Recent Value</label>
+        <input type="text" id="recentValue" name="recentValue" class="form-control">
+        <span id="recent-value-error" class="error-message"></span>
+    </div>
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" class="form-control">
+        <span id="name-error" class="error-message"></span>
+    </div>
+    <!-- Add more form fields here -->
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<a href="{{ path('app_digital_coins_index') }}">Back to list</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var recentValueInput = document.getElementById('recentValue');
+        var errorSpan = document.getElementById('recent-value-error');
+        var nameInput = document.getElementById('name');
+        var errorName = document.getElementById('name-error');
+
+        nameInput.addEventListener('input', function() {
+            validateName();
+        });
+
+        recentValueInput.addEventListener('input', function() {
+            validateRecentValue();
+        });
+
+        function validateName() {
+            var name = nameInput.value.trim();
+            if (!/^[a-zA-Z]+$/.test(name)) {
+                showError(errorName, nameInput, 'Name must be alphabetic');
+            } else if (name === '') {
+                showError(errorSpan, recentValueInput, 'Name field is required');
+            } else {
+                hideError(errorName, nameInput);
+            }
+        }
+
+        function validateRecentValue() {
+            var recentValue = recentValueInput.value.trim();
+            if (recentValue === '') {
+                showError(errorSpan, recentValueInput, 'The Recent Value field is required.');
+            } else if (!/^\d+$/.test(recentValue)) {
+                showError(errorSpan, recentValueInput, 'Recent Value must contain only digits.');
+            } else {
+                hideError(errorSpan, recentValueInput);
+            }
+        }
+
+        function showError(errorSpan, input, message) {
+            errorSpan.textContent = message;
+            input.classList.remove('valid-input');
+            input.classList.add('invalid-input');
+        }
+
+        function hideError(errorSpan, input) {
+            errorSpan.textContent = '';
+            input.classList.remove('invalid-input');
+            input.classList.add('valid-input');
+        }
+    });
+</script>
+</body>
+</html>

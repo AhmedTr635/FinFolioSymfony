@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}DigitalCoins{% endblock %}
+
+{% block body %}
+    <h1>DigitalCoins</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ digital_coin.id }}</td>
+            </tr>
+            <tr>
+                <th>RecentValue</th>
+                <td>{{ digital_coin.recentValue }}</td>
+            </tr>
+            <tr>
+                <th>DateAchat</th>
+                <td>{{ digital_coin.dateAchat ? digital_coin.dateAchat|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>DateVente</th>
+                <td>{{ digital_coin.dateVente ? digital_coin.dateVente|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Montant</th>
+                <td>{{ digital_coin.montant }}</td>
+            </tr>
+            <tr>
+                <th>Leverage</th>
+                <td>{{ digital_coin.leverage }}</td>
+            </tr>
+            <tr>
+                <th>StopLoss</th>
+                <td>{{ digital_coin.stopLoss }}</td>
+            </tr>
+            <tr>
+                <th>UserId</th>
+                <td>{{ digital_coin.userId }}</td>
+            </tr>
+            <tr>
+                <th>ROI</th>
+                <td>{{ digital_coin.ROI }}</td>
+            </tr>
+            <tr>
+                <th>PrixAchat</th>
+                <td>{{ digital_coin.prixAchat }}</td>
+            </tr>
+            <tr>
+                <th>Tax</th>
+                <td>{{ digital_coin.tax }}</td>
+            </tr>
+            <tr>
+                <th>Code</th>
+                <td>{{ digital_coin.code }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_digital_coins_index') }}">back to list</a>
+
+    <a href="{{ path('app_digital_coins_edit', {'id': digital_coin.id}) }}">edit</a>
+
+    {{ include('digital_coins/_delete_form.html.twig') }}
+{% endblock %}
