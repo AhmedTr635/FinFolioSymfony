@@ -10,6 +10,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 class ActifCourant
 {
     #[ORM\Id]
+
+
+
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;

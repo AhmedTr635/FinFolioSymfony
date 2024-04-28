@@ -23,7 +23,19 @@ class ActifCourantController extends AbstractController
             'actif_non_courants' => $actifNonCourantRepository->findAll(),
         ]);
     }
+    #[Route('/psdf', name: 'test', methods: ['GET'])]
+    public function index2(ActifCourantRepository $actifCourantRepository,ActifNonCourantRepository $actifNonCourantRepository, OffreRepository $offreRepository,DepenseRepository $depenseRepository): Response
+    {
 
+
+
+        return $this->render('actif_courant/pdf_template.html.twig', [
+            'actif_courants' => $actifCourantRepository->findAll(),
+            'actif_non_courants' => $actifNonCourantRepository->findAll(),
+            'offres'=>$offreRepository->findAll(),
+            'depenses'=>$depenseRepository->findAll(),
+        ]);
+    }
     #[Route('/new', name: 'app_actif_courant_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
