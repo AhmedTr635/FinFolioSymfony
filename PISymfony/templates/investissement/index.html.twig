@@ -1,0 +1,48 @@
+{% extends 'base-front.html.twig' %}
+
+{% block title %}Investissement index{% endblock %}
+
+{% block body %}
+
+    <h1>Investissement index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>DateAchat</th>
+                <th>PrixAchat</th>
+                <th>ROI</th>
+                <th>Montant</th>
+                <th>Tax</th>
+                <th>ReId</th>
+                <th>UserId</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for investissement in investissements %}
+            <tr>
+                <td>{{ investissement.id }}</td>
+                <td>{{ investissement.dateAchat ? investissement.dateAchat|date('Y-m-d') : '' }}</td>
+                <td>{{ investissement.prixAchat }}</td>
+                <td>{{ investissement.ROI }}</td>
+                <td>{{ investissement.montant }}</td>
+                <td>{{ investissement.tax }}</td>
+                <td>{{ investissement.reId }}</td>
+                <td>{{ investissement.userId }}</td>
+                <td>
+                    <a href="{{ path('app_investissement_show', {'id': investissement.id}) }}">show</a>
+                    <a href="{{ path('app_investissement_edit', {'id': investissement.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_investissement_new') }}">Create new</a>
+{% endblock %}

@@ -1,0 +1,6 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+app_real_estate_page:
+  path: /real_estate_page
+  controller: App\Controller\InvestissementController::realEstatePage

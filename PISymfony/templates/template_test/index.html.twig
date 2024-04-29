@@ -1,0 +1,73 @@
+{% extends 'base-front.html.twig' %}
+
+{% block title %}RealEstate index{% endblock %}
+
+{% block body %}
+    <h1>Liste des Immobiliers disponible</h1>
+
+    <div class="row">
+        {% for real_estate in realEstates %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100">
+                    {% if real_estate.imageData %}
+                        <img class="card-img-top" src="{{ asset(real_estate.imageData) }}" alt="Card image cap" />
+                    {% else %}
+                        <img class="card-img-top" src="{{ asset('uploads/images/noimage.jpg') }}" alt="Card image cap" />
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ real_estate.name }}</h5>
+                        <p class="card-text">
+                            Emplacement: {{ real_estate.emplacement }}<br>
+                            ROI: {{ real_estate.ROI }}<br>
+                            Valeur: {{ real_estate.valeur }}<br>
+                            Chambres: {{ real_estate.nbrchambres }}<br>
+                            Superficie: {{ real_estate.superficie }}<br>
+                        </p>
+                        {% if real_estate.virtualTourLink %}
+                            <button class="btn btn-info show-virtual-tour" data-url="{{ real_estate.virtualTourLink }}">Virtual Tour</button>
+                        {% else %}
+                            <div class="alert alert-danger" role="alert">
+                                No Virtual Tour Available
+                            </div>
+                        {% endif %}
+                        <!-- Button to trigger SweetAlert -->
+                        <button class="btn btn-primary invest-button" data-id="{{ real_estate.id }}">Investir</button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col">
+                <p>No records found.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Include the form template -->
+    <div id="invest-form-template" style="display: none;">
+        {{ include('investissement/_form.html.twig', { 'form': form }) }}
+    </div>
+
+    <!-- Script for the SweetAlert popup -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const investButtons = document.querySelectorAll('.invest-button');
+            investButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const realEstateId = this.getAttribute('data-id');
+                    // Show SweetAlert with the real estate ID and form
+                    Swal.fire({
+                        title: 'Investir dans cet immobilier',
+                        html: document.getElementById('invest-form-template').innerHTML, // Render the form template
+                        showCancelButton: true,
+                        confirmButtonText: 'Investir',
+                        cancelButtonText: 'Annuler',
+                        preConfirm: () => {
+                            // Handle form submission here if needed
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}
