@@ -42,10 +42,8 @@
                             <select class="form-select choice" id="coin-select">
                                 <option value="BTC">BTC - Bitcoin</option>
                                 <option value="ETH">ETH - Ethereum</option>
-                                <option value="USDT">USDT - TetherUS</option>
                                 <option value="BNB">BNB - BNB</option>
                                 <option value="SOL">SOL - Solana</option>
-                                <option value="USDC">USDC - USD Coin</option>
                                 <option value="XRP">XRP - Ripple</option>
                                 <option value="DOGE">DOGE - Dogecoin</option>
                                 <option value="ADA">ADA - Cardano</option>
@@ -70,19 +68,39 @@
                                 <option value="ATOM">ATOM - Cosmos</option>
                                 <option value="XLM">XLM - Stellar Lumens</option>
                             </select>
+                            {# <label for="symbolChoice">Select Symbol:</label>
+                            <select id="symbolChoice">
+                                <option value="BTC" selected>BTC</option>
+                                <option value="SOL">SOL</option>
+                                <option value="ETH">ETH</option>
+                                <option value="XRP">XRP</option>
+                                <option value="ADA">ADA</option>
+                                <option value="DOGE">DOGE</option>
+                                <option value="BNB">BNB</option>
+                            </select> #}
+
                         </div>
                         <div class="col-md-6">
-                            <label for="interval-select" class="form-label">Choose Interval:</label>
+                             <label for="interval-select" class="form-label">Choose Interval:</label>
                             <select class="form-select choice" id="interval-select">
                                 <option value="1m">1m</option>
                                 <option value="3m">3m</option>
                                 <option value="15m">15m</option>
                             </select>
-                        </div>
+
+                            {#  <label for="intervalChoice">Select Interval:</label>
+
+                            <select id="intervalChoice">
+                                <option value="1m" selected>1m</option>
+                                <option value="3m">3m</option>
+                                <option value="15m">15m</option>
+                            </select> #}
+
+                                                  </div>
                     </div>
 
                     <div id="chart"></div>
-                    <div id="lastOpenPrice"></div>
+
                 </div>
             </div>
         </div>
@@ -103,18 +121,196 @@
                             <label for="leverage" class="form-label">Leverage</label>
                             <input type="text" class="form-control" id="leverage" name="leverage" placeholder="Enter leverage">
                         </div>
-                        <button type="submit" class="btn btn-success faza">Buy</button>
-                        <button type="reset" class="btn btn-danger faza">Reset</button>
+                        <button type="submit" class="btn btn-success faza" style="margin-left: 60px;">Buy</button>
+
+                        <br>
+                        <div id="lastOpenPrice" style="display: none;"></div>
+                        <div id="lastOpenPriceContainer"></div>
+
+
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
+        <div class="card custom-width" style="margin-left: 50px; margin-top: 50px; width: 800px;">
+            <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
+                <table class="table text-nowrap">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Montant</th>
+                        <th>ROI</th>
+                        <th>Stop Loss</th>
+                        <th>Prix Achat</th>
+                        <th>Recent Value</th>
+                        <th>Rapid Action</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                    {% for digitalCoin in digital_coins %}
+                        <tr>
+                            <td>
+                                {% set imageName = digitalCoin.getCode() ~ '.png' %} {# Assuming image names follow this pattern: code.png #}
+                                {% if asset(imageName) %}
+                                    <img src="{{ asset(imageName) }}" alt="{{ digitalCoin.getCode() }}" height="25" width="30">
+                                {% else %}
+                                    <span>No Image</span>
+                                {% endif %}
+                                {{ digitalCoin.getCode() }}
+                            </td>
+
+                            <td id="montant-{{ digitalCoin.getId() }}">
+                                <div class="text-muted lh-1">
+                                    <span class="text-primary fw-medium">{{ digitalCoin.getMontant() }}</span>
+                                </div>
+                            </td>
+                            <td id="roi-{{ digitalCoin.getId() }}">Loading...</td>
+                            <td>{{ digitalCoin.getStopLoss() }}</td>
+                            <td>{{ digitalCoin.getPrixAchat() }}</td>
+                            <td id="recent-value-{{ digitalCoin.getId() }}">Loading...</td>
+                            <td><button class="btn btn-danger">SELL</button></td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No records found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
 
 
+    {# <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const symbol = urlParams.get('symbol');
+        let selectedSymbol = document.getElementById('symbolChoice').value;
+        let intervalChoice = document.getElementById('intervalChoice').value;
 
-    <script>
+        var chart = LightweightCharts.createChart(document.getElementById('chart'), {
+            width: 800,
+            height: 400,
+            priceScale: {
+                scaleMargins: {
+                    top: 0.3,
+                    bottom: 0.2
+                }
+            },
+            timeScale: {
+                timeVisible: true,
+                secondsVisible: false,
+                tickMarkType: 'timestamp' // Set tick mark type to Timestamp
+            }
+        });
+
+        var candleSeries = chart.addCandlestickSeries();
+        var lastOpenPrice = null;
+
+        function parseCandlestickData(data) {
+            const candlestickData = [];
+            for (let i = 0; i < data.length; i++) {
+                const time = new Date(data[i][0]).getTime(); // Keep timestamp format
+                const open = parseFloat(data[i][1]);
+                const high = parseFloat(data[i][2]);
+                const low = parseFloat(data[i][3]);
+                const close = parseFloat(data[i][4]);
+
+                if (!isNaN(open) && !isNaN(high) && !isNaN(low) && !isNaN(close)) {
+                    candlestickData.push({ time, open, high, low, close });
+                } else {
+                    console.warn("Skipping data point due to missing or invalid values:", { time, open, high, low, close });
+                }
+            }
+            return candlestickData;
+        }
+
+        function filterData(data) {
+            for (let i = 1; i < data.length; i++) {
+                if (data[i].open === null || isNaN(data[i].open)) {
+                    data[i].open = data[i - 1].open;
+                }
+                if (data[i].high === null || isNaN(data[i].high)) {
+                    data[i].high = data[i - 1].high;
+                }
+                if (data[i].low === null || isNaN(data[i].low)) {
+                    data[i].low = data[i - 1].low;
+                }
+                if (data[i].close === null || isNaN(data[i].close)) {
+                    data[i].close = data[i - 1].close;
+                }
+            }
+            return data;
+        }
+
+        function displayFilteredData(symbol, interval) {
+            fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}USDT&interval=${interval}`)
+                .then(response => response.json())
+                .then(newData => {
+                    const parsedData = parseCandlestickData(newData);
+                    const filteredData = filterData(parsedData);
+                    candleSeries.setData(filteredData);
+
+                    // Update the last open price
+                    if (filteredData.length > 0) {
+                        lastOpenPrice = filteredData[filteredData.length - 1].open;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        // Call the function initially
+        displayFilteredData(selectedSymbol, intervalChoice);
+
+        // Function to add a price line with a specified color
+        function addPriceLine(color) {
+            if (lastOpenPrice !== null) {
+                const priceLine = candleSeries.createPriceLine({ price: lastOpenPrice, color: color });
+            }
+        }
+
+        // Event listener for the button click to add red price line
+        document.getElementById('addRedPriceLineButton').addEventListener('click', function() {
+            addPriceLine('red');
+        });
+
+        // Event listener for the button click to add green price line
+        document.getElementById('addGreenPriceLineButton').addEventListener('click', function() {
+            addPriceLine('green');
+        });
+
+        document.getElementById('intervalChoice').addEventListener('change', function() {
+            intervalChoice = this.value;
+
+            displayFilteredData(selectedSymbol, intervalChoice); // Fetch data for the selected symbol immediately
+
+            // Refresh data and chart every minute with the selected symbol
+            setInterval(function() {
+                displayFilteredData(selectedSymbol, intervalChoice);
+            }, 60 * 1000);
+        });
+
+        // Event listener for symbol choice change
+        document.getElementById('symbolChoice').addEventListener('change', function() {
+            selectedSymbol = this.value;
+            displayFilteredData(selectedSymbol, intervalChoice); // Fetch data for the selected symbol immediately
+
+            // Refresh data and chart every minute with the selected symbol
+            setInterval(function() {
+                displayFilteredData(selectedSymbol, intervalChoice);
+            }, 60 * 1000);
+        });
+    </script> #}
+
+
+{# Static #}
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   <script>
         const chart = LightweightCharts.createChart(document.getElementById('chart'), {
             width: 800,
             height: 400,
@@ -181,6 +377,8 @@
 
                     if (filteredData.length > 0) {
                         lastOpenPrice = filteredData[filteredData.length - 1].open;
+                        document.getElementById('lastOpenPrice').innerText = `Current Price: ${lastOpenPrice}`;
+
                     }
                 })
                 .catch(error => {
@@ -193,6 +391,9 @@
             const selectedCoin = event.target.value;
             const selectedInterval = document.getElementById('interval-select').value;
             displayFilteredData(selectedCoin, selectedInterval);
+            setInterval(function() {
+                displayFilteredData(selectedCoin, selectedInterval);
+            }, 60 * 1000);
         });
 
         // Event listener for interval selection change
@@ -200,7 +401,157 @@
             const selectedInterval = event.target.value;
             const selectedCoin = document.getElementById('coin-select').value;
             displayFilteredData(selectedCoin, selectedInterval);
+            setInterval(function() {
+                displayFilteredData(selectedCoin, selectedInterval);
+            }, 60 * 1000);
         });
+
+        document.getElementById('buy-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            // Get the input values
+            const montant = document.getElementById('montant').value;
+            const stopLoss = document.getElementById('stopLoss').value;
+            const leverage = document.getElementById('leverage').value;
+            const coinCode = document.getElementById('coin-select').value;
+            const prixAchat = document.getElementById('lastOpenPrice').innerText.split(': ')[1];
+            const userId = 22; // Default user ID
+            const tax = montant * 0.08;
+
+            // Create a new FormData instance
+            const formData = new FormData();
+            formData.append('montant', montant);
+            formData.append('stopLoss', stopLoss);
+            formData.append('leverage', leverage);
+            formData.append('coin-select', coinCode);
+            formData.append('prixAchat', prixAchat);
+            formData.append('userId', userId);
+            formData.append('tax', tax);
+
+            // Send a POST request to the server
+            fetch('{{ path('app_digital_coinsapp_digital_coins_buy') }}', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        // If the server returns an error status, throw an error with the status text
+                        throw new Error(response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle the response data here
+                    console.log(data);
+                    document.getElementById('montant').value = '';
+                    document.getElementById('stopLoss').value = '';
+                    document.getElementById('leverage').value = '';
+
+                    // Show success alert
+                    Swal.fire(
+                        'Success!',
+                        'Your Trade was successful!',
+                        'success'
+                    )
+                })
+                .catch(error => {
+                    // Handle the error here
+                    console.error('Error:', error);
+                });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Fetch recent values for each digital coin
+            {% for digitalCoin in digital_coins %}
+            fetchRecentValue('{{ digitalCoin.getCode() }}', '{{ digitalCoin.getId() }}', '{{ digitalCoin.getPrixAchat() }}');
+            {% endfor %}
+
+            // Set interval to update recent values every minute
+            setInterval(updateRecentValues, 60000);
+        });
+
+        function updateRecentValues() {
+            {% for digitalCoin in digital_coins %}
+            fetchRecentValue('{{ digitalCoin.getCode() }}', '{{ digitalCoin.getId() }}', '{{ digitalCoin.getPrixAchat() }}', '{{ digitalCoin.getMontant() }}');
+            {% endfor %}
+        }
+
+        function fetchRecentValue(symbol, id, prixAchat,montant) {
+            fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`)
+                .then(response => response.json())
+                .then(data => {
+                    const recentValueCell = document.getElementById(`recent-value-${id}`);
+                    const roiCell = document.getElementById(`roi-${id}`);
+                    const montantCell = document.getElementById(`montant-${id}`);
+                    if (recentValueCell && roiCell) {
+                        const recentValue = parseFloat(data.price);
+                        recentValueCell.textContent = recentValue.toFixed(2);
+
+                        // Calculate ROI
+                        const roi = recentValue*montant - prixAchat*montant;
+                        console.log(roi);
+                        console.log(montantCell);
+                        roiCell.textContent = roi.toFixed(2);
+
+                        // Update the cell color based on ROI
+                        if (roi > 0) {
+                            roiCell.style.color = 'green';
+                        } else {
+                            roiCell.style.color = 'red';
+                        }
+                        if(recentValue < prixAchat){
+                            recentValueCell.style.color = 'red';
+                        }else{
+                            recentValueCell.style.color = 'green';
+                        }
+
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching recent value:', error);
+                    const recentValueCell = document.getElementById(`recent-value-${id}`);
+                    if (recentValueCell) {
+                        recentValueCell.textContent = 'Error';
+                        recentValueCell.style.color = 'red';
+                    }
+                });
+        }
+        function getImageName(code) {
+            switch (code) {
+                case 'BTC':
+                    return 'BTC.png';
+                case 'ETH':
+                    return 'ETH.png';
+                case 'XRP':
+                    return 'XRP.png';
+                case 'ADA':
+                    return 'ADA.png';
+                case 'DOGE':
+                    return 'DOGE.png';
+                case 'BNB':
+                    return 'BNB.png';
+                case 'SOL':
+                    return 'SOL.png';
+                case 'SHIB':
+                    return 'SHIB.png';
+                case 'AVAX':
+                    return 'AVAX.png';
+                case 'TRX':
+                    return 'TRX.png';
+                case 'MATIC':
+                    return 'MATIC.png';
+                case 'LTC':
+                    return 'LTC.png';
+
+                // Add more cases for other codes if needed
+                default:
+                    return null; // Return null if no matching image found
+            }
+        }
+
+
+       
+
 
         // Call the function initially with default values
     </script>

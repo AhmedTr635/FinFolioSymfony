@@ -45,4 +45,12 @@ class DigitalCoinsRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function findByUserId(int $userId): array
+    {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.userId = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getResult();
+    }
 }

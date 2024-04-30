@@ -7,6 +7,7 @@ use App\Form\DigitalCoinsType;
 use App\Repository\DigitalCoinsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,10 +20,12 @@ class DigitalCoinsController extends AbstractController
     public function index(DigitalCoinsRepository $digitalCoinsRepository): Response
     {
         $digitalCoin = new DigitalCoins();
+        $UserId = 22;
         $form = $this->createForm(DigitalCoinsType::class, $digitalCoin);
 
+
         return $this->render('digital_coins/index.html.twig', [
-            'digital_coins' => $digitalCoinsRepository->findAll(),
+            'digital_coins' => $digitalCoinsRepository->findByUserId($UserId),
             'digital_coin' => $digitalCoin,
             'form' => $form->createView(), // Pass the form view to the template
         ]);
@@ -117,7 +120,7 @@ class DigitalCoinsController extends AbstractController
         // Example: Check if value is not empty, is a number, and within a specific range
         return !empty($value) && is_numeric($value) && ($value > 0 && $value < 1000);
     }
-    #[Route('/buy', name: 'app_digital_coins_buy', methods: ['POST'])]
+    #[Route('/digital/coins/buy', name: 'app_digital_coins_buy', methods: ['POST'])]
     public function buy(Request $request, EntityManagerInterface $entityManager): Response
     {
         // Retrieve data from the form
@@ -125,29 +128,56 @@ class DigitalCoinsController extends AbstractController
         $stopLoss = $request->request->get('stopLoss');
         $leverage = $request->request->get('leverage');
         $coinCode = $request->request->get('coin-select');
-
-        // Fetch the last open price of the coin from the API (You need to implement this logic)
-        $lastOpenPrice = 60000;
+        $prixAchat = $request->request->get('prixAchat');
+        $userId = $request->request->get('userId');
+        $tax = $request->request->get('tax');
 
         // Create a new digital coin entity with initial values
         $digitalCoin = new DigitalCoins();
         $digitalCoin->setDateAchat(new \DateTime());
         $digitalCoin->setMontant($montant);
         $digitalCoin->setCode($coinCode);
-        $digitalCoin->setTax($montant * 0.08);
+        $digitalCoin->setTax($tax);
         $digitalCoin->setROI(0);
         $digitalCoin->setRecentValue(0);
-        $digitalCoin->setPrixAchat($lastOpenPrice); // Set to last open price
+        $digitalCoin->setPrixAchat($prixAchat); // Set to last open price
         $digitalCoin->setLeverage($leverage);
         $digitalCoin->setStopLoss($stopLoss);
+        $digitalCoin->setUserId($userId);
 
         // Persist the digital coin entity
         $entityManager->persist($digitalCoin);
         $entityManager->flush();
 
-        // Redirect to the index page
-        return $this->redirectToRoute('app_digital_coins_index');
+        // Return a JSON response
+        return $this->json(['message' => 'Digital coin created successfully.']);
     }
+    #[Route('/fetch-last-open-price/{symbol}', name: 'app_fetch_last_open_price', methods: ['GET'])]
+    public function fetchLastOpenPrice(string $symbol): JsonResponse
+    {
+        // Define the API endpoint URL
+        $apiUrl = sprintf('https://api.binance.com/api/v3/klines?symbol=%sUSDT&interval=1d', $symbol);
+
+        // Make a GET request to the API
+        $httpClient = HttpClient::create();
+        $response = $httpClient->request('GET', $apiUrl);
+
+        // Check if the request was successful
+        if ($response->getStatusCode() === 200) {
+            $data = $response->toArray();
+
+            // Parse the response data to get the last open price
+            $lastOpenPrice = $data[count($data) - 1][1]; // Assuming the open price is at index 1
+
+            // Return the last open price as JSON response
+            return $this->json(['last_open_price' => $lastOpenPrice]);
+        } else {
+            // Return an error response if the request was not successful
+            return $this->json(['error' => 'Failed to fetch last open price.']);
+        }
+    }
+
+
 
 
 
