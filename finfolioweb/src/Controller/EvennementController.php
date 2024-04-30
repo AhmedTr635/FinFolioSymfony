@@ -11,6 +11,7 @@ use App\Repository\EvennementRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,14 +36,19 @@ class EvennementController extends AbstractController
         $evennements = $evennementRepository->findAll();
 
         // Fetch upcoming event
+
         $upcomingEvent = $evennementRepository->findUpcomingEvent();
 
-
+        $showRatingForm = true; // Set this based on your logic
 
         // Render the template with both the list of events and the upcoming event
         return $this->render('evennement/index.html.twig', [
+
+
             'evennements' => $evennements,
             'upcomingEvent' => $upcomingEvent,
+            'showRatingForm' => $showRatingForm,
+
 
 
         ]);
@@ -79,7 +85,7 @@ class EvennementController extends AbstractController
 
 
     #[Route('/admin', name: 'app_evennement_admin', methods: ['GET'])]
-    public function adminsash(EvennementRepository $evennementRepository, DonRepository $donRepository, Request $request, EntityManagerInterface $entityManager): Response
+    public function adminsash(PaginatorInterface $paginator,EvennementRepository $evennementRepository, DonRepository $donRepository, Request $request, EntityManagerInterface $entityManager): Response
     {
         $totalDonationsByEventId = $evennementRepository->getTotalDonationsByEventId();
         $totalDonations = $donRepository->calculateTotalDonations();
@@ -104,9 +110,18 @@ class EvennementController extends AbstractController
             return $this->redirectToRoute('app_evennement_index', [], Response::HTTP_SEE_OTHER);
         }
 
+       $evennements= $evennementRepository->findAll();
+        $evennements= $paginator->paginate(
+            $evennements,
+            $request->query->getInt('page',1)  ,
+            4
+        );
+        $paginationTemplate = '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig';
+
         // Render the template with event data
         return $this->render('evennement/admindash.html.twig', [
-            'evennements' => $evennementRepository->findAll(),
+            'paginationTemplate' => $paginationTemplate,
+            'evennements' => $evennements,
             'totalDonationsByEventId' => $totalDonationsByEventId,
             'form' => $form->createView(),
             'totalDonations' => $totalDonations,
@@ -152,8 +167,25 @@ class EvennementController extends AbstractController
     #[Route('/{id}', name: 'app_evennement_show', methods: ['GET'])]
     public function show(Evennement $evennement): Response
     {
+        $latitude = $evennement->getLatitude();
+        $longitude = $evennement->getLongitude();
+
+        // Check if latitude and longitude are available
+        if ($latitude !== null && $longitude !== null) {
+            // Generate Google Maps link
+            $googleMapsLink = sprintf(
+                'https://www.google.com/maps/search/?api=1&query=%f,%f',
+                $latitude,
+                $longitude
+            );
+        } else {
+            // If latitude or longitude is null, set Google Maps link to null
+            $googleMapsLink = null;
+        }
+
         return $this->render('evennement/show.html.twig', [
             'evennement' => $evennement,
+            'googleMapsLink' => $googleMapsLink,
         ]);
     }
 
@@ -256,12 +288,52 @@ class EvennementController extends AbstractController
         // Fetch the events associated with the event IDs
         $events = $this->getDoctrine()->getRepository(Evennement::class)->findBy(['id' => $eventIds]);
 
+
+
         // Render the template to display the list of events
         return $this->render('evennement/index.html.twig', [
             'events' => $events,
+
         ]);
     }
 
+
+    #[Route('/submit-rating', name: 'submit_rating')]
+    public function submitRating(Request $request): Response
+    {
+        // Retrieve the submitted rating value
+        $newRating = $request->request->get('rating');
+
+        // Retrieve the event ID from the request
+        $eventId = $request->request->get('event_id');
+
+        // Retrieve the event from the database
+        $event = $this->getDoctrine()->getRepository(Evennement::class)->find($eventId);
+
+        // Retrieve the current total rating and number of ratings for the event
+        $currentTotalRating = $event->getRating() * $event->getNumberOfRatings();
+
+        // Increment the number of ratings
+        $numberOfRatings = $event->getNumberOfRatings() + 1;
+
+        // Calculate the new total rating
+        $newTotalRating = $currentTotalRating + $newRating;
+
+        // Calculate the new average rating
+        $averageRating = $newTotalRating / $numberOfRatings;
+
+        // Set the new average rating and update the number of ratings
+        $event->setRating($averageRating);
+        $event->setNumberOfRatings($numberOfRatings);
+
+        // Persist the changes to the database
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($event);
+        $entityManager->flush();
+
+        // Redirect back to event page or display a confirmation message
+        return $this->redirectToRoute('evennement/index.html.twig', ['id' => $eventId]);
+    }
 
 
 }

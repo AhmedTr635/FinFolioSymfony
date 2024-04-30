@@ -28,3 +28,7 @@ donationButtons.forEach(function(button) {
         openDonationPopup(eventId);
     });
 });
+
+
+
+

@@ -11,6 +11,7 @@
 
     {% block body %}
 
+
         <div class="container-xxl flex-grow-1 container-p-y">
             <div class="row align-items-center">
                 <div class="col-md-6 mb-4 mr-md-1"> <!-- Add smaller margin to the right -->
@@ -179,6 +180,19 @@
             </div>
         </div>
 
+
+        {% if showRatingForm %}
+            <div id="rating-form" class="hidden">
+                <form id="rating-form" action="{{ path('submit_rating') }}" method="POST">
+                    <div class="rating">
+                        {% for i in 1..5 %}
+                            <span class="star" data-value="{{ i }}"><i class="far fa-star"></i></span>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Rating</button>
+                </form>
+            </div>
+        {% endif %}
 
 
 

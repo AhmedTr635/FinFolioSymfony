@@ -82,6 +82,35 @@ class Evennement
         $this->imageData = $imageData;
     }
 
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 8, nullable: true)]
+    private ?float $latitude = null;
+
+    #[ORM\Column(type: 'decimal', precision: 11, scale: 8, nullable: true)]
+    private ?float $longitude = null;
+
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): static
+    {
+        $this->latitude = $latitude;
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): static
+    {
+        $this->longitude = $longitude;
+        return $this;
+    }
+
     #[ORM\OneToMany(mappedBy: 'evenement_id', targetEntity: Don::class)]
     private Collection $dons;
 

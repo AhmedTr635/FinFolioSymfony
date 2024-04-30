@@ -84,8 +84,15 @@
                         <td colspan="7">No events found</td>
                     </tr>
                 {% endfor %}
+
                 </tbody>
+
             </table>
+            <div class="pagination-container" style="float: right; width: 30%;margin-top: 20px">
+
+                {{ knp_pagination_render(evennements, paginationTemplate) }}
+            </div>
+
         </div>
 
 
