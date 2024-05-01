@@ -41,10 +41,12 @@
                                     {{ form_label(form.interetMin, 'intérêt Min:', {'label_attr': {'class': 'form-label'}}) }}
                                     {{ form_widget(form.interetMin, {'attr': {'class': 'form-control form-control-lg'}}) }}
 {#                                    {{ form_errors(form.interetMin) }} #}{# Display validation errors for Intérêt Min field #}
+
                                 </div>
 
                             </div>
                             <button type="submit" class="btn btn-primary">Send</button>
+
                             <button id="loanCalculatorButton" type="button" class="btn btn-secondary">Loan Calculator</button>
                             <span style="margin-left: 10px; margin-right: 10px;"></span>
                             {{ form_end(form) }}
@@ -91,84 +93,7 @@
             </div>
 
 
-{#        <script>#}
-{#            document.getElementById('creditForm').addEventListener('submit', function(event) {#}
-{#                // Get the form inputs#}
-{#                const montant = document.getElementById('credit1_montant').value;#}
-{#                const dateD = document.getElementById('credit1_dateD').value;#}
-{#                const dateF = document.getElementById('credit1_dateF').value;#}
-{#                const interetMax = document.getElementById('credit1_interetMax').value;#}
-{#                const interetMin = document.getElementById('credit1_interetMin').value;#}
 
-{#                // Check if any of the fields are empty#}
-{#                if (!montant) {#}
-{#                    document.getElementById('montantError').style.display = 'block';#}
-{#                    document.getElementById('credit1_montant').classList.add('is-invalid');#}
-{#                    event.preventDefault();#}
-{#                } else {#}
-{#                    document.getElementById('montantError').style.display = 'none';#}
-{#                    document.getElementById('credit1_montant').classList.remove('is-invalid');#}
-{#                }#}
-
-{#                if (!dateD) {#}
-{#                    document.getElementById('dateDError').style.display = 'block';#}
-{#                    document.getElementById('credit1_dateD').classList.add('is-invalid');#}
-{#                    event.preventDefault();#}
-{#                } else {#}
-{#                    document.getElementById('dateDError').style.display = 'none';#}
-{#                    document.getElementById('credit1_dateD').classList.remove('is-invalid');#}
-{#                }#}
-
-{#                if (!dateF) {#}
-{#                    document.getElementById('dateFError').style.display = 'block';#}
-{#                    document.getElementById('credit1_dateF').classList.add('is-invalid');#}
-{#                    event.preventDefault();#}
-{#                } else {#}
-{#                    document.getElementById('dateFError').style.display = 'none';#}
-{#                    document.getElementById('credit1_dateF').classList.remove('is-invalid');#}
-{#                }#}
-
-{#                // Check if interetMax is not a number#}
-{#                if (isNaN(interetMax)) {#}
-{#                    document.getElementById('interetMaxError').innerText = 'Intérêt Max must be a number.';#}
-{#                    document.getElementById('interetMaxError').style.display = 'block';#}
-{#                    document.getElementById('credit1_interetMax').classList.add('is-invalid');#}
-{#                    event.preventDefault();#}
-{#                } else {#}
-{#                    document.getElementById('interetMaxError').style.display = 'none';#}
-{#                    document.getElementById('credit1_interetMax').classList.remove('is-invalid');#}
-{#                }#}
-
-{#                if (!interetMax || isNaN(interetMax)) {#}
-{#                    if (!interetMax) {#}
-{#                        document.getElementById('interetMaxError').innerText = 'Intérêt Max is required.';#}
-{#                    } else {#}
-{#                        document.getElementById('interetMaxError').innerText = 'Intérêt Max must be a number.';#}
-{#                    }#}
-{#                    document.getElementById('interetMaxError').style.display = 'block';#}
-{#                    document.getElementById('credit1_interetMax').classList.add('is-invalid');#}
-{#                    event.preventDefault();#}
-{#                } else {#}
-{#                    document.getElementById('interetMaxError').style.display = 'none';#}
-{#                    document.getElementById('credit1_interetMax').classList.remove('is-invalid');#}
-{#                }#}
-
-{#                // Check if interetMin is empty or not a number#}
-{#                if (!interetMin || isNaN(interetMin)) {#}
-{#                    if (!interetMin) {#}
-{#                        document.getElementById('interetMinError').innerText = 'Intérêt Min is required.';#}
-{#                    } else {#}
-{#                        document.getElementById('interetMinError').innerText = 'Intérêt Min must be a number.';#}
-{#                    }#}
-{#                    document.getElementById('interetMinError').style.display = 'block';#}
-{#                    document.getElementById('credit1_interetMin').classList.add('is-invalid');#}
-{#                    event.preventDefault();#}
-{#                } else {#}
-{#                    document.getElementById('interetMinError').style.display = 'none';#}
-{#                    document.getElementById('credit1_interetMin').classList.remove('is-invalid');#}
-{#                }#}
-{#            });#}
-{#        </script>#}
 
         <script>
             // Function to handle loan calculator button click
@@ -190,73 +115,73 @@
             // Function to validate the loan calculator input
             function validateForm() {
                 // Retrieve values from form inputs
-                // var loanAmount = parseFloat(document.getElementById('montant').value.replace(/,/g, ""));
-                // var interestRate = parseFloat(document.getElementById('interestRateInput').value);
-                // var loanTerm = parseFloat(document.getElementById('loanTermInput').value);
-                //
-                // if (!loanAmount && !interestRate && !loanTerm) {
-                //     // Display the general error message
-                //     document.getElementById('errorMessage').style.display = 'block';
-                //     document.getElementById('montant').classList.add('is-invalid');
-                //     document.getElementById('loanAmountError').style.display = 'block'
-                //     document.getElementById('interestRateError').style.display = 'block';
-                //     document.getElementById('interestRateInput').classList.add('is-invalid');
-                //     document.getElementById('loanTermError').style.display = 'block';
-                //     document.getElementById('loanTermInput').classList.add('is-invalid');
-                //
-                //     return false;
-                // }
-                //     else
-                //
-                //     document.getElementById('errorMessage').style.display = 'none';
-                // document.getElementById('loanAmountError').style.display = 'none';
-                // document.getElementById('montant').classList.remove('is-invalid');
-                // document.getElementById('interestRateError').style.display = 'none';
-                // document.getElementById('interestRateInput').classList.remove('is-invalid');
-                // document.getElementById('loanTermError').style.display = 'none';
-                // document.getElementById('loanTermInput').classList.remove('is-invalid');
-                //
-                //
+                 var loanAmount = parseFloat(document.getElementById('montant').value.replace(/,/g, ""));
+                 var interestRate = parseFloat(document.getElementById('interestRateInput').value);
+                 var loanTerm = parseFloat(document.getElementById('loanTermInput').value);
+
+                 if (!loanAmount && !interestRate && !loanTerm) {
+                     // Display the general error message
+                     document.getElementById('errorMessage').style.display = 'block';
+                     document.getElementById('montant').classList.add('is-invalid');
+                     document.getElementById('loanAmountError').style.display = 'block'
+                     document.getElementById('interestRateError').style.display = 'block';
+                     document.getElementById('interestRateInput').classList.add('is-invalid');
+                     document.getElementById('loanTermError').style.display = 'block';
+                     document.getElementById('loanTermInput').classList.add('is-invalid');
+
+                     return false;
+                 }
+                     else
+
+                     document.getElementById('errorMessage').style.display = 'none';
+                 document.getElementById('loanAmountError').style.display = 'none';
+                 document.getElementById('montant').classList.remove('is-invalid');
+                 document.getElementById('interestRateError').style.display = 'none';
+                 document.getElementById('interestRateInput').classList.remove('is-invalid');
+                 document.getElementById('loanTermError').style.display = 'none';
+                 document.getElementById('loanTermInput').classList.remove('is-invalid');
+
+
                 // // Check if any of the fields are empty
-                // if (!loanAmount) {
-                //     document.getElementById('montant').classList.add('is-invalid');
-                //     document.getElementById('loanAmountError').style.display = 'block';
-                //
-                //
-                //     return false;
-                // } else {
+                 if (!loanAmount) {
+                     document.getElementById('montant').classList.add('is-invalid');
+                     document.getElementById('loanAmountError').style.display = 'block';
+
+
+                     return false;
+                 } else {
                 //     // Hide the error message if the loan amount is not empty
-                //     document.getElementById('loanAmountError').style.display = 'none';
-                //     document.getElementById('montant').classList.remove('is-invalid');
+                    document.getElementById('loanAmountError').style.display = 'none';
+                     document.getElementById('montant').classList.remove('is-invalid');
+
+                 }
                 //
-                // }
-                //
-                // if (!interestRate) {
-                //     // Display the error message for the interest rate input
-                //     document.getElementById('interestRateError').style.display = 'block';
-                //     document.getElementById('interestRateInput').classList.add('is-invalid');
-                //     return false;
-                // } else {
-                //     // Hide the error message if the interest rate is not empty
-                //     document.getElementById('interestRateError').style.display = 'none';
-                //     document.getElementById('interestRateInput').classList.remove('is-invalid');
-                //
-                //
-                //
-                // }
-                //
-                // if (!loanTerm) {
-                //     // Display the error message for the loan term input
-                //     document.getElementById('loanTermError').style.display = 'block';
-                //     document.getElementById('loanTermInput').classList.add('is-invalid');
-                //     return false;
-                // } else {
-                //     // Hide the error message if the loan term is not empty
-                //     document.getElementById('loanTermError').style.display = 'none';
-                //     document.getElementById('loanTermInput').classList.remove('is-invalid');
-                // }
-                //
-                // // All fields are filled, return true
+                 if (!interestRate) {
+                     // Display the error message for the interest rate input
+                     document.getElementById('interestRateError').style.display = 'block';
+                     document.getElementById('interestRateInput').classList.add('is-invalid');
+                     return false;
+                 } else {
+                     // Hide the error message if the interest rate is not empty
+                     document.getElementById('interestRateError').style.display = 'none';
+                     document.getElementById('interestRateInput').classList.remove('is-invalid');
+
+
+
+                 }
+
+                 if (!loanTerm) {
+                     // Display the error message for the loan term input
+                     document.getElementById('loanTermError').style.display = 'block';
+                     document.getElementById('loanTermInput').classList.add('is-invalid');
+                     return false;
+                 } else {
+                     // Hide the error message if the loan term is not empty
+                     document.getElementById('loanTermError').style.display = 'none';
+                     document.getElementById('loanTermInput').classList.remove('is-invalid');
+                 }
+
+                // All fields are filled, return true
                 return true;
             }
 
@@ -310,8 +235,8 @@
                 else
 
 
-                // Perform loan calculation
-                var monthlyInterestRate = interestRate / 100 / 12;
+                    // Perform loan calculation
+                    var monthlyInterestRate = interestRate / 100 / 12;
                 var numberOfPayments = loanTerm * 12;
                 var monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
 
@@ -361,6 +286,9 @@
                 this.value = numberWithCommas(value);
             });
         </script>
+
+
+
 
 
 

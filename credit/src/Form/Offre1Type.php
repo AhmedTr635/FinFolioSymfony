@@ -10,12 +10,14 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType; //
 use Symfony\Component\Form\Extension\Core\Type\NumberType; // Import NumberType
 
+
 class Offre1Type extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('montant')
+
             ->add('interet')
             ->add('credit_id')
             ->add('user_id');

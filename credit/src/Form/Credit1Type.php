@@ -21,7 +21,7 @@ class Credit1Type extends AbstractType
             ->add('montant', TextType::class, [
                 'required' => false,
                 'constraints' => [
-                    // Allow null or string types
+
                 ],
             ])
             ->add('interetMax', null, [

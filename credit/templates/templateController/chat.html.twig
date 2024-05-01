@@ -480,75 +480,73 @@
 {#    </div>#}
 
 
-            <script>
-                const socket = new WebSocket("ws://localhost:3001");
+    <script>
+        const socket = new WebSocket("ws://localhost:3001");
 
-                socket.addEventListener("open", function() {
-                    console.log("CONNECTED");
-                });
+        socket.addEventListener("open", function() {
+            console.log("CONNECTED");
+        });
 
-                function addMessage(name, message, isRightMessage = false) {
-                    const messageClass = isRightMessage ? "chat-message chat-message-right" : "chat-message";
-                    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const messageHTML = `
+        function addMessage(name, message, isSender = false) {
+            const messageClass = isSender ? "chat-message chat-message-right" : "chat-message";
+            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const senderAvatar = isSender ? "../../assets/img/avatars/1.png" : "../../assets/img/avatars/2.png";
+            const receiverAvatar = isSender ? "../../assets/img/avatars/2.png" : "../../assets/img/avatars/1.png";
+            const messageHTML = `
         <li class="${messageClass}">
             <div class="d-flex overflow-hidden">
-                ${!isRightMessage ? `
+                ${!isSender ? `
                     <div class="user-avatar flex-shrink-0 me-3">
                         <div class="avatar avatar-sm">
-                            <img src="../../assets/img/avatars/2.png" alt="Avatar" class="rounded-circle">
+                            <img src="${receiverAvatar}" alt="Avatar" class="rounded-circle">
                         </div>
                     </div>` : ''}
                 <div class="chat-message-wrapper flex-grow-1">
                     <div class="chat-message-text">
                         <p class="mb-0">${message}</p>
                     </div>
-                    <div class="${isRightMessage ? 'text-end' : ''} text-muted mt-1">
-                        ${isRightMessage ? '<i class="bx bx-check-double text-success"></i>' : ''}
+                    <div class="${isSender ? 'text-end' : ''} text-muted mt-1">
+                        ${isSender ? '<i class="bx bx-check-double text-success"></i>' : ''}
                         <small>${currentTime}</small>
                     </div>
                 </div>
-                ${isRightMessage ? `
+                ${isSender ? `
                     <div class="user-avatar flex-shrink-0 ms-3">
                         <div class="avatar avatar-sm">
-                            <img src="../../assets/img/avatars/1.png" alt="Avatar" class="rounded-circle">
+                            <img src="${senderAvatar}" alt="Avatar" class="rounded-circle">
                         </div>
                     </div>` : ''}
             </div>
-
         </li>`;
 
-                    // Append the messageHTML to your chat container
-                     document.getElementById('chat').innerHTML += messageHTML;
-                }
+            // Append the messageHTML to your chat container
+            document.getElementById('chat').innerHTML += messageHTML;
+        }
 
+        socket.addEventListener("message", function(e) {
+            console.log(e.data);
+            try {
+                const message = JSON.parse(e.data);
+                addMessage(message.name, message.message, false); // Assume messages from others
+            } catch(e) {
+                // Catch any errors
+            }
+        });
 
-                socket.addEventListener("message", function(e) {
-                    console.log(e.data);
-                    try {
-                        const message = JSON.parse(e.data);
-                        addMessage(message.name, message.message);
-                    } catch(e) {
-                        // Catch any errors
-                    }
-                });
-
-                document.getElementById("sendBtn").addEventListener("click", function() {
-                    const message = {
-                        name: "Your Name", // You can customize this or retrieve it from an input field
-                        message: document.getElementById("message").value
-
-                    };
-                    socket.send(JSON.stringify(message));
-                    addMessage(message.name, message.message, true);
-                    // Clear the message input field after sending
-                    document.getElementById("message").value = "";
-                });
-            </script>
-
+        document.getElementById("sendBtn").addEventListener("click", function() {
+            const message = {
+                name: "Your Name", // You can customize this or retrieve it from an input field
+                message: document.getElementById("message").value
+            };
+            socket.send(JSON.stringify(message));
+            addMessage(message.name, message.message, true); // Assume messages sent by the user
+            // Clear the message input field after sending
+            document.getElementById("message").value = "";
+        });
+    </script>
 
 
 
 
 
-            {% endblock %}
+{% endblock %}

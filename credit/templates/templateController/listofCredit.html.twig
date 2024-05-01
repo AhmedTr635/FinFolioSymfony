@@ -21,66 +21,178 @@
 
 
     <div style="margin: 50px;" class="container-fluid">
-    <div class="container-fluid mt-3" style="margin: 50px;" >
-        <input style="width: 80%; padding: 10px" type="text" id="searchInput" class="form-control" placeholder="Search credits">
-    </div>
-    <!-- Row -->
-    <div class="row" id="creditCardContainer">
-        {% for credit in credits %}
-            <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 credit-card" id="creditCard{{ loop.index }}">
-                <div class="card pull-up"> <!-- Removed "credit-card" class here -->
-                    <div class="card-body align-items-center" style="padding: 15px;">
-                        <div class="d-flex align-items-center mb-2">
-                            <a href="javascript:void(0)" class="ico-icon">
-                                <img src="/images/avatar/1.png" alt="Avatar" class="rounded" style="width: 50px; height: 50px;">
-                            </a>
-                            <div class="ms-2">
-                                {# <a href="javascript:void(0)"><h4 class="card-title mb-0">{{ credit.name }}</h4></a> #}
-                                {# <span>{{ credit.fullName }}</span> #}
+
+        <div class="container-fluid mt-3" style="margin: 50px;">
+            <input  style="width: 50%; padding: 10px ; opacity: 0" type="text"  class="form-control" placeholder="Search credits" >
+        </div>
+
+        <!-- Total Balance Card -->
+        <div class="col-sm-6 col-xl-3 position-absolute" style="top: 100px; right: 50px;">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="content-left">
+                            <h3 class="mb-0">${{ solde }}</h3>
+                            <small>Total balance</small>
+                        </div>
+                        <span class="badge bg-label-primary rounded-circle p-2">
+                        <i class="bx bx-dollar bx-sm"></i>
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Income Chart -->
+        <div class="row row-bordered g-0">
+            <div class="col-md-8">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Total credit requests </h5>
+                    <small class="card-subtitle">{{ totalCreditRequests }}</small>
+                </div>
+                <div class="card-body" style="position: relative;">
+                    <div id="totalIncomeChart" style="min-height: 265px;">
+                        <div id="apexchartsar878t7m" class="apexcharts-canvas apexchartsar878t7m apexcharts-theme-light" style="width: 534px; height: 250px;">
+
+                        </div>
+                </div>
+            </div>
+        </div>
+            <div class="col-md-4">
+                <div class="card-header d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title mb-0">Report</h5>
+                       <small class="card-subtitle">Monthly Avg </small>
+
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn p-0" type="button" id="totalIncome" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bx bx-dots-vertical-rounded"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="totalIncome">
+                            <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>
+                            <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
+                            <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="report-list">
+                        <div class="report-list-item rounded-2 mb-3">
+                            <div class="d-flex align-items-start">
+                                <div class="report-list-icon shadow-sm me-2">
+                                    <img src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/svg/icons/paypal-icon.svg" width="22" height="22" alt="Paypal">
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end w-100 flex-wrap gap-2">
+                                    <div class="d-flex flex-column">
+                                        <span>Average Amount Requested</span>
+                                        <h5 class="mb-0">{{ amountStats.average_amount_requested }} k</h5>
+                                    </div>
+                                    <small class="text-success">Max: {{ amountStats.minimum_amount_requested }}, Min: {{ amountStats.maximum_amount_requested }}</small>
+                                </div>
                             </div>
                         </div>
-                        <div class="row mb-2">
-                            <div class="col-sm-6">
-                                <label for="loanAmount" class="mb-0 fs-12 text-dark font-w600">Amount Loan:</label>
-                            </div>
-                            <div class="col-sm-6">
-                                <p id="loanAmount" class="mb-0 fs-12 text-dark font-w600">{{ credit.montant }}</p>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col-sm-6">
-                                <label for="loanPeriod" class="mb-0 fs-12 text-dark font-w600">Loan Period:</label>
-                            </div>
-                            <div class="col-sm-6">
-                                <p id="loanPeriod" class="mb-0 fs-12 text-dark font-w600">{{ credit.dateD ? credit.dateD|date('Y-m-d') : '' }} - {{ credit.dateF ? credit.dateF|date('Y-m-d') : '' }}</p>
+                        <div class="report-list-item rounded-2 mb-3">
+                            <div class="d-flex align-items-start">
+                                <div class="report-list-icon shadow-sm me-2">
+                                    <img src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/svg/icons/shopping-bag-icon.svg" width="22" height="22" alt="Shopping Bag">
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end w-100 flex-wrap gap-2">
+                                    <div class="d-flex flex-column">
+                                        <span>Average Interest Rates</span>
+                                        <h5 class="mb-0">Max: {{ interestStats.maximum_interest_max }}, Min: {{ interestStats.minimum_interest_min }}</h5>
+                                    </div>
+                                    <small class="text-success">Max: {{ interestStats.maximum_interest_max }}, Min: {{ interestStats.minimum_interest_min }}</small>
+                                </div>
                             </div>
                         </div>
-                        <div class="row mb-2">
-                            <div class="col-sm-6">
-                                <label for="interestMax" class="mb-0 fs-12 text-dark font-w600">Interest Max:</label>
+                        <div class="report-list-item rounded-2">
+                            <div class="d-flex align-items-start">
+                                <div class="report-list-icon shadow-sm me-2">
+                                    <img src="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/assets/svg/icons/wallet-icon.svg" width="22" height="22" alt="Wallet">
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end w-100 flex-wrap gap-2">
+                                    <div class="d-flex flex-column">
+                                        <span>total amount of credits</span>
+                                        <h5 class="mb-0">{{ totalCreditRequestsAmount }}
+                                            k</h5>
+
+
+
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-sm-6">
-                                <p id="interestMax" class="mb-0 fs-12 text-dark font-w600">{{ credit.interetMax }}%</p>
-                            </div>
-                        </div>
-                        <div class="row mb-2">
-                            <div class="col-sm-6">
-                                <label for="interestMin" class="mb-0 fs-12 text-dark font-w600">Interest Min:</label>
-                            </div>
-                            <div class="col-sm-6">
-                                <p id="interestMin" class="mb-0 fs-12 text-dark font-w600">{{ credit.interetMin }}%</p>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between mt-3">
-                            <button type="button" class="btn btn-primary send-offer-btn" data-amount="{{ credit.montant }}" datamax="{{ credit.interetMax }}" datamin="{{ credit.interetMin }}" data-user-id="{{ credit.getUserId().getId() }}" data-credit-id="{{ credit.getId() }}">Send Offer</button>
-                            <a href="{{ path('app_chat', {'user_id': 113, 'credit_id': credit.id}) }}" class="btn btn-secondary" id="contactButton">Contact</a>
                         </div>
                     </div>
                 </div>
             </div>
-        {% endfor %}
+
+
+            <div class="container-fluid mt-3 d-flex justify-content-center align-items-center" style="margin: 10px;">
+                <div>
+                    <h5 class="card-title mb-0">Credit requests</h5>
+                    <input style="width: 50%; padding: 10px;" type="text" id="searchInput" class="form-control" placeholder="Search credits">
+                </div>
+            </div>
+
+            <!-- Row -->
+        <div class="row" style="margin-top: 100px;">
+            {% for credit in credits %}
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6 credit-card" id="creditCard{{ loop.index }}">
+                    <div class="card pull-up">
+                        <div class="card-body align-items-center" style="padding: 15px;">
+                            <div class="d-flex align-items-center mb-2">
+                                <a href="javascript:void(0)" class="ico-icon">
+                                    <img src="/images/avatar/1.png" alt="Avatar" class="rounded" style="width: 50px; height: 50px;">
+                                </a>
+                                <div class="ms-2">
+                                    {# <a href="javascript:void(0)"><h4 class="card-title mb-0">{{ credit.name }}</h4></a> #}
+                                    {# <span>{{ credit.fullName }}</span> #}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-6">
+                                    <label for="loanAmount" class="mb-0 fs-12 text-dark font-w600">Amount Loan:</label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p id="loanAmount" class="mb-0 fs-12 text-dark font-w600">{{ credit.montant }}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-6">
+                                    <label for="loanPeriod" class="mb-0 fs-12 text-dark font-w600">Loan Period:</label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p id="loanPeriod" class="mb-0 fs-12 text-dark font-w600">{{ credit.dateD ? credit.dateD|date('Y-m-d') : '' }} - {{ credit.dateF ? credit.dateF|date('Y-m-d') : '' }}</p>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-6">
+                                    <label for="interestMax" class="mb-0 fs-12 text-dark font-w600">Interest Max:</label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p id="interestMax" class="mb-0 fs-12 text-dark font-w600">{{ credit.interetMax }}%</p>
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-6">
+                                    <label for="interestMin" class="mb-0 fs-12 text-dark font-w600">Interest Min:</label>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p id="interestMin" class="mb-0 fs-12 text-dark font-w600">{{ credit.interetMin }}%</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between mt-3">
+                                <button type="button" class="btn btn-primary send-offer-btn" data-amount="{{ credit.montant }}" datamax="{{ credit.interetMax }}" datamin="{{ credit.interetMin }}" data-user-id="{{ credit.getUserId().getId() }}" data-credit-id="{{ credit.getId() }}">Send Offer</button>
+                                <a href="{{ path('app_chat', {'user_id': 113, 'credit_id': credit.id}) }}" class="btn btn-secondary" id="contactButton">Contact</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
-</div>
+
 
     {# Include the offer popup within a block #}
     {% block offer_popup %}

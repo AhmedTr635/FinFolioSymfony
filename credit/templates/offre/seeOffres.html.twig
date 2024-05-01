@@ -47,7 +47,7 @@
                             </div>
                         </div>
                         <span class="d-block mb-1">Solde</span>
-                        <h3 class="card-title text-nowrap mb-2">$42,389</h3>
+                        <h3 id="solde-value"  class="card-title text-nowrap mb-2">${{ solde }}</h3>
                         <small class="text-success fw-medium"><i class="bx bx-up-arrow-alt"></i> +52.18%</small>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                             <div class="content-left">
                                 <span>offers accepted</span>
                                 <div class="d-flex align-items-end mt-2">
-                                    <h4 class="mb-0 me-2">2</h4>
+                                    <h4 class="mb-0 me-2">0</h4>
                                     <small class="text-danger">(-14%)</small>
                                 </div>
                                 <p class="mb-0">Last week analytics</p>
@@ -119,11 +119,15 @@
                     <tbody>
                     {% for offre in offres %}
                         <tr>
-                            <td>{{ offre.getUserId()}}</td>
+                            <td>{{ offre.getUserId().getPrenom() ~ ' ' ~ offre.getUserId().getNom() }}</td>
                             <td>${{ offre.getMontant() }}</td>
                             <td>{{ offre.getInteret() }}%</td>
                             <td>
-                                <button class="btn btn-success btn-sm accept-btn">Accept</button>
+                                <form id="accept-form-{{ offre.getId() }}" action="{{ path('accept_offer', {'offerId': offre.getId()}) }}" method="get" onsubmit="return handleAcceptSubmit({{ offre.getId() }})">
+                                    <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                </form>
+
+
                                 <button class="btn btn-danger btn-sm refuse-btn">Refuse</button>
                             </td>
                         </tr>
@@ -147,5 +151,20 @@
             </div>
         </div>
     </div>
+    <script>
+        function handleAcceptSubmit(offerId) {
+            var confirmation = confirm("Are you sure you want to accept this offer?");
+            if (confirmation) {
+                alert("Offer accepted successfully!");
+                return true; // Allow the form submission
+            } else {
+                return false; // Prevent the form submission
+            }
+        }
+    </script>
+
+
+
+
 
 {% endblock %}

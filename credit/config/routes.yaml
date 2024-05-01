@@ -1,3 +1,10 @@
 #index:
 #    path: /
 #    controller: App\Controller\DefaultController::index
+
+accept_offer:
+  path: '/accept-offer/{offerId}'
+  controller: 'App\Controller\OffreController::acceptOffer'
+
+
+
