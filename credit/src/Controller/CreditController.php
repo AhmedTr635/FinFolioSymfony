@@ -42,8 +42,13 @@ class CreditController extends AbstractController
             throw $this->createNotFoundException('User with ID 106 not found');
         }
 
+
         $solde = number_format($solde, 2, '.', ',');
         $credits = $creditRepository->findAll();
+        $users = $userRepository->findAll();
+
+        // Calculate ratings for each user
+        $userRatings = $this->calculateUserRatings($users);
 
         // Fetch statistics data
         $statisticsData = $this->getStatisticsData();
@@ -56,6 +61,8 @@ class CreditController extends AbstractController
         // Merge credit data and statistics data
         $data = [
             'credits' => $credits,
+            'users'=> $users,
+            'userRatings' => $userRatings,
             'totalCreditRequestsAmount' => $totalCreditRequestsAmount,
 
             'solde' => $solde,
@@ -138,8 +145,8 @@ class CreditController extends AbstractController
     }
 
 
-    #[Route('/{user_id}/{credit_id}', name: 'app_chat', methods: ['GET'])]
-    public function chat($user_id, $credit_id, UserRepository $userRepository): Response
+    #[Route('/{user_id}/{credit_id}/{nameClient}', name: 'app_chat', methods: ['GET'])]
+    public function chat($user_id, $credit_id,$nameClient ,UserRepository $userRepository): Response
     {
         // Set user_id to 1
         $user1 = $userRepository->find($user_id);
@@ -156,8 +163,9 @@ class CreditController extends AbstractController
         }
 
         // Fetch the second user associated with the Credit entity
-        $user2 = $credit->getUserId(); // Assuming you have a method to get the user associated with the credit
-
+        $user2 = $credit->getUserId();
+        // Assuming you have a method to get the user associated with the credit
+        $userName = $user2->getName();
         // Log the IDs of the two users
 
 
@@ -165,6 +173,7 @@ class CreditController extends AbstractController
         $content = $this->renderView('templateController/chat.html.twig', [
             'user1' => $user1,
             'user2' => $user2,
+
             'controller_name' => 'DefaultController',
         ]);
 
@@ -204,11 +213,16 @@ class CreditController extends AbstractController
 
         // Average, Minimum, and Maximum Amount Requested
         $amountStats = $this->entityManager
-            ->createQuery('SELECT AVG(c.montant) AS average_amount_requested,
-                          MIN(c.montant) AS minimum_amount_requested,
-                          MAX(c.montant) AS maximum_amount_requested
+            ->createQuery('SELECT MAX((c.montant)) AS maximum_amount_requested,
+                          MIN((c.montant)) AS minimum_amount_requested,
+                          AVG((c.montant)) AS average_amount_requested
                      FROM App\Entity\Credit c')
             ->getSingleResult();
+
+
+
+
+
 
         // Average, Minimum, and Maximum Interest Rates
         $interestStats = $this->entityManager
@@ -238,5 +252,26 @@ class CreditController extends AbstractController
 
         return (float) $totalAmount;
     }
+
+    private function calculateUserRatings(array $users): array
+    {
+        $ratings = [];
+
+        foreach ($users as $user) {
+            // Calculate the rating based on nbcredit
+            $rating = $this->calculateRating($user->getNbCredit());
+            $ratings[$user->getId()] = $rating;
+        }
+
+        return $ratings;
+    }
+
+    private function calculateRating(int $nbCredit): float
+    {
+        // Your rating calculation logic here
+        // Example: Let's say the rating is simply the square root of the number of credits
+        return sqrt($nbCredit);
+    }
+
 
 }

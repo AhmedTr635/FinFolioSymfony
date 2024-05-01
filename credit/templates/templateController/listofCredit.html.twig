@@ -48,14 +48,32 @@
             <div class="col-md-8">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Total credit requests </h5>
-                    <small class="card-subtitle">{{ totalCreditRequests }}</small>
+                    <small class="card-subtitle">{{ totalCreditRequests }}$</small>
                 </div>
                 <div class="card-body" style="position: relative;">
                     <div id="totalIncomeChart" style="min-height: 265px;">
-                        <div id="apexchartsar878t7m" class="apexcharts-canvas apexchartsar878t7m apexcharts-theme-light" style="width: 534px; height: 250px;">
+                        <svg id="SvgjsSvg4388" width="395" height="250" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev" class="apexcharts-svg apexcharts-zoomable" xmlns:data="ApexChartsNS" transform="translate(0, 0)" style="background: transparent;">
+                            <!-- Define the axes, labels, and other necessary elements here -->
 
-                        </div>
-                </div>
+                            <!-- Define the path for the linear chart -->
+                            <path d="M 0 206.70079907417298 L 31.402814171530984 109.55142350931169 L 62.80562834306197 49.60819177780152 L 94.20844251459296 49.60819177780152 L 125.61125668612394 126.08748743524552 L 157.01407085765493 126.08748743524552 L 188.41688502918592 173.6286712223053 L 219.81969920071688 173.6286712223053 L 251.22251337224787 93.01535958337783 L 282.62532754377884 93.01535958337783 L 314.02814171530986 12.402047944450374 L 345.4309558868408 12.402047944450374" fill="none" stroke="#696cff" stroke-width="3" class="apexcharts-area" index="0"></path>
+
+                            <!-- Add crescent and decrescent markers -->
+                            <g class="apexcharts-series-markers-wrap" data:realIndex="0">
+                                <g class="apexcharts-series-markers">
+                                    <!-- Crescent marker -->
+                                    <path d="M -4 206.70079907417298 A 4 4, 0, 0, 1, 0 202.70079907417298 A 4 4, 0, 0, 1, 4 206.70079907417298 Z" fill="#696cff"></path>
+                                    <!-- Decrescent marker -->
+                                    <path d="M -4 109.55142350931169 A 4 4, 0, 0, 0, 0 113.55142350931169 A 4 4, 0, 0, 0, 4 109.55142350931169 Z" fill="#696cff"></path>
+                                    <!-- Add more paths for other data points -->
+                                </g>
+                            </g>
+
+                            <!-- Add labels, axes, and other elements as needed -->
+                        </svg>
+
+
+                    </div>
             </div>
         </div>
             <div class="col-md-4">
@@ -88,7 +106,7 @@
                                         <span>Average Amount Requested</span>
                                         <h5 class="mb-0">{{ amountStats.average_amount_requested }} k</h5>
                                     </div>
-                                    <small class="text-success">Max: {{ amountStats.minimum_amount_requested }}, Min: {{ amountStats.maximum_amount_requested }}</small>
+                                    <small class="text-success">Min {{ amountStats.minimum_amount_requested }}$, Max: {{ amountStats.maximum_amount_requested }}$</small>
                                 </div>
                             </div>
                         </div>
@@ -100,9 +118,9 @@
                                 <div class="d-flex justify-content-between align-items-end w-100 flex-wrap gap-2">
                                     <div class="d-flex flex-column">
                                         <span>Average Interest Rates</span>
-                                        <h5 class="mb-0">Max: {{ interestStats.maximum_interest_max }}, Min: {{ interestStats.minimum_interest_min }}</h5>
+                                        <h5 class="mb-0">Max: {{ interestStats.maximum_interest_max }}%, Min: {{ interestStats.minimum_interest_min }}%</h5>
                                     </div>
-                                    <small class="text-success">Max: {{ interestStats.maximum_interest_max }}, Min: {{ interestStats.minimum_interest_min }}</small>
+                                    <small class="text-success">Max: {{ interestStats.maximum_interest_max }}%, Min: {{ interestStats.minimum_interest_min }}%</small>
                                 </div>
                             </div>
                         </div>
@@ -146,8 +164,8 @@
                                     <img src="/images/avatar/1.png" alt="Avatar" class="rounded" style="width: 50px; height: 50px;">
                                 </a>
                                 <div class="ms-2">
-                                    {# <a href="javascript:void(0)"><h4 class="card-title mb-0">{{ credit.name }}</h4></a> #}
-                                    {# <span>{{ credit.fullName }}</span> #}
+                                     <a href="javascript:void(0)"><h4 class="card-title mb-0">{{ credit.getUserId().getNom() }}</h4></a>
+                                     <span>{{ credit.getUserId().getPrenom() }}</span>
                                 </div>
                             </div>
                             <div class="row mb-2">
@@ -155,7 +173,7 @@
                                     <label for="loanAmount" class="mb-0 fs-12 text-dark font-w600">Amount Loan:</label>
                                 </div>
                                 <div class="col-sm-6">
-                                    <p id="loanAmount" class="mb-0 fs-12 text-dark font-w600">{{ credit.montant }}</p>
+                                    <p id="loanAmount" class="mb-0 fs-12 text-dark font-w600">{{ credit.montant }}$</p>
                                 </div>
                             </div>
                             <div class="row mb-2">
@@ -172,6 +190,9 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <p id="interestMax" class="mb-0 fs-12 text-dark font-w600">{{ credit.interetMax }}%</p>
+                                    <div class="mb-2">
+
+                                    </div>
                                 </div>
                             </div>
                             <div class="row mb-2">
@@ -180,24 +201,49 @@
                                 </div>
                                 <div class="col-sm-6">
                                     <p id="interestMin" class="mb-0 fs-12 text-dark font-w600">{{ credit.interetMin }}%</p>
+
+                                    <div class="read-only-ratings jq-ry-container" data-rateyo-read-only="true" readonly="readonly" style="width: 160px;"><div class="jq-ry-group-wrapper"><div class="jq-ry-normal-group jq-ry-group"><!--?xml version="1.0" encoding="utf-8"?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 12.705 512 486.59" x="0px" y="0px" xml:space="preserve" width="32px" height="32px" fill="gray"><polygon points="256.814,12.705 317.205,198.566 512.631,198.566 354.529,313.435 414.918,499.295 256.814,384.427 98.713,499.295 159.102,313.435 1,198.566 196.426,198.566 "></polygon></svg><!--?xml version="1.0" encoding="utf-8"?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 12.705 512 486.59" x="0px" y="0px" xml:space="preserve" width="32px" height="32px" fill="gray" style="margin-left: 0px;"><polygon points="256.814,12.705 317.205,198.566 512.631,198.566 354.529,313.435 414.918,499.295 256.814,384.427 98.713,499.295 159.102,313.435 1,198.566 196.426,198.566 "></polygon></svg><!--?xml version="1.0" encoding="utf-8"?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 12.705 512 486.59" x="0px" y="0px" xml:space="preserve" width="32px" height="32px" fill="gray" style="margin-left: 0px;"><polygon points="256.814,12.705 317.205,198.566 512.631,198.566 354.529,313.435 414.918,499.295 256.814,384.427 98.713,499.295 159.102,313.435 1,198.566 196.426,198.566 "></polygon></svg><!--?xml version="1.0" encoding="utf-8"?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 12.705 512 486.59" x="0px" y="0px" xml:space="preserve" width="32px" height="32px" fill="gray" style="margin-left: 0px;"><polygon points="256.814,12.705 317.205,198.566 512.631,198.566 354.529,313.435 414.918,499.295 256.814,384.427 98.713,499.295 159.102,313.435 1,198.566 196.426,198.566 "></polygon></svg><!--?xml version="1.0" encoding="utf-8"?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 12.705 512 486.59" x="0px" y="0px" xml:space="preserve" width="32px" height="32px" fill="gray" style="margin-left: 0px;"><polygon points="256.814,12.705 317.205,198.566 512.631,198.566 354.529,313.435 414.918,499.295 256.814,384.427 98.713,499.295 159.102,313.435 1,198.566 196.426,198.566 "></polygon></svg></div><div class="jq-ry-rated-group jq-ry-group" style="width: 40%;"><!--?xml version="1.0" encoding="utf-8"?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 12.705 512 486.59" x="0px" y="0px" xml:space="preserve" width="32px" height="32px" fill="#f39c12"><polygon points="256.814,12.705 317.205,198.566 512.631,198.566 354.529,313.435 414.918,499.295 256.814,384.427 98.713,499.295 159.102,313.435 1,198.566 196.426,198.566 "></polygon></svg><!--?xml version="1.0" encoding="utf-8"?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 12.705 512 486.59" x="0px" y="0px" xml:space="preserve" width="32px" height="32px" fill="#f39c12" style="margin-left: 0px;"><polygon points="256.814,12.705 317.205,198.566 512.631,198.566 354.529,313.435 414.918,499.295 256.814,384.427 98.713,499.295 159.102,313.435 1,198.566 196.426,198.566 "></polygon></svg><!--?xml version="1.0" encoding="utf-8"?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 12.705 512 486.59" x="0px" y="0px" xml:space="preserve" width="32px" height="32px" fill="#f39c12" style="margin-left: 0px;"><polygon points="256.814,12.705 317.205,198.566 512.631,198.566 354.529,313.435 414.918,499.295 256.814,384.427 98.713,499.295 159.102,313.435 1,198.566 196.426,198.566 "></polygon></svg><!--?xml version="1.0" encoding="utf-8"?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 12.705 512 486.59" x="0px" y="0px" xml:space="preserve" width="32px" height="32px" fill="#f39c12" style="margin-left: 0px;"><polygon points="256.814,12.705 317.205,198.566 512.631,198.566 354.529,313.435 414.918,499.295 256.814,384.427 98.713,499.295 159.102,313.435 1,198.566 196.426,198.566 "></polygon></svg><!--?xml version="1.0" encoding="utf-8"?--><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 12.705 512 486.59" x="0px" y="0px" xml:space="preserve" width="32px" height="32px" fill="#f39c12" style="margin-left: 0px;"><polygon points="256.814,12.705 317.205,198.566 512.631,198.566 354.529,313.435 414.918,499.295 256.814,384.427 98.713,499.295 159.102,313.435 1,198.566 196.426,198.566 "></polygon></svg></div></div></div>
+
+
+
+
                                 </div>
                             </div>
                             <div class="d-flex align-items-center justify-content-between mt-3">
                                 <button type="button" class="btn btn-primary send-offer-btn" data-amount="{{ credit.montant }}" datamax="{{ credit.interetMax }}" datamin="{{ credit.interetMin }}" data-user-id="{{ credit.getUserId().getId() }}" data-credit-id="{{ credit.getId() }}">Send Offer</button>
-                                <a href="{{ path('app_chat', {'user_id': 113, 'credit_id': credit.id}) }}" class="btn btn-secondary" id="contactButton">Contact</a>
+                                <a href="{{ path('app_chat', {'user_id': 113, 'credit_id': credit.id ,'nameClient':credit.getUserId().getNom() }) }}" class="btn btn-secondary" id="contactButton">Contact</a>
                             </div>
                         </div>
                     </div>
                 </div>
-            {% endfor %}
+
+            <script>
+                // Function to set the star rating for a specific credit card
+                function setRating{{ loop.index }}(rating) {
+                    const ratedGroup = document.querySelector('#creditCard{{ loop.index }} .jq-ry-rated-group');
+                    const widthPercentage = (rating / 5) * 100; // Assuming a maximum rating of 5 stars
+                    ratedGroup.style.width = widthPercentage + '%';
+                }
+
+                // Example usage: Set rating dynamically for this credit card
+                setRating{{ loop.index }}({{ userRatings[credit.getUserId().getId()] }}); // Access the rating from the userRatings array using the user ID
+            </script>
+     {% endfor %}
         </div>
     </div>
+
+
+
+
+
+
 
 
     {# Include the offer popup within a block #}
     {% block offer_popup %}
         {% include 'templateController/offer_popup.html.twig' %}
     {% endblock %}
+
 
 
 
@@ -243,6 +289,8 @@
             });
         });
     </script>
+
+
 
 
 {% endblock %}
