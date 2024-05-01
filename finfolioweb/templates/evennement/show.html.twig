@@ -1,76 +1,139 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Evennement{% endblock %}
-
-{% block body %}
-    <h1>Evennement</h1>
-
-{#    <table class="table">#}
-{#        <tbody>#}
-{#            <tr>#}
-{#                <th>Id</th>#}
-{#                <td>{{ evennement.id }}</td>#}
-{#            </tr>#}
-{#            <tr>#}
-{#                <th>Nom_event</th>#}
-{#                <td>{{ evennement.nomEvent }}</td>#}
-{#            </tr>#}
-{#            <tr>#}
-{#                <th>Montant</th>#}
-{#                <td>{{ evennement.montant }}</td>#}
-{#            </tr>#}
-{#            <tr>#}
-{#                <th>Date</th>#}
-{#                <td>{{ evennement.date ? evennement.date|date('Y-m-d H:i:s') : '' }}</td>#}
-{#            </tr>#}
-{#            <tr>#}
-{#                <th>Adresse</th>#}
-{#                <td>{{ evennement.adresse }}</td>#}
-{#            </tr>#}
-{#            <tr>#}
-{#                <th>Description</th>#}
-{#                <td>{{ evennement.description }}</td>#}
-{#            </tr>#}
-{#            <tr>#}
-{#                <th>Rating</th>#}
-{#                <td>{{ evennement.rating }}</td>#}
-{#            </tr>#}
-{#        </tbody>#}
-{#    </table>#}
+{% extends 'sidebar.html.twig' %}
+{% block container %}
+    {%  block the_navbar %}
+    {% endblock %}
 
 
 
 
-    <p>Location: {{ evennement.adresse }}</p>
 
-    {% if googleMapsLink is not null %}
-        <div id="map" style="height: 400px; width: 100%;"></div>
-        <a href="{{ googleMapsLink }}" target="_blank">View location on Google Maps</a>
-    {% else %}
-        <p>Location not available for this event.</p>
-    {% endif %}
-{% endblock %}
+    {% block body %}
+        {% if googleMapsLink is not null %}
 
-{% block javascripts %}
-    {% if googleMapsLink is not null %}
-        <script>
-            function initMap() {
-                var latitude = {{ evennement.latitude }};
-                var longitude = {{ evennement.longitude }};
+            <div class="container">
+            <div class="row mb-5">
+                <div class="col-md">
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                {% if evennement.imageData %}
+                                    <img class="card-img-top rounded" src="{{ asset(evennement.imageData) }}" alt="Card image cap" />
+                                {% else %}
+                                    <img class="card-img-top" src="{{ asset('uploads/images/noimage.jpg') }}" alt="Card image cap" />
+                                {% endif %}                        </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title" style="font-size: 24px;">{{ evennement.nomEvent }}</h5>
+                                    <p class="card-text" style="font-size: 18px;">{{ evennement.description }}</p>
+                                    <span class="card-text">
+                                    <i class="fas fa-map-marker-alt" style="font-size: 18px;" ></i>
+                                    <span class="card-text" style="font-size: 18px;">{{ evennement.adresse }}</span>
+                                    <i class="far fa-calendar-alt" style="padding-left: 10px; font-size: 18px;"></i>
+                                    <span class="event-date" style="font-size: 18px;">{{ evennement.date ? evennement.date|date('d M Y \\a\\t h:i A') : '' }}</span>
 
-                var map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: 10,
-                    center: { lat: latitude, lng: longitude }
-                });
+                                </span>
+                                </div>
 
-                var marker = new google.maps.Marker({
-                    position: { lat: latitude, lng: longitude },
-                    map: map
-                });
-            }
+                            </div>
+                            <div class="map-container">
+                                <div class="map-content">
+                                    <div id="map"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
-        </script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdL6W-ZWFsrcYoxx2LLPg8NUDOZOhr4RY&callback=initMap"></script>
-    {% endif %}
+            <a href="{{ googleMapsLink }}" class="google-maps-link" target="_blank">View location on Google Maps</a>
+        {% else %}
+            <p>Location not available for this event.</p>
+        {% endif %}
+        </div>
+    {% endblock %}
+
+    {% block javascripts %}
+        {% if googleMapsLink is not null %}
+            <script>
+                function initMap() {
+                    var latitude = {{ evennement.latitude }};
+                    var longitude = {{ evennement.longitude }};
+
+                    var map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 10,
+                        center: { lat: latitude, lng: longitude }
+                    });
+
+                    var marker = new google.maps.Marker({
+                        position: { lat: latitude, lng: longitude },
+                        map: map
+                    });
+                }
+
+
+            </script>
+            <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdL6W-ZWFsrcYoxx2LLPg8NUDOZOhr4RY&callback=initMap"></script>
+            <style>
+                /* sidebar.css */
+                .container {
+                    max-width: 1200px;
+                    margin-left: 30px;
+                    margin-right: 30px;
+                    padding: 20px;
+                }
+
+                .navbar {
+                    background-color: #333;
+                    color: #fff;
+                    padding: 10px;
+                }
+
+                h1 {
+                    color: #333;
+                    font-size: 24px;
+                    margin-bottom: 10px;
+                }
+
+                p {
+                    color: #666;
+                    font-size: 16px;
+                    line-height: 1.6;
+                }
+
+                .map-container {
+                    margin-top: 20px;
+                    background-color: #fff;
+                    border-radius: 10px;
+                    overflow: hidden; /* to contain the border radius */
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* optional: add shadow effect */
+                }
+
+                .map-content {
+                    padding: 20px; /* Adjust padding as needed */
+                }
+
+                #map {
+                    width: 100%;
+                    height: 400px;
+                }
+                .google-maps-link {
+                    display: block;
+                    margin-top: 10px;
+                    color: #007bff;
+                    text-decoration: none;
+                }
+
+                .google-maps-link:hover {
+                    text-decoration: underline;
+                }
+
+                .marker-icon {
+                    font-size: 24px;
+                    margin-right: 5px; /* Add some spacing between the icon and the text */
+                }
+
+            </style>
+        {% endif %}
+    {% endblock %}
 {% endblock %}

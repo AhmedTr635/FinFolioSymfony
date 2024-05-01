@@ -11,7 +11,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Mime\Email;
 
 #[Route('/don')]
 class DonController extends AbstractController
@@ -82,14 +87,17 @@ class DonController extends AbstractController
     }
 
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('/give-donation/{id}', name: 'app_don_give_donation', methods: ['POST'])]
-    public function giveDonation(Request $request, Evennement $evennement): Response
+    public function giveDonation(Request $request, Evennement $evennement, MailerInterface $mailer): Response
     {
         // Retrieve the submitted donation amount from the request
         $amount = $request->request->get('montant');
 
         // Get the user by ID (replace 118 with the ID you choose)
-        $userId = 118;
+        $userId = 116;
         $entityManager = $this->getDoctrine()->getManager();
         $user = $entityManager->getRepository(User::class)->find($userId);
 
@@ -104,6 +112,24 @@ class DonController extends AbstractController
         // Persist the donation entity to the database
         $entityManager->persist($donation);
         $entityManager->flush();
+
+        $transport = Transport::fromDsn('smtp://finfoliofinfolio@gmail.com:txzoffvmvmoiuyzw@smtp.gmail.com:587');
+
+// Create a Mailer object
+        $mailer = new Mailer($transport);
+        // Send the donation confirmation email to the user
+        $email = (new Email())
+            ->from('finfoliofinfolio@gmail.com') // Replace with your organization's email address
+            ->to($user->getEmail())
+            ->subject('Thank You for Your Donation!')
+            ->html($this->renderView(
+                'don/donation_confirmation_email.html.twig',
+                ['user' => $user, 'donation' => $donation, 'evennement' => $evennement]
+            ));
+
+
+
+        $mailer->send($email);
 
         // Optionally, redirect the user to a different page
         return $this->redirectToRoute('app_evennement_index');

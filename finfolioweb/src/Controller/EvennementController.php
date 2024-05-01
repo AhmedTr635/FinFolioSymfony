@@ -60,10 +60,23 @@ class EvennementController extends AbstractController
 
 
     #[Route('/fetch', name: 'app_evennement_fetch', methods: ['GET'])]
-    public function fetch(EvennementRepository $evennementRepository): JsonResponse
+    public function fetch(Request $request, EvennementRepository $evennementRepository): JsonResponse
     {
-        // Fetch all events
-        $events = $evennementRepository->findAll();
+        // Fetch the current user
+        $user = $this->getUser();
+
+        // Get the donations made by the user
+        $donations = $user->getDons();
+
+        // Extract the event IDs from the donations
+        $eventIds = [];
+        foreach ($donations as $donation) {
+            $eventId = $donation->getEvenementId()->getId();
+            $eventIds[] = $eventId;
+        }
+
+        // Fetch the events associated with the event IDs
+        $events = $evennementRepository->findByEventIds($eventIds);
 
         // Format events for FullCalendar
         $formattedEvents = [];

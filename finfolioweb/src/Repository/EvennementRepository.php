@@ -55,6 +55,14 @@ class EvennementRepository extends ServiceEntityRepository
         return $result;
     }
 
+    public function findByEventIds(array $eventIds): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.id IN (:eventIds)')
+            ->setParameter('eventIds', $eventIds)
+            ->getQuery()
+            ->getResult();
+    }
 
 
 

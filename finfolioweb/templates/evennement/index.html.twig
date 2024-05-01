@@ -85,7 +85,7 @@
                                                 <i class="bx bx-chevron-down"></i>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="eventList">
-                                                <a class="dropdown-item" id="voirDetailsBtn{{ evennement.id }}">Voir Details</a>
+                                                <a class="dropdown-item"  href="{{ path('app_evennement_show', { 'id': evennement.id }) }}">Voir Details</a>
                                             </div>
 
                                             <!-- Modal for Event Description -->
