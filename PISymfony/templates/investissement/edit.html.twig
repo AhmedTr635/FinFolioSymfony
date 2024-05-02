@@ -4,10 +4,40 @@
 
 {% block body %}
     <h1>Edit Investissement</h1>
+<div class="row mb-5">
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card h-100" style="margin-top: 25px;margin-left: 25px">
+            {% if real_estate.imageData %}
+                <img class="card-img-top" src="{{ asset(real_estate.imageData) }}" alt="Card image cap" />
+            {% else %}
+                <img class="card-img-top" src="{{ asset('uploads/images/noimage.jpg') }}" alt="Card image cap" />
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ real_estate.name }}</h5>
+                <p class="card-text">
+                    Emplacement: {{ real_estate.emplacement }}<br>
+                    ROI: {{ real_estate.ROI }}<br>
+                    Valeur: {{ real_estate.valeur }}<br>
+                    Nbrchambres: {{ real_estate.nbrchambres }}<br>
+                    Superficie: {{ real_estate.superficie }}<br>
+                    Growth: {{ real_estate.growth }}
+                </p>
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <button id="saveButton" class="btn badge-primary" type="submit">{{ button_label|default('Save') }}</button>
+                {{ form_end(form) }}
+                <div id="chart"></div>
 
-    {{ include('investissement/_form.html.twig', {'button_label': 'Update'}) }}
+                <a href="{{ path('app_invest_user_dash') }}">back to list</a>
 
-    <a href="{{ path('app_investissement_index') }}">back to list</a>
+                {{ include('investissement/_delete_form.html.twig') }}
 
-    {{ include('investissement/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
 {% endblock %}

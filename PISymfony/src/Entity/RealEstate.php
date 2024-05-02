@@ -55,6 +55,18 @@ class RealEstate
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $virtualTourLink = null;
 
+    #[ORM\Column]
+    #[Assert\Type(type: 'float',message: 'La growth doit contenir que des chiffres')]
+    private ?float $growth = null;
+
+    #[ORM\Column]
+    #[Assert\Type(type: 'float',message: 'La longitude doit contenir que des chiffres')]
+    private ?float $longitude = null;
+
+    #[ORM\Column]
+    #[Assert\Type(type: 'float',message: 'La latitude doit contenir que des chiffres')]
+    private ?float $latitude = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -167,4 +179,36 @@ class RealEstate
 
         return $this;
     }
+
+    public function getGrowth(): ?float
+    {
+        return $this->growth;
+    }
+
+    public function setGrowth(?float $growth): void
+    {
+        $this->growth = $growth;
+    }
+
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): void
+    {
+        $this->longitude = $longitude;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): void
+    {
+        $this->latitude = $latitude;
+    }
+
 }

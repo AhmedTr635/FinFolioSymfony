@@ -125,6 +125,16 @@ class InvestissementRepository extends ServiceEntityRepository
         return $qb->getQuery()->getSingleScalarResult();
     }
 
+    public function findInvestissementById(int $investissementId): ?Investissement
+    {
+        return $this->createQueryBuilder('i')
+            ->andWhere('i.id = :investissementId')
+            ->setParameter('investissementId', $investissementId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+
 
 
 }

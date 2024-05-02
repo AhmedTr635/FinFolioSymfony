@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Investissement;
+use App\Entity\RealEstate;
 use App\Repository\InvestissementRepository;
 use App\Repository\RealEstateRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,11 +28,40 @@ class InvestUserDashController extends AbstractController
             'investissements' => $investissementRepository->findByUserId(22),
             'real_estates' => $realEstateRepository->findAll(),
             'realEstateRepository' => $realEstateRepository,
+            'investissementRepository' => $investissementRepository,
             'totalInvestment' => $totalInvestment,
             'totalROIMontant' => $totalROIMontant,
             'percentageROITotal' => $percentageROITotal,
             'totalTax' => $totalTax,
         ]);
+    }
+    #[Route('/investissement/details/{id}', name: 'app_investissement_user_details', methods: ['GET'])]
+    public function details($id,InvestissementRepository $investissementRepository , RealEstateRepository $realEstateRepository,EntityManagerInterface $entityManager): JsonResponse
+    {
+        // Fetch investissement details based on the provided ID
+        $investissement = $entityManager->getRepository(Investissement::class)->find($id);
+        $realEstate = $entityManager->getRepository(RealEstate::class)->findRealEstateById($investissement->getReId());
+
+
+        if (!$investissement) {
+            // Return a 404 response if investissement is not found
+            return new JsonResponse(['error' => 'Investissement not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Serialize the investissement details into JSON format
+        $data = [
+            'id' => $investissement->getId(),
+            'montant' => $investissement->getMontant(),
+            'reID' => $investissement->getReId(),
+            'roi' => $realEstate->getROI(),
+            'name' => $realEstate->getName(),
+            'realEstate' => $realEstate,
+
+            // Add more investissement details here as needed
+        ];
+
+        // Return the investissement details as JSON response
+        return new JsonResponse($data);
     }
     /*#[Route('/{id}', name: 'app_investissement_delete', methods: ['POST'])]
     public function delete(Request $request, Investissement $investissement, EntityManagerInterface $entityManager): JsonResponse
@@ -47,5 +77,7 @@ class InvestUserDashController extends AbstractController
         // Return JSON response for invalid CSRF token
         return new JsonResponse(['error' => 'Invalid CSRF token'], Response::HTTP_BAD_REQUEST);
     }*/
+
+
 
 }

@@ -85,11 +85,56 @@ class InvestDashUserController extends AbstractController
         ]);
     }
 
+    #[Route('/update-investissement-montant/{id}', name: 'update_investissement_montant', methods: ['POST'])]
+    public function updateInvestissementMontant(Request $request, EntityManagerInterface $entityManager, $id): JsonResponse
+    {
+        // Retrieve the investissement entity by its ID
+        $investissement = $entityManager->getRepository(Investissement::class)->find($id);
 
+        if (!$investissement) {
+            return new JsonResponse(['error' => 'Investissement not found'], Response::HTTP_NOT_FOUND);
+        }
 
+        // Retrieve the new montant value from the request
+        $montant = $request->request->get('montant');
+        $newMontant = (int)$montant;
 
+        // Update the montant property of the investissement entity
+        $investissement->setMontant($newMontant);
 
+        try {
+            // Persist the changes to the database
+            $entityManager->persist($investissement);
+            $entityManager->flush();
 
+            // Return a success response
+            return new JsonResponse(['message' => 'Investissement montant updated successfully: ' . $newMontant], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            // Return an error response if the update fails
+            return new JsonResponse(['error' => 'Failed to update investissement montant'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+#[Route('/delete-investment/{id}', name: 'delete_investment', methods: ['POST'])]
+    public function deleteInvestment(Request $request, EntityManagerInterface $entityManager, $id): JsonResponse
+    {
+        // Retrieve the investissement entity by its ID
+        $investissement = $entityManager->getRepository(Investissement::class)->find($id);
 
+        if (!$investissement) {
+            return new JsonResponse(['error' => 'Investissement not found'], Response::HTTP_NOT_FOUND);
+        }
 
+        // Remove the investissement entity
+        $entityManager->remove($investissement);
+
+        try {
+            // Persist the changes to the database
+            $entityManager->flush();
+            // Return a success response
+            return new JsonResponse(['message' => 'Investissement deleted successfully'], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            // Return an error response if the deletion fails
+            return new JsonResponse(['error' => 'Failed to delete investissement'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

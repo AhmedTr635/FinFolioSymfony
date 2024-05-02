@@ -21,6 +21,9 @@ class RealEstateType extends AbstractType
             ->add('nbrchambres')
             ->add('superficie')
             ->add('nbrclick')
+            ->add('growth')
+            ->add('longitude')
+            ->add('latitude')
             ->add('virtualTourLink', UrlType::class, [ // Add this line
                 'label' => 'Virtual Tour Link',
                 'required' => false,

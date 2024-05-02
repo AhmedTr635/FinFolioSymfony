@@ -84,6 +84,27 @@
                     {# Display validation messages if any #}
                     {{ form_errors(form.virtualTourLink) }}
                 </div>
+                <div>
+                    {{ form_label(form.growth, 'growth',{'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.growth, {'attr': {'class': 'form-control', 'id': 'real_estate_growth'}}) }}
+                    <span id="growth-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.growth) }}
+                </div>
+                <div>
+                    {{ form_label(form.longitude, 'longitude',{'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.longitude, {'attr': {'class': 'form-control', 'id': 'real_estate_longitude'}}) }}
+                    <span id="longitude-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.longitude) }}
+                </div>
+                <div>
+                    {{ form_label(form.latitude, 'latitude',{'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.latitude, {'attr': {'class': 'form-control', 'id': 'real_estate_latitude'}}) }}
+                    <span id="latitude-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.latitude) }}
+                </div>
 
                 <div class="mb-3">
                     {{ form_label(form.imageData, 'Image', {'label_attr': {'class': 'form-label'}}) }}
@@ -130,6 +151,9 @@
             const nbrchambresInput = document.getElementById('real_estate_nbrchambres');
             const superficieInput = document.getElementById('real_estate_superficie');
             const nbrclickInput = document.getElementById('real_estate_nbrclick');
+            const growthInput = document.getElementById('real_estate_growth');
+            const longitudeInput = document.getElementById('real_estate_longitude');
+            const latitudeInput = document.getElementById('real_estate_latitude');
             const virtualTourLinkInput = document.getElementById('real_estate_virtualTourLink');
             const imageDataInput = document.getElementById('real_estate_imageData');
 
@@ -246,6 +270,53 @@
             }
             nbrclickInput.addEventListener('input',function () {
                 validateNbrclick();
+            })
+
+            function validateGrow() {
+                const growth = growthInput.value.trim();
+                const errorElement = document.getElementById("growth-error");
+
+                if (!growth) {
+                    showError(growthInput, errorElement, 'Growth is required');
+                } else if (!/^\d+(\.\d+)?$/.test(growth)) {
+                    showError(growthInput, errorElement, 'Growth must be a numeric value');
+                } else {
+                    hideError(growthInput, errorElement);
+                }
+            }
+            growthInput.addEventListener('input',function () {
+                validateGrow();
+            })
+
+            function validateLongitude() {
+                const longitude = longitudeInput.value.trim();
+                const errorElement = document.getElementById("longitude-error");
+
+                if (!longitude) {
+                    showError(longitudeInput, errorElement, 'Longitude is required');
+                } else if (!/^\d+(\.\d+)?$/.test(longitude)) {
+                    showError(longitudeInput, errorElement, 'Longitude must be a numeric value');
+                } else {
+                    hideError(longitudeInput, errorElement);
+                }
+            }
+            longitudeInput.addEventListener('input',function () {
+                validateLongitude();
+            })
+            function validateLatitude() {
+                const latitude = latitudeInput.value.trim();
+                const errorElement = document.getElementById("latitude-error");
+
+                if (!latitude) {
+                    showError(latitudeInput, errorElement, 'Latitude is required');
+                } else if (!/^\d+(\.\d+)?$/.test(latitude)) {
+                    showError(latitudeInput, errorElement, 'Latitude must be a numeric value');
+                } else {
+                    hideError(latitudeInput, errorElement);
+                }
+            }
+            latitudeInput.addEventListener('input',function () {
+                validateLatitude();
             })
 
 

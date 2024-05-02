@@ -140,6 +140,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="lightweight-charts" level="application" />
     <orderEntry type="library" name="sweetalert2" level="application" />
-    <orderEntry type="library" name="sweetalert2" level="application" />
+    <orderEntry type="library" name="apexcharts" level="application" />
+    <orderEntry type="library" name="embed-widget-advanced-chart" level="application" />
   </component>
 </module>

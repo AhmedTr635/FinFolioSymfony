@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Investissement;
+use App\Entity\RealEstate;
 use App\Form\InvestissementType;
 use App\Repository\InvestissementRepository;
 use App\Repository\RealEstateRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -56,6 +58,7 @@ class InvestissementController extends AbstractController
     {
         $form = $this->createForm(InvestissementType::class, $investissement);
         $form->handleRequest($request);
+        $realEstate = $entityManager->getRepository(RealEstate::class)->findRealEstateById($investissement->getReId());
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
@@ -66,8 +69,10 @@ class InvestissementController extends AbstractController
         return $this->renderForm('investissement/edit.html.twig', [
             'investissement' => $investissement,
             'form' => $form,
+            'real_estate' => $realEstate,
         ]);
     }
+
 
     #[Route('/{id}', name: 'app_investissement_delete', methods: ['POST'])]
     public function delete(Request $request, Investissement $investissement, EntityManagerInterface $entityManager): Response

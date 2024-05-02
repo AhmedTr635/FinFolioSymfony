@@ -25,9 +25,10 @@ class DigitalCoinsController extends AbstractController
 
 
         return $this->render('digital_coins/index.html.twig', [
-            'digital_coins' => $digitalCoinsRepository->findByUserId($UserId),
+            'digital_coins' => $digitalCoinsRepository->findByUserIdAndDateVenteIsNull($UserId),
             'digital_coin' => $digitalCoin,
-            'form' => $form->createView(), // Pass the form view to the template
+            'form' => $form->createView(),
+            'digital_coins_sold' => $digitalCoinsRepository->findByUserIdAndDateVenteIsNotNull($UserId),// Pass the form view to the template
         ]);
     }
 
@@ -176,6 +177,91 @@ class DigitalCoinsController extends AbstractController
             return $this->json(['error' => 'Failed to fetch last open price.']);
         }
     }
+    #[Route('/digital/coins/sell', name: 'app_digital_coins_sell', methods: ['POST'])]
+    public function sell(Request $request, DigitalCoinsRepository $digitalCoinsRepository, EntityManagerInterface $entityManager): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $digitalCoin = $digitalCoinsRepository->find($data['id']);
+        if (!$digitalCoin) {
+            return new JsonResponse(['error' => 'Digital coin not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Convert ROI string to float
+        $roi = (float) rtrim($data['roi'], '%');
+
+        $digitalCoin->setROI($roi);
+        $digitalCoin->setDateVente(new \DateTime());
+
+        $entityManager->persist($digitalCoin);
+        $entityManager->flush();
+
+        return new JsonResponse(['message' => 'Digital coin updated successfully']);
+    }
+
+    #[Route('/table1-data', name: 'app_digital_coins_table1_data', methods: ['GET'])]
+    public function getTable1Data(DigitalCoinsRepository $digitalCoinsRepository): JsonResponse
+    {
+        // Fetch data for table 1 from the repository or any other source
+        $userId = 22;
+        $table1Data = $digitalCoinsRepository->findByUserIdAndDateVenteIsNull($userId); // Example: Fetch data from repository method
+
+        // Return the data as JSON response
+        return $this->json($table1Data);
+    }
+
+    #[Route('/donut-chart-data', name: 'app_donut_chart_data', methods: ['GET'])]
+    public function getDonutChartData(DigitalCoinsRepository $digitalCoinsRepository): JsonResponse
+    {
+        // Fetch data for donut chart
+        $userId = 22;
+        $coins = $digitalCoinsRepository->findByUserIdAndDateVenteIsNull($userId);
+
+        // Calculate total montant
+        $totalMontant = $digitalCoinsRepository->findTotalMontantWhereDateVenteIsNull();
+
+        // Prepare data for chart
+        $chartData = [];
+        foreach ($coins as $coin) {
+            $percentage = ($coin->getMontant() / $totalMontant) * 100;
+            $chartData[] = [
+                'label' => $coin->getCode(),
+                'value' => $percentage,
+            ];
+        }
+
+        return $this->json($chartData);
+    }
+
+    #[Route('/table2-data', name: 'app_digital_coins_table2_data', methods: ['GET'])]
+    public function getTable2Data(DigitalCoinsRepository $digitalCoinsRepository): JsonResponse
+    {
+        // Fetch data for table 2 from the repository or any other source
+        $userId = 22;
+        $table2Data = $digitalCoinsRepository->findByUserIdAndDateVenteIsNotNull($userId); // Example: Fetch data from repository method
+
+        // Return the data as JSON response
+        return $this->json($table2Data);
+    }
+
+    #[Route('/total-montant-where-date-vente-is-null', name: 'app_total_montant_where_date_vente_is_null', methods: ['GET'])]
+    public function getTotalMontantWhereDateVenteIsNull(DigitalCoinsRepository $digitalCoinsRepository): JsonResponse
+    {
+        $totalMontant = $digitalCoinsRepository->findTotalMontantWhereDateVenteIsNull();
+        return $this->json(['total_montant' => $totalMontant]);
+    }
+
+    #[Route('/total-roi-where-date-vente-is-not-null', name: 'app_total_roi_where_date_vente_is_not_null', methods: ['GET'])]
+    public function getTotalRoiWhereDateVenteIsNotNull(DigitalCoinsRepository $digitalCoinsRepository): JsonResponse
+    {
+        $totalRoi = $digitalCoinsRepository->findTotalRoiWhereDateVenteIsNotNull();
+        return $this->json(['total_roi' => $totalRoi]);
+    }
+
+
+
+
+
 
 
 

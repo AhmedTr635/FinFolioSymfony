@@ -27,6 +27,7 @@
                             Valeur: {{ real_estate.valeur }}<br>
                             Chambres: {{ real_estate.nbrchambres }}<br>
                             Superficie: {{ real_estate.superficie }}<br>
+                            Growth: {{ real_estate.growth }}<br>
                             {# Click: {{ real_estate.nbrclick }}<br> #}
                             {% set realEstateId = real_estate.id %}
                             {% set sum = investmentsSumByRealEstate[realEstateId] ?? 0 %}
@@ -43,7 +44,8 @@
                                 Le Tour Virtuel n'est pas disponible
                             </div>
                         {% endif %}
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#investModal{{ real_estate.id }}">Investir</button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#investModal{{ real_estate.id }}" onclick="incrementClickCount({{ real_estate.id }})">Investir</button>
+                        <a href="{{ path('app_real_estate_user_show', {'id': real_estate.id}) }}" class="btn btn-warning" onclick="incrementClickCount({{ real_estate.id }})">Details</a>
                         {# <a href="{{ path('app_real_estate_show', {'id': real_estate.id}) }}" class="btn btn-primary">Show</a>
                         <a href="{{ path('app_real_estate_edit', {'id': real_estate.id}) }}" class="btn btn-secondary">Edit</a> #}
                     </div>
@@ -56,7 +58,7 @@
         {% endfor %}
     </div>
 
-    <button class="btn btn-primary" onclick="location.href='{{ path('app_real_estate_new') }}'">Create new</button>
+    {#     <button class="btn btn-primary" onclick="location.href='{{ path('app_real_estate_new') }}'">Create new</button> #}
 
     <!-- Modal -->
     {% for real_estate in realEstates %}
@@ -82,6 +84,7 @@
                                 <label for="roi" class="form-label">ROI annuel : </label>
                                 <span id="roi{{ real_estate.id }}"></span>
                             </div>
+
                             {# <div class="mb-3">
                                 <!-- Add empty div for ApexChart -->
                                 <div id="roiChart{{ real_estate.id }}"></div>
@@ -93,7 +96,22 @@
                 </div>
             </div>
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
         <script>
+            function incrementClickCount(realEstateId) {
+                fetch('/real/estate/' + realEstateId + '/click', {
+                    method: 'POST',
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
             document.addEventListener('DOMContentLoaded', function() {
                 const montantInput{{ real_estate.id }} = document.getElementById('montant{{ real_estate.id }}');
                 const montantError{{ real_estate.id }} = document.getElementById('montant-error{{ real_estate.id }}');
