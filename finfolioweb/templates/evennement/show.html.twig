@@ -30,6 +30,10 @@
                                     <span class="card-text" style="font-size: 18px;">{{ evennement.adresse }}</span>
                                     <i class="far fa-calendar-alt" style="padding-left: 10px; font-size: 18px;"></i>
                                     <span class="event-date" style="font-size: 18px;">{{ evennement.date ? evennement.date|date('d M Y \\a\\t h:i A') : '' }}</span>
+                  <div class="progress mt-4">
+                <div  class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: {{ (totalMontant / totalAmountNeeded) * 100 }}%" aria-valuenow="{{ (totalMontant / totalAmountNeeded) * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+                                        <span class="card-text" style="font-size: 18px;"> ${{ totalMontant }} / ${{ evennement.montant }}</span>
 
                                 </span>
                                 </div>
@@ -70,6 +74,7 @@
                         map: map
                     });
                 }
+
 
 
             </script>

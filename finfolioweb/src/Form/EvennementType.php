@@ -40,6 +40,17 @@ class EvennementType extends AbstractType
                 'attr' => ['class' => 'form-control'],
                 'label' => 'Address'
             ])
+
+            ->add('latitude', NumberType::class, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'latitude'
+            ])
+
+            ->add('longitude', NumberType::class, [
+                'attr' => ['class' => 'form-control'],
+                'label' => 'longitude'
+            ])
+
             ->add('description', TextareaType::class, [
                 'attr' => ['class' => 'form-control'],
                 'label' => 'Description'

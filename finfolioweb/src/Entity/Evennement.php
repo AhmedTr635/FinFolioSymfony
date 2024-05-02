@@ -50,10 +50,6 @@ class Evennement
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "L adresse est obligatoire")]
-    #[Assert\Length(
-        min: 10,
-        minMessage: "L adresse doit contenir au moins 10 charateres"
-    )]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 5000, nullable: true)]
@@ -65,7 +61,7 @@ class Evennement
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $rating = null;
+    private ?float $rating = null;
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageData = null;
 
@@ -189,7 +185,7 @@ class Evennement
         return $this;
     }
 
-    public function getRating(): ?int
+    public function getRating(): ?float
     {
         return $this->rating;
     }
@@ -237,6 +233,11 @@ class Evennement
     public function getUser(): Collection
     {
         return $this->user;
+    }
+
+    public function setUser(Collection $user): void
+    {
+        $this->user = $user;
     }
 
     public function addUser(User $user): static

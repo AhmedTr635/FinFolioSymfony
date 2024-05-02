@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Don;
+use App\Entity\Evennement;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -52,7 +53,6 @@ class DonRepository extends ServiceEntityRepository
 
         return $totalDonations;
     }
-
 
 
 

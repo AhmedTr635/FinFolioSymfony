@@ -8,6 +8,8 @@ use App\Entity\User;
 use App\Form\DonType;
 use App\Repository\DonRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -158,4 +160,29 @@ class DonController extends AbstractController
     }
 
 
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    #[Route('/progress', name: 'progress')]
+
+    public function yourAction($eventId, Evennement $evennement, DonRepository $donRepository): Response
+    {
+        // If event is not found, handle accordingly (e.g., show an error message)
+        if (!$evennement) {
+            throw $this->createNotFoundException('Event not found');
+        }
+
+        // Get the total amount needed from the Evennement entity
+        $totalAmountNeeded = $evennement->getMontant(); // Assuming getMontant() is a method in your Evennement entity
+
+        // Get the total sum of montantuser for the event using repository function
+        $totalMontant = $donRepository->getTotalMontantForEvennement($evennement);
+
+        // Render the Twig template and pass the collected amount and total amount needed to it
+        return $this->render('evennement/show.html.twig', [
+            'totalMontant' => $totalMontant,
+            'totalAmountNeeded' => $totalAmountNeeded,
+        ]);
+    }
 }

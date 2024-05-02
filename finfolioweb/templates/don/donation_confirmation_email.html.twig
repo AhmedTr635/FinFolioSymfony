@@ -90,8 +90,8 @@
 <div class="container">
     <div class="invitation-header">
         <h1>Event Invitation</h1>
-        <p>Dear {{ user.nom }} {{ user.prenom }},</p>
-        <p>Thank you for your generous donation of ${{ donation.montantUser }} to support our cause!</p>
+        <p>Cher(e) {{ user.nom }} {{ user.prenom }},</p>
+        <p>Merci pour avoir fait un do de  ${{ donation.montantUser }} pour nous supporter!</p>
     </div>
     <div class="event-image">
 
@@ -99,15 +99,15 @@
 
         </div>
     <div class="invitation-details">
-        <p>We cordially invite you to our upcoming event:</p>
+        <p>On vous invite cordialement à notre événement:</p>
         <p class="event-details"><strong>{{ evennement.nomEvent }}</strong></p>
         <p class="event-details">Date: {{ evennement.date ? evennement.date|date('d M Y \\a\\t h:i A') : '' }}</p>
-        <p class="event-details">Location: {{ evennement.adresse }}</p>
-        <p class="event-details">Join us for an exciting and meaningful experience!</p>
+        <p class="event-details">Adresse: {{ evennement.adresse }}</p>
+        <p class="event-details">Joignez nous pour une experience inoubiable!</p>
     </div>
     <div class="invitation-footer">
-        <p class="footer-text">Best regards,</p>
-        <p class="footer-text">Your Organization</p>
+        <p class="footer-text">Cordialement,</p>
+        <p class="footer-text">Finfolio</p>
     </div>
 </div>
 </body>

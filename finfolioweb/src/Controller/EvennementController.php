@@ -6,6 +6,7 @@ use App\Entity\Don;
 use App\Entity\Evennement;
 use App\Entity\User;
 use App\Form\EvennementType;
+use App\Form\RatingType;
 use App\Repository\DonRepository;
 use App\Repository\EvennementRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,11 +28,10 @@ class EvennementController extends AbstractController
      * @throws NonUniqueResultException
      */
     #[Route('/', name: 'app_evennement_index', methods: ['GET'])]
-    public function index(EvennementRepository $evennementRepository, Request $request): Response
+    public function index(PaginatorInterface $paginator,EvennementRepository $evennementRepository, Request $request): Response
 
     {
 
-        dump($request->getLocale());
         // Fetch all events
         $evennements = $evennementRepository->findAll();
 
@@ -41,13 +41,20 @@ class EvennementController extends AbstractController
 
         $showRatingForm = true; // Set this based on your logic
 
+
+        $evennements= $paginator->paginate(
+            $evennements,
+            $request->query->getInt('page',1)  ,
+            3
+        );
+        $paginationTemplate = '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig';
+
         // Render the template with both the list of events and the upcoming event
         return $this->render('evennement/index.html.twig', [
 
-
+            'paginationTemplate' => $paginationTemplate,
             'evennements' => $evennements,
             'upcomingEvent' => $upcomingEvent,
-            'showRatingForm' => $showRatingForm,
 
 
 
@@ -60,23 +67,26 @@ class EvennementController extends AbstractController
 
 
     #[Route('/fetch', name: 'app_evennement_fetch', methods: ['GET'])]
-    public function fetch(Request $request, EvennementRepository $evennementRepository): JsonResponse
+    public function fetch(EvennementRepository $evennementRepository): JsonResponse
     {
-        // Fetch the current user
-        $user = $this->getUser();
+        // Fetch the user from the database (replace '116' with the desired user ID)
+        $userId = 116;
+        $entityManager = $this->getDoctrine()->getManager();
+        $user = $entityManager->getRepository(User::class)->find($userId);
 
-        // Get the donations made by the user
+        // Fetch the user's donations
         $donations = $user->getDons();
 
-        // Extract the event IDs from the donations
+        // Initialize an empty array to store event IDs
         $eventIds = [];
+
+        // Extract event IDs from the user's donations
         foreach ($donations as $donation) {
-            $eventId = $donation->getEvenementId()->getId();
-            $eventIds[] = $eventId;
+            $eventIds[] = $donation->getEvenementId()->getId();
         }
 
-        // Fetch the events associated with the event IDs
-        $events = $evennementRepository->findByEventIds($eventIds);
+        // Fetch events associated with the extracted event IDs
+        $events = $evennementRepository->findBy(['id' => $eventIds]);
 
         // Format events for FullCalendar
         $formattedEvents = [];
@@ -91,6 +101,8 @@ class EvennementController extends AbstractController
         // Return events as JSON response
         return new JsonResponse($formattedEvents);
     }
+
+
 
 
 
@@ -177,9 +189,27 @@ class EvennementController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
     #[Route('/{id}', name: 'app_evennement_show', methods: ['GET'])]
-    public function show(Evennement $evennement): Response
+    public function show(Evennement $evennement, DonRepository $donRepo): Response
     {
+
+        // If event is not found, handle accordingly (e.g., show an error message)
+        if (!$evennement) {
+            throw $this->createNotFoundException('Event not found');
+        }
+
+        // Get the total amount needed from the Evennement entity
+        $totalAmountNeeded = $evennement->getMontant(); // Assuming getMontant() is a method in your Evennement entity
+
+        // Get the total sum of montantuser for the event using repository function
+        $totalMontant = $donRepo->getTotalDonationForEvent($evennement);
+
+
+   $donation = $donRepo->findAll();
         $latitude = $evennement->getLatitude();
         $longitude = $evennement->getLongitude();
 
@@ -196,29 +226,19 @@ class EvennementController extends AbstractController
             $googleMapsLink = null;
         }
 
+
         return $this->render('evennement/show.html.twig', [
+            'donation' => $donation,
             'evennement' => $evennement,
             'googleMapsLink' => $googleMapsLink,
+            'totalMontant' => $totalMontant,
+            'totalAmountNeeded' => $totalAmountNeeded,
         ]);
     }
 
-//    #[Route('/{id}/edit', name: 'app_evennement_edit', methods: ['GET', 'POST'])]
-//    public function edit(Request $request, Evennement $evennement, EntityManagerInterface $entityManager): Response
-//    {
-//        $form = $this->createForm(EvennementType::class, $evennement);
-//        $form->handleRequest($request);
-//
-//        if ($form->isSubmitted() && $form->isValid()) {
-//            $entityManager->flush();
-//
-//            return $this->redirectToRoute('app_evennement_index', [], Response::HTTP_SEE_OTHER);
-//        }
-//
-//        return $this->renderForm('evennement/edit.html.twig', [
-//            'evennement' => $evennement,
-//            'form' => $form,
-//        ]);
-//    }
+
+
+
 
 
     #[Route('/{id}/edit', name: 'app_evennement_edit', methods: ['GET', 'POST'])]
@@ -262,91 +282,36 @@ class EvennementController extends AbstractController
     }
 
 
-    //progressBar
-    #[Route('/evennement/progress-bar/{id}', name: 'evennement_progress_bar')]
-    public function progressBar(Evennement $evennement, DonRepository $donRepository): Response
-    {
-        // Retrieve the total donation amount for the given event
-        $totalDonationAmount = $donRepository->getTotalDonationForEvent();
+//    #[Route('/my-donated-events', name: 'my_donated_events')]
+//    public function myDonatedEvents(): Response
+//    {
+//        $userId = 116;
+//        $entityManager = $this->getDoctrine()->getManager();
+//        $user = $entityManager->getRepository(User::class)->find($userId);
+//
+//        // Get the donations made by the user
+//        $donations = $user->getDons();
+//
+//        // Extract the event IDs from the donations
+//        $eventIds = [];
+//        foreach ($donations as $donation) {
+//            $eventId = $donation->getEvenementId()->getId();
+//            $eventIds[] = $eventId;
+//
+//        }
+//
+//        // Fetch the events associated with the event IDs
+//        $events = $this->getDoctrine()->getRepository(Evennement::class)->findBy(['id' => $eventIds]);
+//
+//
+//
+//        // Render the template to display the list of events
+//        return $this->render('evennement/index.html.twig', [
+//            'events' => $events,
+//
+//        ]);
+//    }
 
-        $montant = $evennement->getMontant();
-
-        // Calculate the progress percentage
-        $percentage = $totalDonationAmount / $montant * 100;
-
-        // Render a template fragment containing the progress bar
-        return $this->render('evennement/progress_bar.html.twig', [
-            'percentage' => $percentage,
-        ]);
-    }
-
-    #[Route('/my-donated-events', name: 'my_donated_events')]
-    public function myDonatedEvents(): Response
-    {
-        // Fetch the user by ID (replace '118' with the actual user ID)
-        $userId = 118;
-        $user = $this->getDoctrine()->getRepository(User::class)->find($userId);
-
-        // Get the donations made by the user
-        $donations = $user->getDons();
-
-        // Extract the event IDs from the donations
-        $eventIds = [];
-        foreach ($donations as $donation) {
-            $eventId = $donation->getEvenementId()->getId();
-            $eventIds[] = $eventId;
-
-        }
-
-        // Fetch the events associated with the event IDs
-        $events = $this->getDoctrine()->getRepository(Evennement::class)->findBy(['id' => $eventIds]);
-
-
-
-        // Render the template to display the list of events
-        return $this->render('evennement/index.html.twig', [
-            'events' => $events,
-
-        ]);
-    }
-
-
-    #[Route('/submit-rating', name: 'submit_rating')]
-    public function submitRating(Request $request): Response
-    {
-        // Retrieve the submitted rating value
-        $newRating = $request->request->get('rating');
-
-        // Retrieve the event ID from the request
-        $eventId = $request->request->get('event_id');
-
-        // Retrieve the event from the database
-        $event = $this->getDoctrine()->getRepository(Evennement::class)->find($eventId);
-
-        // Retrieve the current total rating and number of ratings for the event
-        $currentTotalRating = $event->getRating() * $event->getNumberOfRatings();
-
-        // Increment the number of ratings
-        $numberOfRatings = $event->getNumberOfRatings() + 1;
-
-        // Calculate the new total rating
-        $newTotalRating = $currentTotalRating + $newRating;
-
-        // Calculate the new average rating
-        $averageRating = $newTotalRating / $numberOfRatings;
-
-        // Set the new average rating and update the number of ratings
-        $event->setRating($averageRating);
-        $event->setNumberOfRatings($numberOfRatings);
-
-        // Persist the changes to the database
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($event);
-        $entityManager->flush();
-
-        // Redirect back to event page or display a confirmation message
-        return $this->redirectToRoute('evennement/index.html.twig', ['id' => $eventId]);
-    }
 
 
 }

@@ -23,9 +23,7 @@
                 </div>
                 <!-- Button column -->
                 <div class="col-md-6 mb-4 d-flex justify-content-md-end">
-                    <div class="col-md-6 mb-4 d-flex justify-content-md-end">
-                        <button id="myEventsBtn" class="btn btn-primary" data-url="{{ path('my_donated_events') }}">Mes événements</button>
-                    </div>
+
                     <div class="col-md-6 mb-4 d-flex justify-content-md-end">
                         <!-- Add the "Calendrier" button here -->
                         <a href="{{ path('app_event_calendar') }}" class="btn btn-primary">Calendrier</a>
@@ -44,25 +42,40 @@
 
 
 
-        <div class="upcoming-event-container">
-              {% if upcomingEvent %}
-                <div id="upcomingEvent">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title">Evenement à venir</h5>
-                        </div>
-                        <div class="card-body">
-                            <h5>{{ upcomingEvent.nomEvent|trans|raw }}</h5>
-                            <p>{{ upcomingEvent.date ? upcomingEvent.date|date('d M Y \\a\\t h:i A') : '' }}</p>
-                            <!-- Add more details if needed -->
+        <div class="upcoming-event-container  " style="padding-right: 50px; padding-left: 50px ">
+            {% if upcomingEvent %}
+                <div class="row mb-5">
+                    <div class="col-md">
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                                <div class="col-md-8">
+                                    <div class="card-body " id="upcomingEvent">
+                                        <h5 class="card-title" style="font-size: 24px; text-align: center;">Evenement à venir </h5>
+                                        <h6 class="card-text" style="font-size: 18px;">{{ upcomingEvent.nomEvent|trans|raw }}</h6>
+                                        <span class="card-text" style="font-size: 18px;">
+                                    <i class="far fa-calendar-alt" style="padding-right: 5px;"></i>
+                                    <span style="display: inline-block;">{{ upcomingEvent.date ? upcomingEvent.date|date('d M Y \\a\\t h:i A') : '' }}</span>
+                                    <i class="fas fa-map-marker-alt" style="padding-left: 10px; padding-right: 5px;"></i>
+                                    <span style="display: inline-block;">{{ upcomingEvent.adresse }}</span>
+                                </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             {% endif %}
-
-
         </div>
 
+
+<style>
+    .gradient-background {
+        background: linear-gradient(to right, #ff9966, #ff5e62);
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+    }
+</style>
 
         <div class="event-container-xxl px-3 flex-grow-1 container-p-y">
             <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
@@ -86,6 +99,7 @@
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="eventList">
                                                 <a class="dropdown-item"  href="{{ path('app_evennement_show', { 'id': evennement.id }) }}">Voir Details</a>
+
                                             </div>
 
                                             <!-- Modal for Event Description -->
@@ -102,7 +116,7 @@
                                 </div>
                             </div>
                             {% if evennement.imageData %}
-                                <img class="card-img-top" src="{{ asset(evennement.imageData) }}" alt="Card image cap" />
+                                <img class="card-img-top" src="{{ asset(evennement.imageData) }}" alt="Card image cap"  style=" width=150px; height:300px;"/>
                             {% else %}
                                 <img class="card-img-top" src="{{ asset('uploads/images/noimage.jpg') }}" alt="Card image cap" />
                             {% endif %}
@@ -152,7 +166,7 @@
                                             <h2>Give Donation</h2>
                                             <p>Enter the donation amount:</p>
                                             <form id="donationForm{{ evennement.id }}" action="{{ path('app_don_give_donation', {'id': evennement.id}) }}" method="POST" novalidate>
-                                                <input type="hidden" name="user_id" value="118"> <!-- Replace '118' with the actual user ID -->
+
                                                 <input type="text" id="donationAmount" name="montant" placeholder="Enter amount" required>
                                                 <div id="amountValidationMessage" class="validation-message"></div>
                                                 <button type="submit">Submit</button>
@@ -165,34 +179,25 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 {% endfor %}
+
+
             </div>
+
+        </div>
+
+        <div class="pagination-container" style="float: right; width: 30%;margin-top: 20px">
+
+            {{ knp_pagination_render(evennements, paginationTemplate) }}
         </div>
 
 
 
 
-        <div id="myEventsModal" class="modal">
-            <div class="modal-content" id="myEventsContent">
-                <span class="close">&times;</span>
-                <!-- Content will be loaded here dynamically -->
-            </div>
-        </div>
 
 
-        {% if showRatingForm %}
-            <div id="rating-form" class="hidden">
-                <form id="rating-form" action="{{ path('submit_rating') }}" method="POST">
-                    <div class="rating">
-                        {% for i in 1..5 %}
-                            <span class="star" data-value="{{ i }}"><i class="far fa-star"></i></span>
-                        {% endfor %}
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit Rating</button>
-                </form>
-            </div>
-        {% endif %}
 
 
 
@@ -212,10 +217,14 @@
 
 
 <script>
+/////////////////////////////////////Rating////////////////////////////////////////////////////////////
 
 
 
-    ////////////////////////////////////Voir Details////////////////////////////////////////////////////////
+
+
+
+   ///// ////////////////////////////////////Voir Details////////////////////////////////////////////////////////
 
 
         // Function to open the event description modal
@@ -358,12 +367,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Create HTML markup for the upcoming event
                 const eventHTML = `
-                            <div class="upcoming-event" style="background-color: #ffffff; border-radius: 10px; padding: 20px; margin: 0 auto; max-width: 95%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-bottom: 20px">
-                    <h4 style="margin-top: 0;">${eventName}</h4>
-                    <p class="event-info" style="margin-top: 10px;"><strong>Date:</strong> ${eventDate} | <strong>Address:</strong> ${eventAddress} | <strong>Amount:</strong> ${eventAmount}</p>
-                </div>
-
-            `;
+    <div class="upcoming-event" style="background-color: #ffffff; border-radius: 10px; padding: 20px; margin: 0 auto; max-width: 95%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-bottom: 20px">
+        <h4 style="margin-top: 0;">${eventName}</h4>
+        <p class="event-info" style="margin-top: 10px;">
+            <strong><i class="far fa-calendar-alt"></i> Date:</strong> ${eventDate} |
+            <strong><i class="fas fa-map-marker-alt"></i> Address:</strong> ${eventAddress} |
+            <strong>Amount:</strong> ${eventAmount}
+        </p>
+    </div>
+`;
 
                 // Display the upcoming event
                 upcomingEventDiv.innerHTML = eventHTML;
@@ -384,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Find and display the upcoming event
         const upcomingEvent = findUpcomingEvent(events);
         displayUpcomingEvent(upcomingEvent);
-    });
+    }});
 
 
     //MyEvents
@@ -423,7 +435,18 @@ document.querySelector('.close').addEventListener('click', function() {
 
     <style>
 
-        /* CSS for the modal content */
+
+
+
+        /* Close button */
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+        }
         .modal-content {
             background-color: #ffffff;
             padding: 20px;
@@ -437,15 +460,6 @@ document.querySelector('.close').addEventListener('click', function() {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow for depth */
         }
 
-        /* Close button */
-        .close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-        }
 
         .close:hover,
         .close:focus {

@@ -395,9 +395,7 @@
                 if (!adresse) {
                     showError(input, errorElement, 'L adresse est obligatoire');
                     return false;
-                } else if (adresse.length < 10) {
-                    showError(input, errorElement, 'L adresse doit etre au moins 10 charateres');
-                    return false;
+
                 } else {
                     hideError(input, errorElement);
                     return true;
