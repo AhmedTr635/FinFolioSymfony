@@ -1,0 +1,231 @@
+{% extends 'user/usersPage.html.twig' %}
+
+{% block list %}
+    <tbody>
+    {% for user in users %}
+        {# <tr>#}
+        <tr class="odd">
+            <td class="">
+                <div class="d-flex justify-content-start align-items-center user-name">
+                    <div class="avatar-wrapper"><div class="avatar avatar-sm me-3">
+                            <span class="avatar-initial rounded-circle bg-label-primary">{{ user.nom|slice(0, 1)|upper }}{{ user.prenom|slice(0, 1)|upper }}</span>
+                        </div></div>
+                    <div class="d-flex flex-column">
+                        <a href="{{ path('app_user_show', {'id': user.id}) }}" class="text-body text-truncate">
+                            <span class="fw-medium">{{ user.nom  ~ " " ~ user.prenom  }}</span>
+                        </a>
+                        <small class="text-muted">{{ user.email }}</small>
+                    </div>
+                </div>
+            </td>
+            <td class= "role">
+                <span class="text-truncate d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-hover-success w-px-30 h-px-30 me-2"><i class="bx bx-user bx-xs"></i></span>{{ user.role }}
+                </span>
+            </td>
+            <td>
+                <span class="fw-medium">{{ user.numtel }}</span>
+            </td>
+            {% if user.datepunition is not defined or user.datepunition|date('d/m/Y') == '30/11/-0001' %}
+                <td>{{ "Pas de punition"  }}</td>
+            {% else %}
+                <td>{{ user.datepunition|date('d/m/Y')  }}</td>
+            {% endif %}
+
+                <td class="sorting_1 status">
+                    {% if user.statut == 'active' %}
+                    <span class="badge bg-label-success">{{ user.statut }}</span>
+                    {% else %}
+                    <span class="badge bg-label-warning">{{ user.statut }}</span>
+                    {% endif %}
+
+                </td>
+
+            <td>
+                <div class="d-inline-block text-nowrap">
+                    <button class="btn  btn-sm btn-icon edit-user "  type="button" data-bs-toggle="offcanvas" href="{{ path('app_user_edit', {'id': user.id}) }}" data-user-id="{{ user.id }}" data-bs-target="#offcanvasEditUser"><i class="bx bx-edit"></i></button>
+{#                    <a class="btn btn-sm btn-icon edit-user" href="{{ path('app_user_edit', {'id': user.id}) }}">#}
+{#                        <i class="bx bx-edit"></i>#}
+{#                    </a>#}
+
+                    <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }} " class="delete-form" >
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                            <button class="btn btn-sm btn-icon delete-record confirm-delete"  type="submit">
+
+                            <i class="bx bx-trash"></i>
+                        </button>
+                    </form>
+                    <button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                        <i class="bx bx-dots-vertical-rounded me-2"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end m-0">
+                        <a href="{{ path('app_user_show', {'id': user.id}) }}" class="dropdown-item">View</a>
+                        <a href="javascript:" class="dropdown-item">Suspend</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    {{ knp_pagination_render(users, paginationTemplate) }}
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listeners to all delete buttons
+        var deleteButtons = document.querySelectorAll('.confirm-delete');
+        deleteButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var form = this.closest('.delete-form');
+                if (form) {
+                    // Show the confirmation dialog
+                    Swal.fire({title:"êtes vous sûr?",text:"Vous ne pourrez plus recupérer ces données!",icon:"warning",showCancelButton:!0,confirmButtonText:"Oui",customClass:{confirmButton:"btn btn-danger me-3",cancelButton:"btn btn-label-secondary"},buttonsStyling:!1}).then((result) => {
+                        if (result.isConfirmed) {
+                            // If confirmed, submit the corresponding form
+                            form.submit();
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+</script>
+{% endblock %}
+
+{% block ajoutUser %}
+ {{ include('user/_form.html.twig') }}
+ <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="offcanvas">Cancel</button>
+{% endblock %}
+{% block modificationUser %}
+    <div id="edit-user-form" >
+
+    </div>
+
+    <script>
+        {#document.addEventListener('DOMContentLoaded', function() {#}
+        {#    const offcanvasEditUser = new bootstrap.Offcanvas(document.getElementById('offcanvasEditUser'));#}
+
+        {#    // Gestion du clic sur le bouton "Modifier"#}
+        {#    document.querySelectorAll('.edit-user').forEach(function(button) {#}
+        {#        button.addEventListener('click', function() {#}
+        {#            const userId = this.getAttribute('data-user-id');#}
+        {#            console.log(userId);#}
+        {#            // Requête AJAX pour charger le formulaire de modification#}
+        {#            fetch('{{ path('app_user_edit', {'id': 'USER_ID'}) }}'.replace('USER_ID', userId))#}
+
+        {#                .then(response => response.text())#}
+        {#                .then(data => {#}
+        {#                    console.log(data);#}
+        {#                    document.getElementById('edit-user-form').innerHTML = data;#}
+        {#                    //offcanvasEditUser.show();#}
+        {#                    // Inclure le script JavaScript ici pour qu'il soit exécuté après le chargement du formulaire#}
+
+        {#                   setupValidation();#}
+
+        {#                })#}
+
+        {#                .catch(error => {#}
+        {#                    console.error('Error:', error);#}
+        {#                });#}
+        {#        });#}
+        {#    });#}
+        {#});#}
+        document.addEventListener('DOMContentLoaded', function() {
+            const formContainer = document.getElementById('edit-user-form');
+
+            document.querySelectorAll('.edit-user').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+
+                    // Requête AJAX pour charger le formulaire de modification
+                    fetch('/admin/'.concat(userId, '/edit'))
+                        .then(response => response.text())
+                        .then(html => {
+                            formContainer.innerHTML = html;
+                            const form = document.getElementById('user-form');
+
+                            form.addEventListener('submit', function(event) {
+                                event.preventDefault();
+                                const formData = new FormData(form);
+                                fetch('/admin/'.concat(userId, '/edit'), {
+                                    method: 'POST',
+                                    body: formData
+                                })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            return response.text().then(html => {
+                                                formContainer.innerHTML = html;
+                                                setupValidation(); // Réinitialiser la validation après le chargement du formulaire
+                                            });
+                                        }
+                                        window.location.reload();
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                    });
+                            });
+
+                            setupValidation(); // Configurer la validation une fois le formulaire chargé
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                });
+            });
+        });
+
+    </script>
+    <script src="{{ asset('assets/jsUser/validation.js') }}"></script>
+
+{% endblock %}
+
+{% block userConnecte %}
+    {% if app.user != null %}
+        <span class="fw-medium d-block">{{ app.user.username }}</span>
+    {% endif %}
+{% endblock %}
+{% block nbrUsers %}
+{{ usersCount }}
+{% endblock %}
+{% block nbrAdmins %}
+    {{ adminsCount }}
+{% endblock %}
+{% block activeUsers %}
+{{ activeCount }}
+{% endblock %}
+{% block desactiveUsers %}
+    {{ desactiveCount }}
+{% endblock %}
+
+{% block imageUser %}
+    {% if app.user %}
+        {% if app.user.image %}
+            {% set cheminAbsolu = app.user.image %}
+            {% set nomFichier = "imagesUser/"~cheminAbsolu|split('\\')|last %}
+            <img  src="{{ asset(nomFichier) }}" alt class="w-px-40 h-auto rounded-circle">
+
+        {% else %}
+            <p>L'utilisateur n'a pas d'image.</p>
+        {% endif %}
+    {% else %}
+        <p>Vous n'êtes pas connecté.</p>
+    {% endif %}
+{% endblock %}
+{% block imageUserHabta %}
+
+    {% if app.user %}
+        {% if app.user.image %}
+            {% set cheminAbsolu = app.user.image %}
+            {% set nomFichier = "imagesUser/"~cheminAbsolu|split('\\')|last %}
+            <img src="{{ asset(nomFichier) }}" alt class="w-px-40 h-auto rounded-circle">
+        {% else %}
+            <p>L'utilisateur n'a pas d'image.</p>
+        {% endif %}
+    {% else %}
+        <p>Vous n'êtes pas connecté.</p>
+    {% endif %}
+{% endblock %}

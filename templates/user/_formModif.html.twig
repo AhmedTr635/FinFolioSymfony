@@ -1,0 +1,38 @@
+
+{#        {% for flashError in app.flashes('error') %}#}
+{#            <div class="alert alert-danger" role="alert">#}
+{#                {{ flashError }}#}
+{#            </div>#}
+{#        {% endfor %}#}
+<script src="{{ asset('assets/jsUser/validation.js') }}"></script>
+
+<div id="user-form-container" data-datepunition-id="{{ form.datepunition.vars.id }}" data-statut-id="{{ form.statut.vars.id }}">
+    <!-- Votre formulaire ici -->
+
+{{ form_start(form, {'attr': {'id': 'user-form'}}) }}
+
+<div class="form-group row">
+    <label class="col-sm-3 col-form-label">Statut</label>
+    <div class="col-sm-9">
+        {{ form_widget(form.statut, {'attr': {'class': 'form-control'}}) }}
+        {% if form_errors(form.statut) %}
+            <div class="error">{{ form_errors(form.statut) }}</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="form-group row">
+    <label class="col-sm-3 col-form-label">Date de Punition</label>
+    <div class="col-sm-9">
+        {{ form_widget(form.datepunition, {'attr': {'class': 'form-control datepicker'}}) }}
+        {% if form_errors(form.datepunition) %}
+            <div class="text-danger">{{ form_errors(form.datepunition) }}</div>
+        {% endif %}
+    </div>
+</div>
+
+{{ form_end(form) }}
+</div>
+
+
+

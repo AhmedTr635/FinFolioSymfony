@@ -1,0 +1,11 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+get_user_info:
+  path: '/get_user_info/{id}'
+  controller: 'App\Controller\UserController::getUserInfo'
+#access_denied:
+#  path: /user/access-denied
+#  controller: App\Controller\UserController::accessDenied
+
+

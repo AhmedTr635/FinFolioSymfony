@@ -1,0 +1,29 @@
+#tableau-container {
+    max-height: 300px; /* Set the maximum height for the container */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+/* Ensure table headers remain visible while scrolling */
+
+
+#tableau {
+    width: 100%; /* Ensure the table fills the container */
+}
+
+#searchInput {
+
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    font-size: 16px;
+    background-color: #ffffff;
+    transition: border-color 0.3s ease;
+}
+#searchInput:focus {
+    outline: none;
+    border-color: #9a74f1; /* Change border color when focused */
+}
+.card-title text-nowrap mb-2{
+}

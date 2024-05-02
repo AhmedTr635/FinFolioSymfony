@@ -1,0 +1,46 @@
+{{ form_start(form, {'attr': {'id': 'depenseForm', 'class': 'custom-form','novalidate': 'novalidate'}})}}
+<style>
+    .error-message {
+        color: red;
+    }
+</style>
+   <div class="row">
+
+        <div class="col-md-6">
+            {{ form_label(form.type) }}
+            {{ form_widget(form.type, {'attr': {'class': 'form-control', 'id': 'depense_type'}}) }}
+            <span id="depense_type-error" class="error-message"></span>
+            {% if form_errors(form.type) %}
+
+            <div class="error">{{ form_errors(form.type) }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            {{ form_label(form.montant) }}
+            {{ form_widget(form.montant, {'attr': {'class': 'form-control', 'id': 'depense_montant'}}) }}
+            <span id="depense_montant-error" class="error-message"></span>
+            {% if form_errors(form.montant) %}
+
+                <div class="error">{{ form_errors(form.montant) }}</div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-6">
+            {{ form_label(form.date) }}
+            {{ form_widget(form.date, {'attr': {'class': 'form-control', 'id': 'depense_date'}}) }}
+            <span id="depense_date-error" class="error-message"></span>
+            {% if form_errors(form.date) %}
+
+                <div class="error">{{ form_errors(form.date) }}</div>
+            {% endif %}
+                </div>
+                 </div>
+              <div>
+        </div>
+    <div>
+<button type="submit" class="btn btn-primary" id="submitbutton" style="margin-top: 25px">{{ button_label }}</button>
+
+</div>
+{{ form_end(form) }}
+

@@ -1,0 +1,471 @@
+{% extends 'evennement/sidebar.html.twig' %}
+{% block container %}
+    {% block title %}{% endblock %}
+{%  block the_navbar %}
+    {% endblock %}
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+
+    {% block body %}
+
+        <div class="container-xxl flex-grow-1 container-p-y">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mr-md-1"> <!-- Add smaller margin to the right -->
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="eventSearch" placeholder="Search..." class="form-control border-start-0 rounded-end">
+                    </div>
+
+                </div>
+                <!-- Button column -->
+                <div class="col-md-6 mb-4 d-flex justify-content-md-end">
+                    <div class="col-md-6 mb-4 d-flex justify-content-md-end">
+                        <button id="myEventsBtn" class="btn btn-primary" data-url="{{ path('my_donated_events') }}">Mes événements</button>
+                    </div>
+                    <div class="col-md-6 mb-4 d-flex justify-content-md-end">
+                        <!-- Add the "Calendrier" button here -->
+                        <a href="{{ path('app_event_calendar') }}" class="btn btn-primary">Calendrier</a>
+                    </div>
+                </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+        <div class="upcoming-event-container">
+              {% if upcomingEvent %}
+                <div id="upcomingEvent">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Evenement à venir</h5>
+                        </div>
+                        <div class="card-body">
+                            <h5>{{ upcomingEvent.nomEvent|trans|raw }}</h5>
+                            <p>{{ upcomingEvent.date ? upcomingEvent.date|date('d M Y \\a\\t h:i A') : '' }}</p>
+                            <!-- Add more details if needed -->
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+
+        </div>
+
+
+        <div class="event-container-xxl px-3 flex-grow-1 container-p-y">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                {% for evennement in evennements %}
+                    <div class=" events col">
+                        <div class="card h-100">
+                            <!-- Card content goes here -->
+                            <div class="card-header flex-grow-0">
+                                <div class="d-flex">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                        <img src="../../assets/img/avatars/21.png" alt="User" class="rounded-circle">
+                                    </div>
+                                    <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-1">
+                                        <div class="me-2">
+                                            <h5 class=" event-name mb-0">{{ evennement.nomEvent }}</h5>
+                                            <small class="event-date">{{ evennement.date ? evennement.date|date('d M Y \\a\\t h:i A') : '' }}</small>
+                                        </div>
+                                        <div class="dropdown d-none d-sm-block">
+                                            <button class="btn p-0" type="button" id="eventList" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="bx bx-chevron-down"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="eventList">
+                                                <a class="dropdown-item" id="voirDetailsBtn{{ evennement.id }}">Voir Details</a>
+                                            </div>
+
+                                            <!-- Modal for Event Description -->
+                                            <div id="eventDescriptionModal{{ evennement.id }}" class="modal">
+                                                <div class="modal-content">
+                                                    <span class="close" onclick="closeEventDescriptionPopup({{ evennement.id }})">&times;</span>
+                                                    <h2>{{ evennement.nomEvent }}</h2>
+                                                    <p>{{ evennement.description }}</p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if evennement.imageData %}
+                                <img class="card-img-top" src="{{ asset(evennement.imageData) }}" alt="Card image cap" />
+                            {% else %}
+                                <img class="card-img-top" src="{{ asset('uploads/images/noimage.jpg') }}" alt="Card image cap" />
+                            {% endif %}
+                            <div class="featured-date mt-n4 ms-4 bg-white rounded w-px-50 shadow text-center p-1">
+                                <h5 class="mb-0 text-dark">{{ evennement.date ? evennement.date|date('d') : '' }}</h5>
+                                <span class="text-primary">{{ evennement.date ? evennement.date|date('M') : '' }}</span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="event-adresse mb-0"> <i class="fas fa-map-marker-alt"></i> {{ evennement.adresse }}</h5>
+                                <div class="d-flex gap-2">
+{#                                    <span class="badge bg-label-primary">Technical</span>#}
+{#                                    <span class="badge bg-label-primary">Account</span>#}
+{#                                    <span class="badge bg-label-primary">Excel</span>#}
+                                </div>
+                                <div class="d-flex my-3">
+                                    <div class="rating">
+                                        {% for i in 1..5 %}
+                                            {% if i <= evennement.rating %}
+                                                <span><i class="fas fa-star"></i></span>
+                                            {% else %}
+                                                <span><i class="far fa-star"></i></span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+
+
+                                    <button class="btn-give-donation btn-primary ms-auto" id="donation_button" data-event-id="{{ evennement.id }}">Faire un don</button>
+
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="card-actions">
+                                        <div class="d-flex flex-wrap gap-4 "> <!-- Increased gap to 4 for more space -->
+                                            <div class="d-flex align-items-center me-4">
+                                                <div>
+                                                    <p class="event-montant mb-0">${{ evennement.montant }}</p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+
+                                    <div id="donationModal{{ evennement.id }}" class="modal"> <!-- Append evennement.id to the id -->
+                                        <div class="modal-content">
+                                            <span class="close" onclick="closeDonationPopup({{ evennement.id }})">&times;</span> <!-- Pass evennement.id to the function -->
+                                            <h2>Give Donation</h2>
+                                            <p>Enter the donation amount:</p>
+                                            <form id="donationForm{{ evennement.id }}" action="{{ path('app_don_give_donation', {'id': evennement.id}) }}" method="POST" novalidate>
+                                                <input type="hidden" name="user_id" value="118"> <!-- Replace '118' with the actual user ID -->
+                                                <input type="text" id="donationAmount" name="montant" placeholder="Enter amount" required>
+                                                <div id="amountValidationMessage" class="validation-message"></div>
+                                                <button type="submit">Submit</button>
+                                            </form>
+
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+
+
+
+        <div id="myEventsModal" class="modal">
+            <div class="modal-content" id="myEventsContent">
+                <span class="close">&times;</span>
+                <!-- Content will be loaded here dynamically -->
+            </div>
+        </div>
+
+
+
+
+
+
+
+        {% block css %}
+            <link rel="stylesheet" href="../../assets/css/event.css" />
+        {% endblock %}
+
+        {% block js %}
+            <script src="{{ asset('../../assets/js/event/event.js') }}"></script>
+
+            <script src="{{ asset('../../assets/js/event/edit_event.js') }}"></script>
+
+
+
+
+<script>
+
+
+
+    ////////////////////////////////////Voir Details////////////////////////////////////////////////////////
+
+
+        // Function to open the event description modal
+        function openEventDescriptionPopup(eventId) {
+        const modal = document.getElementById('eventDescriptionModal' + eventId);
+        modal.style.display = 'block';
+    }
+
+        // Function to close the event description modal
+        function closeEventDescriptionPopup(eventId) {
+        const modal = document.getElementById('eventDescriptionModal' + eventId);
+        modal.style.display = 'none';
+    }
+
+        document.addEventListener('DOMContentLoaded', function () {
+        // Add event listeners to all "Voir Details" buttons
+        const voirDetailsButtons = document.querySelectorAll('[id^="voirDetailsBtn"]');
+        voirDetailsButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+        const eventId = button.getAttribute('id').replace('voirDetailsBtn', '');
+        openEventDescriptionPopup(eventId);
+    });
+    });
+    });
+
+    //////////////////////////////////////////Donation/////////////////////////////////////////////////////////////
+document.addEventListener('DOMContentLoaded', function () {
+    const donationAmountInput = document.getElementById('donationAmount');
+    const amountValidationMessage = document.getElementById('amountValidationMessage');
+
+    donationAmountInput.addEventListener('input', function () {
+        validateAmountInput(this.value);
+    });
+
+    function validateAmountInput(amount) {
+        // Check if the amount is a valid number
+        if (!isNaN(amount) && amount >= 0) {
+            // Reset validation message if the input is valid
+            amountValidationMessage.textContent = '';
+            return true;
+        } else {
+            // Display validation message if the input is invalid
+            amountValidationMessage.textContent = 'Please enter a valid amount';
+            return false;
+        }
+    }
+});
+
+
+
+
+
+
+    const searchInput = document.getElementById('eventSearch');
+    const eventCards = document.querySelectorAll('.events');
+
+    // Add event listener to the search input
+    searchInput.addEventListener('input', function () {
+        const searchQuery = this.value.toLowerCase().trim();
+
+        // Loop through each event card
+        eventCards.forEach(function (card) {
+            const eventName = card.querySelector('.event-name').textContent.toLowerCase();
+            const eventAddress = card.querySelector('.event-adresse').textContent.toLowerCase();
+
+            // Check if the event name or address contains the search query
+            if (eventName.includes(searchQuery) || eventAddress.includes(searchQuery)) {
+                card.style.display = 'block'; // Show the event card
+            } else {
+                card.style.display = 'none'; // Hide the event card
+            }
+        });
+    });
+
+
+    //upcoming event
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const upcomingEventDiv = document.getElementById('upcomingEvent');
+
+        // Function to find the upcoming event
+        function findUpcomingEvent(events) {
+            let upcomingEvent = null;
+            let closestDate = Infinity;
+            const today = new Date();
+
+            // Loop through each event to find the one closest to today's date
+            events.forEach(function(event) {
+                const eventDateStr = event.querySelector('.event-date').textContent.trim();
+                console.log("Event Date String:", eventDateStr); // Debugging message
+                const eventDate = parseDate(eventDateStr); // Parse the date string
+                console.log("Parsed Date:", eventDate); // Debugging message
+                const timeDifference = eventDate.getTime() - today.getTime();
+                console.log("Time Difference (ms):", timeDifference); // Debugging message
+
+                // If the event is in the future and closer to today's date than the previous closest event
+                if (timeDifference > 0 && timeDifference < closestDate) {
+                    upcomingEvent = event;
+                    closestDate = timeDifference;
+                }
+            });
+
+            return upcomingEvent;
+        }
+
+// Function to parse date string into a Date object
+        function parseDate(dateStr) {
+            // Split the date string into its components
+            const parts = dateStr.split(' ');
+            const day = parseInt(parts[0], 10);
+            const monthStr = parts[1];
+            const year = parseInt(parts[2], 10);
+            const timeParts = parts[5].split(':');
+            let hour = parseInt(timeParts[0], 10);
+            let minute = parseInt(timeParts[1], 10);
+
+            // Adjust hour for PM
+            if (parts[6] === 'PM') {
+                hour += 12;
+            }
+
+            // Create and return the Date object
+            return new Date(year, getMonthIndex(monthStr), day, hour, minute);
+        }
+
+// Function to get month index from month name abbreviation
+        function getMonthIndex(monthStr) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months.indexOf(monthStr);
+        }
+
+        // Function to display the upcoming event
+        function displayUpcomingEvent(upcomingEvent) {
+            if (upcomingEvent) {
+                // Extract name, date, address, and amount from the upcoming event
+                const eventName = upcomingEvent.querySelector('.event-name  ').textContent.trim();
+                const eventDate = upcomingEvent.querySelector('.event-date').textContent.trim();
+                const eventAddress = upcomingEvent.querySelector('.event-adresse ').textContent.trim();
+                const eventAmount = upcomingEvent.querySelector('.event-montant ').textContent.trim();
+
+                // Create HTML markup for the upcoming event
+                const eventHTML = `
+                            <div class="upcoming-event" style="background-color: #ffffff; border-radius: 10px; padding: 20px; margin: 0 auto; max-width: 95%; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); margin-bottom: 20px">
+                    <h4 style="margin-top: 0;">${eventName}</h4>
+                    <p class="event-info" style="margin-top: 10px;"><strong>Date:</strong> ${eventDate} | <strong>Address:</strong> ${eventAddress} | <strong>Amount:</strong> ${eventAmount}</p>
+                </div>
+
+            `;
+
+                // Display the upcoming event
+                upcomingEventDiv.innerHTML = eventHTML;
+            } else {
+                upcomingEventDiv.innerHTML = '<p>No upcoming events found</p>';
+            }
+        }
+
+        // Event listener for input change
+        searchInput.addEventListener('input', function() {
+            // Hide upcoming event when searching
+            upcomingEventDiv.innerHTML = '';
+        });
+
+        // Get all event nodes
+        const events = document.querySelectorAll('.event');
+
+        // Find and display the upcoming event
+        const upcomingEvent = findUpcomingEvent(events);
+        displayUpcomingEvent(upcomingEvent);
+    });
+
+
+    //MyEvents
+// Get the button and modal elements
+const myEventsBtn = document.getElementById('myEventsBtn');
+const myEventsModal = document.getElementById('myEventsModal');
+const myEventsContent = document.getElementById('myEventsContent');
+
+// Add click event listener to the button
+myEventsBtn.addEventListener('click', function() {
+    // Fetch the URL from the data attribute
+    const url = myEventsBtn.getAttribute('data-url');
+
+    // Fetch the content of the modal using AJAX
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            // Set the fetched content as the inner HTML of the modal content element
+            myEventsContent.innerHTML = data;
+            // Show the modal
+            myEventsModal.style.display = 'block';
+        })
+        .catch(error => console.error('Error fetching my donated events:', error));
+});
+
+// Add click event listener to the close button of the modal
+document.querySelector('.close').addEventListener('click', function() {
+    // Close the modal when the close button is clicked
+    myEventsModal.style.display = 'none';
+});
+
+
+
+</script>
+
+
+    <style>
+
+        /* CSS for the modal content */
+        .modal-content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px; /* Set width for the small window */
+            height: 220px; /* Set height for the small window */
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow for depth */
+        }
+
+        /* Close button */
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-give-donation{
+            /* Existing styles */
+            background-color: #6359dc;
+            color: #fff;
+            border: none;
+            padding: 10px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            /* New styles */
+            display: block; /* Make buttons block-level elements */
+            margin: 0 auto; /* Center horizontally */
+        }
+        .input-group .input-group-text {
+            font-size: 1rem; /* Adjust the font size as needed */
+            height: calc(1.5em + 0.75rem + 5px); /* Set the height to match the input */
+        }
+    </style>
+
+
+
+
+        {% endblock %}
+
+    {% endblock %}
+{% endblock %}
+
+
+

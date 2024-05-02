@@ -1,0 +1,270 @@
+{#{{ form_start(form, {'attr': {'id': 'event_form'}}) }}#}
+{#{{ form_widget(form) }}#}
+{#    <button class="btn">{{ button_label|default('Save') }}</button>#}
+{#{{ form_end(form) }}#}
+
+
+
+{{ form_start(form, {'attr': {'id': 'event_form', 'class': 'custom-form','novalidate': 'novalidate'}}) }}
+
+<div class="form-group">
+    {{ form_label(form.nom_event) }}
+    {{ form_widget(form.nom_event, {'attr': {'class': 'form-control js-input', 'id': 'evennement_nom_event'}}) }}
+
+    <span id="evennement_nom_event-error" class="error-message"></span>
+    {% if form_errors(form.nom_event) %}
+        <div class="error">{{ form_errors(form.nom_event) }}</div>
+    {% endif %}
+
+</div>
+
+<div class="form-group">
+    {{ form_label(form.montant) }}
+    {{ form_widget(form.montant, {'attr': {'class': 'form-control js-input', 'type': 'number', 'id': 'evennement_montant'}}) }}
+
+    <span id="evennement_montant-error" class="error-message"></span>
+    {% if form_errors(form.montant) %}
+        <div class="error">{{ form_errors(form.montant) }}</div>
+    {% endif %}
+</div>
+
+<div class="form-group">
+    {{ form_label(form.date) }}
+    {{ form_widget(form.date, {'attr': {'class': 'form-control js-input js-datepicker', 'type': 'date', 'id': 'evennement_date', 'required': 'required'}}) }}
+
+
+    <span id="evennement_date-error" class="error-message"></span>
+    {% if form_errors(form.date) %}
+        <div class="error">{{ form_errors(form.date) }}</div>
+    {% endif %}
+
+</div>
+
+<div class="form-group">
+    {{ form_label(form.adresse) }}
+    {{ form_widget(form.adresse, {'attr': {'class': 'form-control js-input', 'id': 'evennement_adresse'}}) }}
+
+    <span id="evennement_adresse-error" class="error-message"></span>
+    {% if form_errors(form.adresse) %}
+        <div class="error">{{ form_errors(form.adresse) }}</div>
+    {% endif %}
+
+</div>
+
+<div class="form-group">
+    {{ form_label(form.description) }}
+    {{ form_widget(form.description, {'attr': {'class': 'form-control js-input', 'id': 'evennement_description'}}) }}
+
+    <span id="evennement_description-error" class="error-message"></span>
+    {% if form_errors(form.description) %}
+        <div class="error">{{ form_errors(form.description) }}</div>
+    {% endif %}
+
+</div>
+
+<div class="form-group">
+    {{ form_label(form.imageData) }}
+    {{ form_widget(form.imageData, {'attr': {'class': 'form-control js-input', 'id': 'evennement_imageData'}}) }}
+
+    <span id="evennement_imageData-error" class="error-message"></span>
+    {% if form_errors(form.imageData) %}
+        <div class="error">{{ form_errors(form.imageData) }}</div>
+    {% endif %}
+</div>
+
+<div class="form-group">
+    <button type="submit" class="btn btn-primary">{{ button_label|default('Envoyer') }}</button>
+</div>
+
+{{ form_end(form) }}
+
+
+
+{#{{ form_start(form) }}#}
+
+{#{{ form_row(form.nom_event, {'errors': 'none'}) }}#}
+{#{% if form_errors(form.nom_event) %}#}
+{#    <div class="error">{{ form_errors(form.nom_event) }}</div>#}
+{#{% endif %}#}
+
+{#{{ form_row(form.montant, {'errors': 'none'}) }}#}
+{#{% if form_errors(form.montant) %}#}
+{#    <div class="error">{{ form_errors(form.montant) }}</div>#}
+{#{% endif %}#}
+
+{#{{ form_row(form.date, {'errors': 'none'}) }}#}
+{#{% if form_errors(form.date) %}#}
+{#    <div class="error">{{ form_errors(form.date) }}</div>#}
+{#{% endif %}#}
+
+{#{{ form_row(form.adresse, {'errors': 'none'}) }}#}
+{#{% if form_errors(form.adresse) %}#}
+{#    <div class="error">{{ form_errors(form.adresse) }}</div>#}
+{#{% endif %}#}
+
+{#{{ form_row(form.description, {'errors': 'none'}) }}#}
+{#{% if form_errors(form.description) %}#}
+{#    <div class="error">{{ form_errors(form.description) }}</div>#}
+{#{% endif %}#}
+
+
+{#{{ form_end(form) }}#}
+
+
+<style>
+
+
+
+    /* Form Group Styles */
+    .form-group {
+        margin-bottom: 20px; /* Add space between form groups */
+    }
+
+    /* Form Label Styles */
+    .form-group label {
+        font-weight: bold; /* Bold label text */
+    }
+
+    /* Button Styles */
+    .btn {
+        padding: 10px 20px; /* Add padding to buttons */
+        font-size: 16px; /* Font size for buttons */
+        border: none; /* Remove button border */
+        border-radius: 4px; /* Rounded corners for buttons */
+        cursor: pointer; /* Add cursor pointer on hover */
+        background-color: #007bff; /* Button background color */
+        color: #fff; /* Button text color */
+    }
+
+    .btn:hover {
+        background-color: #0056b3; /* Button background color on hover */
+    }
+
+    /* Date Field Styles */
+    .input-group.date {
+        position: relative;
+    }
+
+    .input-group.date .form-control {
+        border-radius: 4px; /* Rounded corners for the date field */
+    }
+
+    /* Calendar Icon Styles */
+    .input-group-append .input-group-text {
+        border-radius: 0 4px 4px 0; /* Rounded corners for the icon container */
+        border: none; /* Remove border for the icon container */
+        background-color: #007bff; /* Background color for the icon container */
+        color: #fff; /* Color for the icon */
+        cursor: pointer; /* Add cursor pointer on hover */
+    }
+
+    .input-group-append .input-group-text:hover {
+        background-color: #0056b3; /* Background color for the icon container on hover */
+    }
+
+    /* Form Validation Styles */
+    .is-invalid {
+        border-color: red !important; /* Change border color to red for invalid fields */
+    }
+
+    .error-message {
+        color: red; /* Set the color of the error message to red */
+        font-size: 14px; /* Set the font size of the error message */
+        display: block; /* Ensure that the error message is displayed as a block element */
+        margin-top: 5px; /* Add some top margin to separate the error message from the input field */
+    }
+
+
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
+    <script>
+//         document.addEventListener('DOMContentLoaded', function() {
+//         const form = document.getElementById('event_form');
+//         const nameInput = document.getElementById('evennement_nom_event');
+//         const montantInput = document.getElementById('montant');
+//         const dateInput = document.getElementById('date');
+//         const adresseInput = document.getElementById('adresse');
+//         const descriptionInput = document.getElementById('description');
+//
+//
+//
+//             nameInput.addEventListener('input', function() {
+//         validateName();
+//     });
+//             montantInput.addEventListener('input', function() {
+//                 validatemontant();});
+//
+//         function validateName() {
+//         const name = nameInput.value.trim();
+//         if (!/^[a-zA-Z]*$/.test(name)) {
+//         showError(nameInput,document.getElementById("nom_event-error"), 'Name must contain only alphabetic characters');
+//     }else if (name === '') {
+//         showError(nameInput,document.getElementById("nom_event-error"), 'Vous devez remplir ce champ');
+//     }
+//         else {
+//         hideError(nameInput,document.getElementById("nom_event-error"));
+//     }
+//     }
+//         function validatemontant() {
+//         const montant = montantInput.value.trim();
+//         const errorElement = document.getElementById("montant-error");
+//
+//         if (!montant) {
+//         showError(montantInput, errorElement, 'montant is required');
+//     } else if (!/^\d+(\.\d+)?$/.test(montant)) {
+//         showError(montantnput, errorElement, 'montant must be a numeric value');
+//     } else {
+//         hideError(montantInput, errorElement);
+//     }
+//     }
+//             montantInput.addEventListener('input',function () {
+//         validatemontant();
+//     })
+//         function showError(input, errorElement, message) {
+//         errorElement.textContent = message;
+//         input.classList.remove('is-valid');
+//         input.classList.add('is-invalid');
+//     }
+//
+// // Function to hide error message
+//         function hideError(input, errorElement) {
+//         errorElement.textContent = '';
+//         input.classList.remove('is-invalid');
+//         input.classList.add('is-valid');
+//     }
+//
+//
+//         // Form submission handler
+//         form.addEventListener('submit', function(event) {
+//         event.preventDefault(); // Prevent form submission for now
+//
+//         // Validate inputs
+//         const isValid = validateForm();
+//         if (isValid) {
+//         // If form is valid, you can submit the form
+//         form.submit();
+//     }
+//     });
+//
+//         // Function to validate the entire form
+//         function validateForm() {
+//         let isValid = true;
+//
+//         // Validate Name
+//         validateName();
+//
+//         // Add validation for other fields here
+//
+//         return isValid;
+//     }
+//     });
+
+
+
+
+
+</script>

@@ -1,0 +1,152 @@
+{{ form_start(form) }}
+
+{{ form_row(form.nom) }}
+
+
+{{ form_row(form.prenom, {'attr': {'class': form_errors(form.prenom)|default(null) ? 'error-border' : ''}}) }}
+
+
+{{ form_row(form.email, {'attr': {'class': form_errors(form.email)|default(null) ? 'error-border' : ''}}) }}
+
+
+{{ form_row(form.password, {'attr': {'class': form_errors(form.password)|default(null) ? 'error-border' : ''}}) }}
+
+
+{{ form_row(form.numtel, {'attr': {'class': form_errors(form.numtel)|default(null) ? 'error-border' : ''}}) }}
+
+
+{{ form_row(form.image, {'attr': {'class': form_errors(form.image)|default(null) ? 'error-border' : ''}}) }}
+
+
+{{ form_end(form) }}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var nomInput = document.getElementById('user_nom');
+        var prenomInput = document.getElementById('user_prenom');
+        var emailInput = document.getElementById('user_email');
+        var numtelInput = document.getElementById('user_numtel');
+        var passwordInput = document.getElementById('user_password');
+        var form = document.getElementById('user_form');
+
+        // Fonctions de validation pour chaque champ
+        function validateNom() {
+            var nomValue = nomInput.value.trim();
+            if (nomValue === '') {
+                showError(nomInput, 'Merci de saisir votre nom.');
+                return false; // Validation échoue
+            } else if (nomValue.length < 3) {
+                showError(nomInput, 'Le nom doit avoir au moins 3 caractères.');
+                return false; // Validation échoue
+            } else {
+                hideError(nomInput);
+                return true; // Validation réussie
+            }
+        }
+
+        function validatePrenom() {
+            var prenomValue = prenomInput.value.trim();
+            if (prenomValue === '') {
+                showError(prenomInput, 'Merci de saisir votre prénom.');
+                return false; // Validation échoue
+            } else if (prenomValue.length < 3) {
+                showError(prenomInput, 'Le prénom doit avoir au moins 3 caractères.');
+                return false; // Validation échoue
+            } else {
+                hideError(prenomInput);
+                return true; // Validation réussie
+            }
+        }
+
+        function validateEmail() {
+            var emailValue = emailInput.value.trim();
+            if (emailValue === '') {
+                showError(emailInput, "L'email est obligatoire.");
+                return false; // Validation échoue
+            } else if (!isValidEmail(emailValue)) {
+                showError(emailInput, "L'email n'est pas valide.");
+                return false; // Validation échoue
+            } else {
+                hideError(emailInput);
+                return true; // Validation réussie
+            }
+        }
+
+        function validateNumtel() {
+            var numtelValue = numtelInput.value.trim();
+            if (numtelValue === '') {
+                showError(numtelInput, 'Merci de saisir votre numéro de téléphone.');
+                return false; // Validation échoue
+            } else if (!isValidPhoneNumber(numtelValue)) {
+                showError(numtelInput, 'Entrez un numéro de téléphone valide.');
+                return false; // Validation échoue
+            } else {
+                hideError(numtelInput);
+                return true; // Validation réussie
+            }
+        }
+
+        function validatePassword() {
+            var passwordValue = passwordInput.value.trim();
+            if (passwordValue === '') {
+                showError(passwordInput, "Le mot de passe est obligatoire.");
+                return false; // Validation échoue
+            } else if (!isValidPassword(passwordValue)) {
+                showError(passwordInput, 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.');
+                return false; // Validation échoue
+            } else {
+                hideError(passwordInput);
+                return true; // Validation réussie
+            }
+        }
+
+        // Fonction pour afficher les erreurs en rouge et ajouter la classe error-border
+        function showError(input, message) {
+            var errorDiv = input.nextElementSibling;
+            if (!errorDiv || !errorDiv.classList.contains('error-message')) {
+                errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                input.parentNode.insertBefore(errorDiv, input.nextElementSibling);
+            }
+            errorDiv.textContent = message;
+            errorDiv.style.color = 'red'; // Couleur rouge pour les messages d'erreur
+            input.classList.add('error-border'); // Ajoute la classe error-border
+        }
+
+        // Fonction pour masquer les erreurs et supprimer la classe error-border
+        function hideError(input) {
+            var errorDiv = input.nextElementSibling;
+            if (errorDiv && errorDiv.classList.contains('error-message')) {
+                errorDiv.textContent = '';
+            }
+            input.classList.remove('error-border'); // Supprime la classe error-border
+        }
+
+        // Fonction pour valider l'email
+        function isValidEmail(email) {
+            var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        // Fonction pour valider le numéro de téléphone
+        function isValidPhoneNumber(numtel) {
+            var regex = /^(\+216)?[2459]\d{7}$/;
+            return regex.test(numtel);
+        }
+
+        // Fonction pour valider le mot de passe
+        function isValidPassword(password) {
+            var regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^\w\d\s:])([^\s]){8,}$/;
+            return regex.test(password);
+        }
+
+        // Ajoutez des écouteurs d'événements sur les champs du formulaire pour la validation en temps réel
+        nomInput.addEventListener('input', validateNom);
+        prenomInput.addEventListener('input', validatePrenom);
+        emailInput.addEventListener('input', validateEmail);
+        numtelInput.addEventListener('input', validateNumtel);
+        passwordInput.addEventListener('input', validatePassword);
+
+    });
+
+</script>
