@@ -1,0 +1,341 @@
+{% extends 'bo.html.twig' %}
+
+{% block content %}
+    <style>
+        .error-message {
+            color: red;
+        }
+        .custom-card {
+            width: 750px;
+        }
+    </style>
+
+    <div class="col-xl">
+        <div class="card mb-4 custom-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Edit RealEstate </h5>
+                <small class="text-muted float-end"></small>
+            </div>
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'id': 'realEstateForm'}}) }}
+                <div class="mb-3">
+                    {{ form_label(form.name, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.name, {'attr': {'class': 'form-control', 'id': 'real_estate_name'}}) }}
+                    <span id="name-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.name) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.emplacement, 'Emplacement', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.emplacement, {'attr': {'class': 'form-control', 'id': 'real_estate_emplacement'}}) }}
+                    <span id="emplacement-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.emplacement) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.ROI, 'ROI', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.ROI, {'attr': {'class': 'form-control', 'id': 'real_estate_ROI'}}) }}
+                    <span id="ROI-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.ROI) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.valeur, 'Valeur', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.valeur, {'attr': {'class': 'form-control', 'id': 'real_estate_valeur'}}) }}
+                    <span id="valeur-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.valeur) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.nbrchambres, 'Nombres de chambres', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.nbrchambres, {'attr': {'class': 'form-control', 'id': 'real_estate_nbrchambres'}}) }}
+                    <span id="nbrchambres-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.nbrchambres) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.superficie, 'Superficie', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.superficie, {'attr': {'class': 'form-control', 'id': 'real_estate_superficie'}}) }}
+                    <span id="superficie-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.superficie) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.nbrclick, 'Nombre de clicks', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.nbrclick, {'attr': {'class': 'form-control', 'id': 'real_estate_nbrclick'}}) }}
+                    <span id="nbrclick-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.nbrclick) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.virtualTourLink, 'Virtual Tour', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.virtualTourLink, {'attr': {'class': 'form-control', 'id': 'real_estate_virtualTourLink'}}) }}
+                    <span id="virtualTourLink-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.virtualTourLink) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.imageData, 'Image', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.imageData, {'attr': {'class': 'form-control', 'id': 'real_estate_imageData', 'onchange': 'previewImage(event)'}}) }}
+                    <span id="imageData-error" class="error-message"></span>
+                    {# Display validation messages if any #}
+                    {{ form_errors(form.imageData) }}
+
+                    {# Image preview container #}
+                    {#<div id="image-preview"></div> #}
+                </div>
+                <div id="image-preview-container">
+                    {% if real_estate.imageData %}
+                        <img src="{{ asset(real_estate.imageData) }}" id="old-image" width="200"/>
+                    {% else %}
+                        <img src="{{ asset('uploads/images/noimage.jpg') }}" id="old-image" width="200"/>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button class="btn btn-secondary" onclick="location.href='{{ path('app_real_estate_index') }}'">Back to List</button>
+
+                {{ form_end(form) }}
+                {{ include('real_estate/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageDataInput = document.getElementById('real_estate_imageData');
+            const imagePreviewContainer = document.getElementById('image-preview-container');
+            const oldImage = document.getElementById('old-image');
+
+            imageDataInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const newImage = document.createElement('img');
+                    newImage.src = e.target.result;
+                    newImage.width = 200;
+
+                    // Replace old image with new image
+                    if (oldImage) {
+                        imagePreviewContainer.replaceChild(newImage, oldImage);
+                    } else {
+                        imagePreviewContainer.appendChild(newImage);
+                    }
+                };
+
+                reader.readAsDataURL(file);
+            });
+        });
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById('image-preview');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Image Preview" width="200">`;
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.innerHTML = '';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('realEstateForm');
+            const nameInput = document.getElementById('real_estate_name');
+            const emplacementInput = document.getElementById('real_estate_emplacement');
+            const ROIInput = document.getElementById('real_estate_ROI');
+            const valeurInput = document.getElementById('real_estate_valeur');
+            const nbrchambresInput = document.getElementById('real_estate_nbrchambres');
+            const superficieInput = document.getElementById('real_estate_superficie');
+            const nbrclickInput = document.getElementById('real_estate_nbrclick');
+            const virtualTourLinkInput = document.getElementById('real_estate_virtualTourLink');
+            const imageDataInput = document.getElementById('real_estate_imageData');
+
+            nameInput.addEventListener('input', function() {
+                validateName();
+            });
+
+            function validateName() {
+                const name = nameInput.value.trim();
+                if (!/^[a-zA-Z]*$/.test(name)) {
+                    showError(nameInput,document.getElementById("name-error"), 'Name must contain only alphabetic characters');
+                }else if (name === '') {
+                    showError(nameInput,document.getElementById("name-error"), 'Vous devez remplir ce champ');
+                }
+                else {
+                    hideError(nameInput,document.getElementById("name-error"));
+                }
+            }
+
+            function validateEmplacement() {
+                const emplacement = emplacementInput.value.trim();
+                const errorElement = document.getElementById("emplacement-error");
+
+                if (!emplacement) {
+                    showError(emplacementInput, errorElement, 'Emplacement is required');
+                } else if (!/^[a-zA-Z]*$/.test(emplacement)) {
+                    showError(emplacementInput, errorElement, 'Emplacement must contain only alphabetic characters');
+                } else {
+                    hideError(emplacementInput, errorElement);
+                }
+            }
+            emplacementInput.addEventListener('input',function () {
+                validateEmplacement();
+            })
+            function validateROI() {
+                const ROI = ROIInput.value.trim();
+                const errorElement = document.getElementById("ROI-error");
+
+                if (!ROI) {
+                    showError(ROIInput, errorElement, 'ROI is required');
+                } else if (!/^\d+(\.\d+)?$/.test(ROI)) {
+                    showError(ROIInput, errorElement, 'ROI must be a numeric value');
+                } else {
+                    hideError(ROIInput, errorElement);
+                }
+            }
+            ROIInput.addEventListener('input',function () {
+                validateROI();
+            })
+
+// Function to validate the Valeur field
+            function validateValeur() {
+                const valeur = valeurInput.value.trim();
+                const errorElement = document.getElementById("valeur-error");
+
+                if (!valeur) {
+                    showError(valeurInput, errorElement, 'Valeur is required');
+                } else if (!/^\d+(\.\d+)?$/.test(valeur)) {
+                    showError(valeurInput, errorElement, 'Valeur must be a numeric value');
+                } else {
+                    hideError(valeurInput, errorElement);
+                }
+            }
+            valeurInput.addEventListener('input',function () {
+                validateValeur();
+            })
+
+// Function to validate the Number of Bedrooms field
+            function validateNbrChambres() {
+                const nbrchambres = nbrchambresInput.value.trim();
+                const errorElement = document.getElementById("nbrchambres-error");
+
+                if (!nbrchambres) {
+                    showError(nbrchambresInput, errorElement, 'Number of Bedrooms is required');
+                } else if (!/^\d+$/.test(nbrchambres)) {
+                    showError(nbrchambresInput, errorElement, 'Number of Bedrooms must be a numeric value');
+                } else {
+                    hideError(nbrchambresInput, errorElement);
+                }
+            }
+            nbrchambresInput.addEventListener('input',function () {
+                validateNbrChambres();
+            })
+
+// Function to validate the Superficie field
+            function validateSuperficie() {
+                const superficie = superficieInput.value.trim();
+                const errorElement = document.getElementById("superficie-error");
+
+                if (!superficie) {
+                    showError(superficieInput, errorElement, 'Superficie is required');
+                } else if (!/^\d+(\.\d+)?$/.test(superficie)) {
+                    showError(superficieInput, errorElement, 'Superficie must be a numeric value');
+                } else {
+                    hideError(superficieInput, errorElement);
+                }
+            }
+            superficieInput.addEventListener('input',function () {
+                validateSuperficie();
+            })
+
+// Function to validate the Number of Clicks field
+            function validateNbrclick() {
+                const nbrclick = nbrclickInput.value.trim();
+                const errorElement = document.getElementById("nbrclick-error");
+
+                if (!nbrclick) {
+                    showError(nbrclickInput, errorElement, 'Number of Clicks is required');
+                } else if (!/^\d+$/.test(nbrclick)) {
+                    showError(nbrclickInput, errorElement, 'Number of Clicks must be a numeric value');
+                } else {
+                    hideError(nbrclickInput, errorElement);
+                }
+            }
+            nbrclickInput.addEventListener('input',function () {
+                validateNbrclick();
+            })
+
+
+
+
+            // Define other validation functions here
+
+            // Function to show error message
+            /*function showError(input, message) {
+                const errorElement = document.getElementById('name-error');
+                errorElement.textContent = message;
+                input.classList.remove('is-valid');
+                input.classList.add('is-invalid');
+            }
+
+            // Function to hide error message
+            function hideError(input) {
+                const errorElement = document.getElementById('name-error');
+                errorElement.textContent = '';
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            }*/
+            function showError(input, errorElement, message) {
+                errorElement.textContent = message;
+                input.classList.remove('is-valid');
+                input.classList.add('is-invalid');
+            }
+
+// Function to hide error message
+            function hideError(input, errorElement) {
+                errorElement.textContent = '';
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            }
+
+
+            // Form submission handler
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent form submission for now
+
+                // Validate inputs
+                const isValid = validateForm();
+                if (isValid) {
+                    // If form is valid, you can submit the form
+                    form.submit();
+                }
+            });
+
+            // Function to validate the entire form
+            function validateForm() {
+                let isValid = true;
+
+                // Validate Name
+                validateName();
+
+                // Add validation for other fields here
+
+                return isValid;
+            }
+        });
+    </script>
+{% endblock %}

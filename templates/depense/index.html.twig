@@ -1,6 +1,6 @@
 
 
-{% extends 'bo.html.twig' %}
+{% extends 'sidebar.html.twig' %}
 
 {% block title %}
     <title>Dashboard - Depense</title>
@@ -8,10 +8,15 @@
 
 {% endblock %}
 
+{% block the_navbar %}
+
+
+{% endblock %}
 
 {% block content %}
     <link rel="stylesheet" href="../../assets/css/depense/deps.css">
-{#    {% block js %}{%endblock %}#}
+
+    {#    {% block js %}{%endblock %}#}
 {#    {%block js0 %}{%endblock %}#}
     <style>
         .depMoney{
@@ -25,18 +30,40 @@
 
     <div class="content-wrapper">
 
+        {% if hintMessage is not empty %}
 
-        <div class="container-xl">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <input type="text" id="searchInput" placeholder="Tapez un type" style="margin-top: 40px;">
+            <div id="hintToast" class="bs-toast toast fade show bg-info text-white align-items-center" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; top: 50px; right: 0;">
+                <div class="toast-header">
+                    <i class='bx bx-bell me-2'></i>
+                    <div class="me-auto fw-medium">Hint</div>
+                    <small>Maintenant</small>
+                    <button type="button" class="btn-close text-white" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <form action="{{ path('generate_excel') }}" method="post">
-                        <button type="submit" class="btn btn-primary justify-content-end"  style="margin-top: 45px">Télécharger version Excel</button>
+                <div class="toast-body">
+                    {{ hintMessage }}
+                </div>
+            </div>
+
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <input type="text" id="searchInput" placeholder="Tapez un nom" style="margin-top: 100px;">
+            </div>
+            <div class="col-md-4 mb-2">
+                <div class="row" style="margin-top: 100px">
+                    <form action="{{ path('generate_excel') }}" method="post" class="col-6">
+                        <button type="submit" class="btn btn-primary w-100 mb-2">Télécharger  Excel</button>
+                    </form>
+                    <form id="sendMailForm" action="{{ path('app_send_mail') }}" method="post" class="col-6">
+                        <button type="submit" class="btn btn-primary w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Envoyer mail des dépenses version PDF">Envoyer Mail</button>
                     </form>
                 </div>
             </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 
             <!-- End Somme des dépenses card and Download Excel button -->
 
@@ -59,7 +86,7 @@
                     <table id="depenseTable" class="table table-borderless">
                         <thead>
                         <tr>
-                            <th>Type</th>
+                            <th>Nom</th>
                             <th>Montant</th>
                             <th>Date</th>
                             <th>Actions</th>
@@ -160,6 +187,7 @@
                         const closeButton = document.getElementById('close-popup');
                         const formContainer = document.getElementById('form-container');
                         const overlay = document.getElementById('popup-overlay');
+
 
                         addButton.addEventListener('click', function () {
                             popup.style.display = 'block';
@@ -376,14 +404,53 @@
                         input.classList.add('is-valid');
                         input.classList.remove('is-invalid');
                     }
+                    document.addEventListener("DOMContentLoaded", function() {
+                        // Find the form and button elements
+                        const sendMailForm = document.getElementById("sendMailForm");
+                        const sendMailButton = sendMailForm.querySelector("button");
 
+                        // Attach a click event listener to the button
+                        sendMailButton.addEventListener("click", function(event) {
+                            // Prevent the default form submission behavior
+                            event.preventDefault();
 
-                </script>
-
-
-
-                <script>
-
+                            // Send an AJAX request to the server
+                            fetch(sendMailForm.action, {
+                                method: 'POST'
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        // Show success message using Swal
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Succès!',
+                                            text: 'Votre email a été envoyé avec succès.',
+                                            confirmButtonColor: '#3085d6',
+                                            confirmButtonText: 'OK'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                // Optional: Reload the page or perform any other action
+                                                // window.location.reload();
+                                            }
+                                        });
+                                    } else {
+                                        // Show error message if sending email failed
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Erreur!',
+                                            text: 'Une erreur s\'est produite lors de l\'envoi de l\'email: ' + data.error,
+                                            confirmButtonColor: '#d33',
+                                            confirmButtonText: 'OK'
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    // Handle fetch error
+                                    console.error('Error:', error);
+                                });
+                        });
+                    });
                     document.addEventListener('DOMContentLoaded', function () {
                         var chartLabels = JSON.parse('{{ chartData.labels|raw }}');
                         var chartData = JSON.parse('{{ chartData.data|raw }}');
@@ -459,6 +526,7 @@
 
                         }).render();
                     });
+
                     document.addEventListener('DOMContentLoaded', function() {
                         // Add event listeners to all delete buttons
                         var deleteButtons = document.querySelectorAll('.confirm-delete');
@@ -476,19 +544,102 @@
                             });
                         });
                     });
+
+
+
+                    let input = document.getElementById('searchInput');
+                    let table = document.getElementById('depenseTable');
+
+                    // Add event listener to input field
+                    input.addEventListener('input', function() {
+                        let filter = input.value.trim().toUpperCase(); // Trim leading and trailing spaces
+                        let rows = table.getElementsByTagName('tr');
+
+                        // Loop through all table rows, hide those that don't match the search query
+                        for (let i = 0; i < rows.length; i++) {
+                            let type = rows[i].getElementsByTagName('td')[0];
+                            if (type) {
+                                let content = type.textContent.toUpperCase();
+                                if (content.startsWith(filter)) {
+                                    rows[i].style.display = '';
+                                } else {
+                                    rows[i].style.display = 'none';
+                                }
+                            }
+                        }
+                    });
+
+                    $(document).ready(function() {
+                        $('#send-mail-btn').click(function() {
+                            // Make an AJAX request to the Symfony controller endpoint
+                            $.ajax({
+                                url: "{{ path('app_send_mail') }}",
+                                type: "POST",
+                                success: function(response) {
+                                    // Display a success message to the user
+                                    alert(response.message);
+                                },
+                                error: function(xhr, status, error) {
+                                    // Handle errors
+                                    console.error(error);
+                                    alert("Error sending mail.");
+                                }
+                            });
+                        });
+                    });
+
+
+
+
+                    const hintToast = document.getElementById('hintToast');
+
+                    // Hide the toast initially
+                    hintToast.style.transition = 'opacity 1s ease';
+                    hintToast.style.opacity = '0';
+
+                    // Show the toast with fade in effect after a delay
+                    setTimeout(function() {
+                        hintToast.style.opacity = '1';
+                    }, 1000);
+                </script>
+
+
+
+                <script>
+
+
                     //////////
 
 
                 </script>
+            <script>
 
+            </script>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+            <!-- Add JavaScript to handle button click -->
+            <script>
+
+            </script>
             </div>
 
             <!-- End Content -->
         </div>
 
-    </div>
 
+
+    <style>
+        /* Custom tooltip styles */
+        .tooltip-inner {
+            background-color: #ffffff;/* Change 'your-color' to your desired color */
+            color: rgb(16, 118, 217); /* Text color */
+        }
+        .tooltip.bs-tooltip-top .tooltip-arrow::before {
+            border-top-color: rgb(16, 118, 217); /* Change 'your-color' to your desired color */
+        }
+        /* Custom arrow styles (optional) */
+
+    </style>
 
     <!-- End Content wrapper -->
 
@@ -497,14 +648,18 @@
 
     <!-- Drag Target Area To SlideIn Menu On Small Screens -->
     <div class="drag-target"></div>
+
     <style>
+
         /* Add CSS styles to make the chart container bigger */
         #chart {
             width: 600px; /* Set the width */
             height: 400px; /* Set the height */
         }
     </style>
+
     <style>
+
         .close-button {
             position: absolute;
             top: 2px;
@@ -527,32 +682,11 @@
 
 
 
-    <script>
-
-        let input = document.getElementById('searchInput');
-        let table = document.getElementById('depenseTable');
-
-        // Add event listener to input fieldW
-        input.addEventListener('input', function() {
-            let filter = input.value.toUpperCase();
-            let rows = table.getElementsByTagName('tr');
-
-            // Loop through all table rows, hide those that don't match the search query
-            for (let i = 0; i < rows.length; i++) {
-                let type = rows[i].getElementsByTagName('td')[0];
-                if (type) {
-                    if (type.textContent.toUpperCase().indexOf(filter) > -1) {
-                        rows[i].style.display = '';
-                    } else {
-                        rows[i].style.display = 'none';
-                    }
-                }
-            }
-        });
-    </script>
 
 
-{#    <script src="{{ asset('../../assets/vendor/libs/moment/moment.js') }}"></script>#}
+
+
+    {#    <script src="{{ asset('../../assets/vendor/libs/moment/moment.js') }}"></script>#}
 {#    <script src="{{ asset('../../assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>#}
 {#    <script src="{{ asset('../../assets/vendor/libs/select2/select2.js') }}"></script>#}
 {#    <script src="{{ asset('../../assets/vendor/libs/%40form-validation/popular.js') }}"></script>#}

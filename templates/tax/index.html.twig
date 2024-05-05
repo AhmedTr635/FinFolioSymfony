@@ -1,52 +1,17 @@
 {% extends 'bo.html.twig' %}
 
-{% block title %}Tax index{% endblock %}
+{% block title %}
+    <title>Dashboard - Taxe</title>
+
+{% endblock %}
 
 {% block content %}
     <link rel="stylesheet" href="../../assets/css/tax/taxDash.css">
         <div class="col-md-3 mb-4">
-            <input type="text" id="searchInput" placeholder="tapez un type " style="margin-top: 40px;">
+            <input type="text" id="searchInput" placeholder="tapez un type " style="margin-top: 100px; margin-left: 50px">
         </div>
 
 
-
-{#    <!-- Order Statistics -->#}
-{#    <div class="col-md-5 col-lg-4 col-xl-4 order-0 mb-4">#}
-{#        <div class="card h-100">#}
-{#            <div class="card-header d-flex align-items-center justify-content-between pb-0">#}
-{#                <div class="card-title mb-0">#}
-{#                    <h5 class="m-0 me-2">Tax</h5>#}
-{#                    <small class="text-muted">42.82k Total Sales</small>#}
-{#                </div>#}
-
-{#            </div>#}
-{#            <div class="card-body">#}
-{#                <div class="d-flex justify-content-between align-items-center mb-3">#}
-{#                    <div class="d-flex flex-column align-items-center gap-0">#}
-{#                        <h2 class="mb-4">{{ sommeTax }}$</h2>#}
-{#                        <span>Total tax</span>#}
-{#                    </div>#}
-{#                    <div id="chartTax"></div>#}
-{#                </div>#}
-
-{#                {% for tax in taxes %}#}
-{#                    <li class="d-flex mb-4 pb-1">#}
-{#                        <div class="avatar flex-shrink-0 me-3">#}
-{#                            <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-dollar text-primary"></i></span>#}
-{#                        </div>#}
-{#                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">#}
-{#                            <div class="me-2">#}
-{#                                <h6 class="mb-0">{{ tax.type }}</h6>#}
-{#                            </div>#}
-{#                            <div class="me-2">#}
-{#                                <h6 class="mb-0">{{ tax.montant }}$</h6>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </li>#}
-{#                {% endfor %}#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
 <div class="row">
     <div class="col-md-5 col-lg-8 col-xl-4 order-0 mb-4" style="margin-left: 50px">
         <div class="card h-100">
@@ -118,7 +83,7 @@
             .tax-type.Depense { background-color: rgba(3, 195, 236, 0.6); }
             .tax-type.Crédit { background-color: rgba(113, 221, 55, 0.66); }
             .tax-type.Investissement { background-color: rgba(177, 147, 248, 0.61); }
-            .tax-type.Banque { background-color: rgba(113, 221, 55, 0.66); }
+            .tax-type.Banque { background-color: rgba(255, 108, 240, 0.66); }
 
             /* Add more classes for other tax types as needed */
         </style>
@@ -160,14 +125,15 @@
 
         // Add event listener to input field
         input.addEventListener('input', function() {
-            let filter = input.value.toUpperCase();
+            let filter = input.value.trim().toUpperCase(); // Trim leading and trailing spaces
             let rows = table.getElementsByTagName('tr');
 
             // Loop through all table rows, hide those that don't match the search query
             for (let i = 0; i < rows.length; i++) {
                 let type = rows[i].getElementsByTagName('td')[1];
                 if (type) {
-                    if (type.textContent.toUpperCase().indexOf(filter) > -1) {
+                    let content = type.textContent.toUpperCase();
+                    if (content.startsWith(filter)) {
                         rows[i].style.display = '';
                     } else {
                         rows[i].style.display = 'none';
@@ -175,11 +141,34 @@
                 }
             }
         });
+
         document.addEventListener('DOMContentLoaded', function () {
             var chartLabels = JSON.parse('{{ chartData.labels|raw }}');
             var chartDataValues = JSON.parse('{{ chartData.data|raw }}');
-            var seriesColors = ['rgba(177,147,248,0.61)', 'rgba(113,221,55,0.66)', 'rgba(3,195,236,0.6)','rgba(255,55,141,0.63)']; // Define colors for each series
             var totalExpense = {{ sommeTax }}; // Calculate total expense
+
+            // Define colors for each series based on tax type
+            var seriesColors = [];
+
+            // Loop through chart labels and assign colors based on tax type
+            for (var i = 0; i < chartLabels.length; i++) {
+                var taxType = chartLabels[i];
+                var color;
+                // Assign colors based on tax type
+                if (taxType === "Depense") {
+                    color = 'rgba(3, 195, 236, 0.6)'; // Purple
+                } else if (taxType === "Investissement") {
+                    color = 'rgba(177, 147, 248, 0.61)'; // Blue
+                 } else if (taxType === "Banque") {
+                color =  'rgba(255, 108, 240, 0.66)'; // Blue
+            } else if (taxType === "Crédit") {
+                    color = 'rgba(113, 221, 55, 0.66)'; // Blue
+                }else {
+                    // You can add more conditions for other tax types and assign colors accordingly
+                    color = 'rgba(0,0,0,0)'; // Default color
+                }
+                seriesColors.push(color);
+            }
 
             new ApexCharts(document.querySelector("#chartTax"), {
                 series: chartDataValues,
@@ -197,7 +186,6 @@
                                     show: false,
                                     fontSize: "0.8125rem",
                                     label: "",
-
                                 }
                             }
                         }
@@ -206,8 +194,8 @@
                 tooltip: {
                     enabled: true,
                     y: {
-                        formatter: function(value) {
-                            return parseFloat(value).toFixed(1)+"%"; // Format tooltip value to two decimal places
+                        formatter: function (value) {
+                            return parseFloat(value).toFixed(1) + "%"; // Format tooltip value to two decimal places
                         }
                     }
                 },
@@ -226,8 +214,7 @@
                     labels: { colors: '#9a74f1' }
                 },
                 labels: chartLabels,
-
-                colors: seriesColors, // Assign colors array to the colors option
+                colors: seriesColors, // Assign dynamically fetched colors array to the colors option
                 markers: {
                     size: 6,
                     colors: '#9a74f1',
@@ -238,76 +225,8 @@
             }).render();
         });
 
-        {#document.addEventListener('DOMContentLoaded', function () {#}
-        {#    var chartLabels = JSON.parse('{{ chartData.labels|raw }}');#}
-        {#    var chartDataValues = JSON.parse('{{ chartData.data|raw }}');#}
 
-        {#    new ApexCharts(document.querySelector("#chartTax"), {#}
-        {#        series: chartDataValues,#}
-        {#        chart: {#}
-        {#            height: 350,#}
-        {#            type: 'donut',#}
-        {#        },#}
-        {#        plotOptions: {#}
-        {#            pie: {#}
-        {#                donut: {#}
-        {#                    size: '75%',#}
-        {#                }#}
-        {#            }#}
-        {#        },#}
-        {#        dataLabels: {#}
-        {#            enabled: false#}
-        {#        },#}
-        {#        stroke: {#}
-        {#            width: 2,#}
-        {#            curve: "smooth"#}
-        {#        },#}
-        {#        legend: {#}
-        {#            show: true,#}
-        {#            position: 'bottom',#}
-        {#            fontSize: '20px',#}
-        {#            fontFamily: 'Arial, sans-serif',#}
-        {#            labels: { colors: '#9a74f1' }#}
-        {#        },#}
-        {#        colors: ['#9a74f1'],#}
-        {#        markers: {#}
-        {#            size: 6,#}
-        {#            colors: '#9a74f1',#}
-        {#            strokeWidth: 3,#}
-        {#            hover: { size: 8 }#}
-        {#        },#}
-        {#        grid: { show: false },#}
-        {#        xaxis: {#}
-        {#            categories: chartLabels,#}
-        {#            labels: { style: { fontSize: '14px', colors: 'rgba(12,12,12,0.37)' } }#}
-        {#        },#}
-        {#        yaxis: {#}
-        {#            labels: { style: { fontSize: '14px', colors: 'rgba(12,12,12,0.37)' } }#}
-        {#        },#}
-        {#        tooltip: {#}
-        {#            enabled: true,#}
-        {#            enabledOnSeries: undefined,#}
-        {#            shared: true,#}
-        {#            followCursor: false,#}
-        {#            intersect: false,#}
-        {#            inverseOrder: false,#}
-        {#            custom: undefined,#}
-        {#            hideEmptySeries: true,#}
-        {#            fillSeriesColor: false,#}
-        {#            theme: false,#}
-        {#            x: {#}
-        {#                show: true,#}
-        {#                formatter: undefined,#}
-        {#            },#}
-        {#            y: {#}
-        {#                formatter: undefined,#}
-        {#                title: {#}
-        {#                    formatter: (seriesName) => seriesName,#}
-        {#                },#}
-        {#            }#}
-        {#        }#}
-        {#    }).render();#}
-        {#});#}
+
 
     </script>
 

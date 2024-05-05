@@ -47,6 +47,13 @@ class TotalTaxRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function setTotalTaxValue(float $total): void
+    {
+        // Assuming $total is the total tax value you want to set
+        // You would need to adjust this code according to your entity structure
+        // For instance, if 'total' is a property of your entity, you might set it directly
+        $this->total = $total;
+    }
 
     /**
      * @throws NonUniqueResultException

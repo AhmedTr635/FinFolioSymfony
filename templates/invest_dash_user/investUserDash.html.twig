@@ -1,0 +1,266 @@
+{% extends 'bo.html.twig' %}
+
+{% block title %}Investissement index{% endblock %}
+
+{% block content %}
+    <style>
+        .custom-width {
+            width: 500px;
+        }
+        .custom-card {
+            height: 449px;
+            width: 600px;
+            margin-left: 15px;
+        }
+        .custom-table {
+            width: 500px;
+            height: 449px;
+            /* Add margin to create space between the table and the card */
+        }
+        .mhmd-width {
+            margin-left: 120px;
+        }
+    </style>
+
+    <h1></h1>
+
+    <div class="row">
+
+        <div class="col-12 col-lg-6 col-xxl-5 order-lg-0 order-1 mb-4">
+            <div class="card h-100 custom-card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title m-0 me-2">Statistics des Investissements en Immobilier</h5>
+                    <div class="dropdown">
+                        <button class="btn p-0" type="button" id="sessionOverview" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bx bx-dots-vertical-rounded"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sessionOverview">
+                            <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>
+                            <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
+                            <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body row gap-md-0 gap-4">
+                    <div class="col-md-5">
+                        <h1 class="mb-0 text-nowrap">{{ totalInvestment }}</h1>
+                        <small class="text-success">
+                            +0.7645%
+                        </small>
+                        <div id="averageROIChart" class="ms-n3"></div>
+
+
+                        <div id="sessionOverviewChart" class="ms-n3"></div>
+                    </div>
+                    <div class="col-md-7 d-flex flex-column justify-content-between">
+                        <div class="d-flex justify-content-between">
+                            <div class="d-flex flex-column">
+                                <small class="text-muted">Revenue Annuel</small>
+                                <span class="fw-medium">{{ totalROIMontant |number_format(2,',')}}</span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <small class="text-muted">Total Tax</small>
+                                <span class="fw-medium">{{ totalTax }}</span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <small class="text-muted"></small>
+                                <span class="fw-medium"></span>
+                            </div>
+                        </div>
+                        <div class="progress-wrapper mb-4">
+                            <div class="mb-3">
+                                <small class="text-muted">ROI réel</small>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress w-100 me-2" style="height:20px">
+                                        <div class="progress-bar bg-primary" style="width: {{ percentageROITotal }}%" role="progressbar" aria-valuenow="{{ percentageROITotal }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small class="text-muted">{{ percentageROITotal |number_format(2,',')}}%</small>
+                                </div>
+                            </div>
+
+                            {# <div>
+                                <small class="text-muted">Invalid Session</small>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress w-100 me-2" style=" height:8px">
+                                        <div class="progress-bar bg-primary" style="width: 40%" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small class="text-muted">40%</small>
+                                </div>
+                            </div> #}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
+            <div class="card custom-width mhmd-width">
+                <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
+                    <table class="table text-nowrap">
+                        <thead>
+                        <tr>
+                            <th>Immobilier</th>
+                            <th>Montant</th>
+                            <th>Statut de Paiment</th>
+                            <th>ROI</th>
+                            <th>TAX</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0">
+                        {% for investissement in investissements %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% set realEstate = realEstateRepository.findRealEstateById(investissement.reId) %}
+                                        {% if realEstate %}
+
+                                            {% if realEstate.imageData %}
+                                                <img src="{{ asset(realEstate.getImageData()) }}" alt="{{ realEstate.getName() }}" height="32" width="32" class="me-2">
+                                            {% else %}
+                                                <img src=src="{{ asset('uploads/images/noimage.jpg') }}" alt="{{ realEstate.getName() }}" height="32" width="32" class="me-2">
+                                            {% endif %}
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-medium lh-1">{{ realEstate.getName() }}</span>
+                                                <small class="text-muted">{{ realEstate.getEmplacement() }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="text-muted lh-1"><span class="text-primary fw-medium">{{ investissement.montant }}</span></div>
+                                    <small class="text-muted">{{ ((investissement.montant *100) / investissement.prixAchat) | number_format(2,',') }} %</small>
+                                </td>
+                                <td><span class="badge bg-label-success">Completed</span></td>
+                                <td><span class="text-primary fw-medium">{{ (investissement.montant * investissement.rOI)/100 }}</span></td>
+                                <td><span class="text-primary fw-medium">{{ investissement.tax }}</span></td>
+                                <td>
+                                    <form  class ='delete-form' method="post" action="{{ path('app_investissement_delete', {'id': investissement.id}) }}" >
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ investissement.id) }}">
+                                        <button class="btn btn-danger confirm-delete">Delete</button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5">no records found</td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../../assets/js/extended-ui-sweetalert2.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to all delete buttons
+            var deleteButtons = document.querySelectorAll('.confirm-delete');
+            deleteButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var form = this.closest('.delete-form');
+                    if (form) {
+                        // Show the confirmation dialog
+                        Swal.fire({title:"êtes vous sûr?",text:"Vous ne pourrez plus recupérer ces données!",icon:"warning",showCancelButton:!0,confirmButtonText:"Oui,je suis sûr",customClass:{confirmButton:"btn btn-danger me-3",cancelButton:"btn btn-label-secondary"},buttonsStyling:!1}).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();// If confirmed, submit the corresponding form
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var options = {
+                series: [42], // Pass the average ROI percentage here
+                chart: {
+                    height: 300,
+                    type: 'radialBar',
+                },
+                plotOptions: {
+                    radialBar: {
+                        offsetY: 0,
+                        startAngle: 0,
+                        endAngle: 360,
+                        hollow: {
+                            margin: 5,
+                            size: '70%',
+                            background: 'transparent',
+                            image: undefined,
+                            imageOffsetX: 0,
+                            imageOffsetY: 0,
+                            position: 'front',
+                            dropShadow: {
+                                enabled: true,
+                                top: 3,
+                                left: 0,
+                                blur: 4,
+                                opacity: 0.24
+                            }
+                        },
+                        dataLabels: {
+                            name: {
+                                show: false,
+                            },
+                            value: {
+                                show: false,
+                            }
+                        }
+                    }
+                },
+                colors: ['#1ab7ea'],
+                labels: ['ROI'],
+                legend: {
+                    show: true,
+                    floating: true,
+                    fontSize: '16px',
+                    position: 'bottom', // Adjusted legend position
+                    offsetX: 10,
+                    offsetY: 10,
+                    labels: {
+                        useSeriesColors: true,
+                    },
+                    markers: {
+                        size: 0
+                    },
+                    formatter: function (seriesName, opts) {
+                        return seriesName + ": 42%"; // Format the legend here
+                    },
+                    itemMargin: {
+                        horizontal: 1
+                    }
+                },
+                responsive: [{
+                    breakpoint: undefined,
+                    options: {},
+                }],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'dark',
+                        type: 'horizontal',
+                        shadeIntensity: 0.5,
+                        gradientToColors: ['#ABE5A1'],
+                        inverseColors: true,
+                        opacityFrom: 1,
+                        opacityTo: 1,
+                        stops: [0, 100]
+                    },
+                },
+            };
+
+            var chart = new ApexCharts(document.querySelector("#averageROIChart"), options);
+            chart.render();
+        });
+    </script>
+
+
+{% endblock %}

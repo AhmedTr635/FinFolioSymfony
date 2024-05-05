@@ -1,0 +1,13 @@
+{# real_estate/_form.html.twig #}
+
+{{ form_start(form) }}
+{% for child in form %}
+    <div class="mb-3">
+        {{ form_label(child) }}
+        {{ form_widget(child, {'attr': {'class': 'form-control', 'required': 'required'}}) }}
+        {# Display validation messages if any #}
+        {{ form_errors(child) }}
+    </div>
+{% endfor %}
+<button type="submit" class="btn btn-primary">Submit</button>
+{{ form_end(form) }}

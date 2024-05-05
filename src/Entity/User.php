@@ -60,9 +60,13 @@ class User
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Depense::class)]
     private Collection $depenses;
 
+    #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: Credit::class)]
+    private Collection $credits;
+
     public function __construct()
     {
         $this->depenses = new ArrayCollection();
+        $this->credits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -262,6 +266,36 @@ class User
             // set the owning side to null (unless already changed)
             if ($depense->getUser() === $this) {
                 $depense->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Credit>
+     */
+    public function getCredits(): Collection
+    {
+        return $this->credits;
+    }
+
+    public function addCredit(Credit $credit): static
+    {
+        if (!$this->credits->contains($credit)) {
+            $this->credits->add($credit);
+            $credit->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCredit(Credit $credit): static
+    {
+        if ($this->credits->removeElement($credit)) {
+            // set the owning side to null (unless already changed)
+            if ($credit->getUserId() === $this) {
+                $credit->setUserId(null);
             }
         }
 

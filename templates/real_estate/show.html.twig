@@ -1,0 +1,35 @@
+{% extends 'bo.html.twig' %}
+
+{% block title %}RealEstate{% endblock %}
+
+{% block content %}
+    <h1>RealEstate</h1>
+
+    <div class="row mb-5">
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100">
+                {% if real_estate.imageData %}
+                    <img class="card-img-top" src="{{ asset(real_estate.imageData) }}" alt="Card image cap" />
+                {% else %}
+                    <img class="card-img-top" src="{{ asset('uploads/images/noimage.jpg') }}" alt="Card image cap" />
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ real_estate.name }}</h5>
+                    <p class="card-text">
+                        Emplacement: {{ real_estate.emplacement }}<br>
+                        ROI: {{ real_estate.ROI }}<br>
+                        Valeur: {{ real_estate.valeur }}<br>
+                        Nbrchambres: {{ real_estate.nbrchambres }}<br>
+                        Superficie: {{ real_estate.superficie }}<br>
+                        Nbrclick: {{ real_estate.nbrclick }}
+                    </p>
+                    <a href="{{ path('app_real_estate_edit', {'id': real_estate.id}) }}" class="btn btn-outline-primary">Edit</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="location.href='{{ path('app_real_estate_index') }}'">Back to List</button>
+
+    {{ include('real_estate/_delete_form.html.twig') }}
+{% endblock %}

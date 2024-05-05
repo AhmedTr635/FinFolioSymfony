@@ -24,7 +24,7 @@ class TaxController extends AbstractController
     public function index(PaginatorInterface $paginator,Request $request, EntityManagerInterface $entityManager,TotalTaxRepository $totalTaxRepository,TaxRepository $taxRepository): Response
     {
         $totalTax = $this->sommeTax();
-        $currentTaxTotale =$totalTax + $totalTaxRepository->getTotalTaxValue();
+        $currentTaxTotale = $totalTaxRepository->getTotalTaxValue();
 
         $taxByType = $taxRepository->getExpensesByTaxType();
         $sommeTax=$this->sommeTax();
@@ -77,31 +77,6 @@ class TaxController extends AbstractController
             }
             $sumsByType[$type] = $sum;
         }
-        // Calculate total montant
-
-        // Calculate total by month
-
-//        $taxes = $entityManager->getRepository(Tax::class)->findAll();
-//
-//
-//        // Analyser les données
-//        $stats = [];
-//        foreach ($taxes as $tax) {
-//            $type = $tax->getType();
-//            $amount = $tax->getMontant();
-//
-//            if (!isset($stats[$type])) {
-//                $stats[$type] = 0;
-//            }
-//
-//            $stats[$type] += $amount;
-//        }
-//
-//        // Préparer les données pour le graphique
-//        $chartData = [
-//            'labels' => array_keys($stats),
-//            'data' => array_values($stats)
-//        ];
 
         return $this->render('tax/index.html.twig', [
             'paginationTemplate' => $paginationTemplate,

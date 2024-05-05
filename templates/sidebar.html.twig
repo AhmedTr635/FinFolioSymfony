@@ -189,14 +189,14 @@
                 <!-- Apps & Pages -->
 
                 <li class="menu-item">
-                    <a href="app-email.html" class="menu-link">
+                    <a href="{{ path('app_investdashuser_index') }}" class="menu-link">
                         <i class="menu-icon fas fa-university"></i>
                         <div class="text-truncate" data-i18n="Dashboard">Dashboard</div>
                     </a>
                 </li>
 
                 <li class="menu-item">
-                    <a href="app-chat.html" class="menu-link">
+                    <a href="{{ path('app_investdashuser_index') }}" class="menu-link">
                         <i class=" menu-icon fas fa-handshake"></i>
                         <div class="text-truncate" data-i18n="Crédit">Crédit</div>
                     </a>
@@ -209,12 +209,12 @@
                     </a>
                     <ul class="menu-sub submenu-hidden" id="submenu-investissement">
                         <li class="menu-item">
-                            <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/front-pages/landing-page.html" class="menu-link" target="_blank">
+                            <a href="{{ path('app_investdashuser_index') }}" class="menu-link">
                                 <div class="text-truncate" data-i18n="Real State">Real State </div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/front-pages/pricing-page.html" class="menu-link" target="_blank">
+                            <a href="{{ path('app_investdashuser_index') }}" class="menu-link">
                                 <div class="text-truncate" data-i18n="Trading">Trading</div>
                             </a>
                         </li>
@@ -262,7 +262,7 @@
         </aside>
         <script>
             function toggleSubMenu() {
-                var submenu = document.getElementById('submenu-investissement');
+                var submenu = document.getElementById('submenu-invest_dash_user');
                 submenu.style.display = (submenu.style.display === 'none') ? 'block' : 'none';
             }
         </script>
@@ -819,6 +819,9 @@
     <div class="drag-target"></div>
 
 </div>
+<script>
+    !(function(){const sc=document.createElement('script');sc.src="https://apps.voc.ai/api_v2/gpt/bots/livechat/embed.js?id=13863&token=66195FF3E4B0330D5ACB1645";sc.async=true;sc.defer=true;document.body.appendChild(sc);})()</script>
+<script src="https://apps.voc.ai/live-chat?id=13863&token=66195FF3E4B0330D5ACB1645" async defer></script>
 <!-- / Layout wrapper -->
 
 
@@ -831,7 +834,9 @@
 
 <!-- Core JS -->
 <!-- build:js assets/vendor/js/core.js -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script src="../../assets/js/extended-ui-sweetalert2.js"></script>
 <script src="../../assets/vendor/libs/jquery/jquery.js"></script>
 <script src="../../assets/vendor/libs/popper/popper.js"></script>
 <script src="../../assets/vendor/js/bootstrap.js"></script>

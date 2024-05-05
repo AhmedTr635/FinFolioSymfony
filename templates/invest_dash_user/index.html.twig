@@ -1,0 +1,337 @@
+{% extends 'sidebar.html.twig' %}
+
+{% block title %}     <title>Dashboard - Investissement</title>
+{% endblock %}
+{% block the_navbar %}
+{% endblock %}
+{% block content %}
+    <style>
+        .error-message {
+            color: red;
+        }
+    </style>
+
+    <div class="row" style="margin-top: 100PX">
+        {% for real_estate in realEstates %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100">
+                    {% if real_estate.imageData %}
+                        <img class="card-img-top" src="{{ asset(real_estate.imageData) }}" alt="Card image cap" />
+                    {% else %}
+                        <img class="card-img-top" src="{{ asset('uploads/images/noimage.jpg') }}" alt="Card image cap" />
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ real_estate.name }}</h5>
+                        <p class="card-text">
+                            Emplacement: {{ real_estate.emplacement }}<br>
+                            ROI: {{ real_estate.ROI }}<br>
+                            Valeur: {{ real_estate.valeur }}<br>
+                            Chambres: {{ real_estate.nbrchambres }}<br>
+                            Superficie: {{ real_estate.superficie }}<br>
+                            {# Click: {{ real_estate.nbrclick }}<br> #}
+                            {% set realEstateId = real_estate.id %}
+                            {% set sum = investmentsSumByRealEstate[realEstateId] ?? 0 %}
+                            Total Investment: <span id="totalInvestment{{ real_estate.id }}">{{ sum }}</span><br>
+                        </p>
+                        <div class="progress">
+                            <div id="progressBar{{ real_estate.id }}" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: {{ (sum / real_estate.valeur) * 100 }}%" aria-valuenow="{{ (sum / real_estate.valeur) * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <br>
+                        {% if real_estate.virtualTourLink %}
+                            <button class="btn btn-info show-virtual-tour" data-url="{{ real_estate.virtualTourLink }}">Virtual Tour</button>
+                        {% else %}
+                            <div class="alert alert-danger" role="alert">
+                                Le Tour Virtuel n'est pas disponible
+                            </div>
+                        {% endif %}
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#investModal{{ real_estate.id }}">Investir</button>
+                        {# <a href="{{ path('app_real_estate_show', {'id': real_estate.id}) }}" class="btn btn-primary">Show</a>
+                        <a href="{{ path('app_real_estate_edit', {'id': real_estate.id}) }}" class="btn btn-secondary">Edit</a> #}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col">
+                <p>No records found.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button class="btn btn-primary" onclick="location.href='{{ path('app_real_estate_new') }}'">Create new</button>
+
+    <!-- Modal -->
+    {% for real_estate in realEstates %}
+        <div class="modal fade" id="investModal{{ real_estate.id }}" tabindex="-1" aria-labelledby="investModalLabel{{ real_estate.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="investModalLabel{{ real_estate.id }}">Investir dans {{ real_estate.name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="investForm{{ real_estate.id }}" action="{{ path('app_make_investment', {'id': real_estate.id}) }}" method="post">
+                            <div class="mb-3">
+                                <label for="montant{{ real_estate.id }}" class="form-label">Montant</label>
+                                <input type="text" class="form-control" id="montant{{ real_estate.id }}" name="montant">
+                                <span id="montant-error{{ real_estate.id }}" class="error-message"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tax" class="form-label">Tax : </label>
+                                <span id="tax{{ real_estate.id }}"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label for="roi" class="form-label">ROI annuel : </label>
+                                <span id="roi{{ real_estate.id }}"></span>
+                            </div>
+                            {# <div class="mb-3">
+                                <!-- Add empty div for ApexChart -->
+                                <div id="roiChart{{ real_estate.id }}"></div>
+                            </div> #}
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="button" class="btn btn-primary" onclick="confirmInvestment('{{ real_estate.id }}')">Confirmer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            {#document.addEventListener('DOMContentLoaded', function() {#}
+            {#    const montantInput{{ real_estate.id }} = document.getElementById('montant{{ real_estate.id }}');#}
+            {#    const montantError{{ real_estate.id }} = document.getElementById('montant-error{{ real_estate.id }}');#}
+            {#    const roiChart{{ real_estate.id }} = document.getElementById('roiChart{{ real_estate.id }}');#}
+
+            {#    // Initialize the ApexChart#}
+            {#    const roiChartOptions = {#}
+            {#        chart: {#}
+            {#            type: 'line',#}
+            {#            height: 350,#}
+            {#            toolbar: {#}
+            {#                show: false#}
+            {#            }#}
+            {#        },#}
+            {#        series: [],#}
+            {#        xaxis: {#}
+            {#            categories: []#}
+            {#        }#}
+            {#    };#}
+
+            {#    const roiChart = new ApexCharts(roiChart{{ real_estate.id }}, roiChartOptions);#}
+            {#    roiChart.render();#}
+
+            {#    // Event listener for montant input#}
+            {#    montantInput{{ real_estate.id }}.addEventListener('input', function() {#}
+            {#        calculateAndRenderROIChart({{ real_estate.id }});#}
+            {#    });#}
+
+            {#    // Function to calculate ROI for each month and update the chart#}
+            {#    function calculateAndRenderROIChart(realEstateId) {#}
+            {#        const montant = parseFloat(montantInput{{ real_estate.id }}.value.trim());#}
+            {#        const realEstateROI = parseFloat({{ real_estate.ROI }});#}
+
+            {#        // Assuming you have logic to calculate ROI for each month, update series and categories accordingly#}
+            {#        const roiData = [];#}
+            {#        const months = [];#}
+
+            {#        // Example: Calculate ROI for 12 months#}
+            {#        for (let i = 1; i <= 12; i++) {#}
+            {#            const monthlyROI = (montant * realEstateROI) / 100;#}
+            {#            roiData.push(monthlyROI.toFixed(2));#}
+            {#            months.push(`Month ${i}`);#}
+            {#        }#}
+
+            {#        // Render the chart using ApexCharts#}
+            {#        const roiChartOptions = {#}
+            {#            chart: {#}
+            {#                type: 'line',#}
+            {#                height: 350,#}
+            {#                toolbar: {#}
+            {#                    show: false#}
+            {#                }#}
+            {#            },#}
+            {#            series: [{ data: roiData }],#}
+            {#            xaxis: {#}
+            {#                categories: months#}
+            {#            }#}
+            {#        };#}
+
+            {#        const roiChart = new ApexCharts(roiChart{{ real_estate.id }}, roiChartOptions);#}
+            {#        roiChart.render();#}
+            {#    }#}
+
+            {#    // Event listener for montant input#}
+            {#    montantInput{{ real_estate.id }}.addEventListener('input', function() {#}
+            {#        calculateAndRenderROIChart({{ real_estate.id }});#}
+            {#    });#}
+            {#});#}
+            document.addEventListener('DOMContentLoaded', function() {
+                const montantInput{{ real_estate.id }} = document.getElementById('montant{{ real_estate.id }}');
+                const montantError{{ real_estate.id }} = document.getElementById('montant-error{{ real_estate.id }}');
+                const taxSpan{{ real_estate.id }} = document.getElementById('tax{{ real_estate.id }}');
+                const roiSpan{{ real_estate.id }} = document.getElementById('roi{{ real_estate.id }}');
+
+                montantInput{{ real_estate.id }}.addEventListener('input', function() {
+                    validateMontant({{ real_estate.id }});
+                    calculateTaxAndROI({{ real_estate.id }});
+                });
+
+                function validateMontant(realEstateId) {
+                    const montant = montantInput{{ real_estate.id }}.value.trim();
+
+                    if (!montant) {
+                        showError(montantInput{{ real_estate.id }}, montantError{{ real_estate.id }}, 'Montant is required');
+                    } else if (!/^\d+(\.\d+)?$/.test(montant)) {
+                        showError(montantInput{{ real_estate.id }}, montantError{{ real_estate.id }}, 'Montant must be a numeric value');
+                    } else {
+                        hideError(montantInput{{ real_estate.id }}, montantError{{ real_estate.id }});
+                    }
+                }
+
+                function calculateTaxAndROI(realEstateId) {
+                    const montant = parseFloat(montantInput{{ real_estate.id }}.value.trim());
+                    const realEstateROI = parseFloat({{ real_estate.ROI }});
+
+                    const tax = montant * 0.08;
+                    const roi = (montant * realEstateROI)/100;
+
+                    taxSpan{{ real_estate.id }}.textContent = tax.toFixed(2);
+                    roiSpan{{ real_estate.id }}.textContent = roi.toFixed(2);
+                }
+
+                function showError(input, errorElement, message) {
+                    errorElement.textContent = message;
+                    input.classList.remove('is-valid');
+                    input.classList.add('is-invalid');
+                }
+
+                function hideError(input, errorElement) {
+                    errorElement.textContent = '';
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                }
+            });
+
+            function confirmInvestment(realEstateId) {
+                // Retrieve the form
+                const form = document.getElementById('investForm' + realEstateId);
+
+                // Perform AJAX submission or form submission using fetch or XMLHttpRequest
+                // For simplicity, assuming form submission using fetch
+                fetch(form.action, {
+                    method: form.method,
+                    body: new FormData(form)
+                })
+                    .then(response => {
+                        // Check if the response is successful (HTTP status code 200-299)
+                        if (response.ok) {
+                            // Show Sweet Alert of success
+                            Swal.fire({
+                                title: 'Investissement Confirmé',
+                                text: 'Votre investissement a été enregistré avec succès!',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                // Update total investment and progress bar
+                                updateInvestment(realEstateId);
+                            });
+
+                            // Reset form fields
+                            form.reset();
+
+                            // Close the modal (if necessary)
+                            const modal = document.getElementById('investModal' + realEstateId);
+                            const modalInstance = bootstrap.Modal.getInstance(modal);
+                            modalInstance.hide();
+                        } else {
+                            // Show error message in case of unsuccessful submission
+                            Swal.fire({
+                                title: 'Erreur',
+                                text: 'Une erreur est survenue lors de la confirmation de l\'investissement. Veuillez réessayer.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Show error message in case of network error or other exceptions
+                        Swal.fire({
+                            title: 'Erreur',
+                            text: 'Une erreur est survenue lors de la confirmation de l\'investissement. Veuillez réessayer.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+            }
+        </script>
+    {% endfor %}
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const virtualTourButtons = document.querySelectorAll('.show-virtual-tour');
+            virtualTourButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const url = this.getAttribute('data-url');
+                    if (url) {
+                        Swal.fire({
+                            title: 'Virtual Tour',
+                            html: `Opening Virtual Tour at: <a href="${url}" target="_blank">${url}</a>`,
+                            icon: 'info',
+                            confirmButtonText: 'OK'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'No Virtual Tour Available',
+                            text: 'Unfortunately, there is no virtual tour available for this real estate.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            });
+        });
+        function updateInvestment(realEstateId) {
+            // Perform AJAX request to update total investment
+            fetch('{{ path('update_investment') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    realEstateId: realEstateId
+                }),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Network response was not ok.');
+                })
+                .then(data => {
+                    // Update total investment and progress bar using data received from the server
+                    document.getElementById('totalInvestment' + realEstateId).innerText = data.totalInvestment;
+                    const progressBar = document.getElementById('progressBar' + realEstateId);
+                    progressBar.style.width = data.progressPercentage + '%';
+                    progressBar.setAttribute('aria-valuenow', data.progressPercentage);
+
+                    // Show success message
+                    /*Swal.fire({
+                        title: 'Success',
+                        text: 'Investment data updated successfully.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });*/
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Show error message in case of network error or other exceptions
+                    /*Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to update investment data.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });*/
+                });
+        }
+    </script>
+{% endblock %}
