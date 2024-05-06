@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ActifNonCourant{% endblock %}
+
+{% block body %}
+    <h1>ActifNonCourant</h1>
+
+    <table class="table">
+        <tbody>
+
+        <tr>
+            <th>Name</th>
+            <td>{{ actif_non_courant.name }}</td>
+        </tr>
+
+        <tr>
+            <th>Type</th>
+            <td>{{ actif_non_courant.type }}</td>
+        </tr>
+        <tr>
+            <th>Montant</th>
+            <td>{{ actif_non_courant.valeur }}</td>
+        </tr>
+
+        </tbody>
+    </table>
+
+
+
+    {{ include('actif_non_courant/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,271 @@
+{% block body %}
+
+
+    <body>
+    <div class="container">
+    <h1 class="financial-title">Mon Bilan</h1>
+    <div id="table-container">
+        <div class="row">
+        <div class="table-cell" colspan="2">
+
+            <h1>Actif Courant Table</h1>
+            <table class="inner-table">
+                <thead>
+                <tr>
+
+                    <th>Name</th>
+
+                    <th>Montant</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% set total_montant_courant = 0 %}
+                {% set total_amortized_fee_courant = 0 %}
+                {% for actif_courant in actif_courants %}
+
+                    {% if actif_courant.type == 'Voiture' %}
+                        {% set amortization_rate = 0.1 %}
+                    {% elseif actif_courant.type == 'Stocks' %}
+                        {% set amortization_rate = 0.05 %}
+                    {% else %}
+                        {% set amortization_rate = 0.0 %}
+                    {% endif %}
+                    {% set total_montant_courant = total_montant_courant + actif_courant.montant %}
+                    {% set amortized_fee = actif_courant.montant * amortization_rate %}
+                    {% set total_amortized_fee_courant = total_amortized_fee_courant + amortized_fee %}
+                    <tr>
+
+                        <td>{{ actif_courant.name }}</td>
+
+                        <td>{{ actif_courant.montant }}</td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p><b>Total Montant apres amortissement: {{ total_amortized_fee_courant }}</b></p>
+            <p><b>Total Montant (Actif Courant): {{ total_montant_courant }}</b></p>
+
+        </div>
+
+        <div class="table-cell">
+            <h1>Actif Non Courant Table</h1>
+            <table class="inner-table">
+                <thead>
+                <tr>
+
+                    <th>Name</th>
+
+                    <th>Valeur</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% set total_montant_non_courant = 0 %}
+                {% set total_amortized_fee_non_courant = 0 %}
+                {% for actif_non_courant in actif_non_courants %}
+                    {% set total_montant_non_courant = total_montant_non_courant + actif_non_courant.valeur %}
+                    {% if actif_non_courant.type == 'Logiciel' %}
+                        {% set amortization_rate = 0.1 %}
+                    {% elseif actif_non_courant.type == 'Materiel' %}
+                        {% set amortization_rate = 0.05 %}
+                    {% else %}
+                        {% set amortization_rate = 0.0 %}
+                    {% endif %}
+                    {% set amortized_fee_n = actif_non_courant.valeur * amortization_rate %}
+                    {% set total_amortized_fee_non_courant = total_amortized_fee_non_courant + amortized_fee_n %}
+                    <tr>
+
+                        <td>{{ actif_non_courant.name }}</td>
+
+                        <td>{{ actif_non_courant.valeur }}</td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p><b>Total Montant apres amortissement: {{ total_amortized_fee_non_courant }}</b></p>
+            <p><b>Total Montant (Actif Non Courant): {{ total_montant_non_courant }}</b></p>
+        </div>
+        </div>
+
+    <div class="row">
+        <div class="table-cell" colspan="2">
+            <h2>Credits</h2>
+
+                <table class="inner-table">
+                    <thead>
+                    <tr>
+                        <th>Montant</th>
+                        <th>Interet</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% set total_montant = 0 %}
+                    {% set total_montant_after_interet = 0 %}
+                    {% for offre in offres %}
+
+                        <tr>
+                            <td>{{ offre.montant }}</td>
+                            {% set total_montant = total_montant + offre.montant %}
+                            {% set montant_after_interet = offre.montant * (1 + offre.interet) %}
+                            <td>{{ offre.interet }}</td>
+                            {% set total_montant_after_interet = total_montant_after_interet + montant_after_interet %}
+
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            <p><b>Total Montant : {{ total_montant }}</b></p>
+            <p><b>Total Montant Apres Interet: {{ total_montant_after_interet }}</b></p>
+
+        </div>
+        <div class="table-cell" colspan="2">
+            <h2>Depenses</h2>
+
+            <table class="inner-table">
+                <thead>
+                <tr>
+                    <th>Taux Tax</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                {% set total_montant_after_tax = 0 %}
+                {% for depense in depenses %}
+
+                    <tr>
+                        <td>{{ depense.taux_tax }}</td>
+                        <td>{{ depense.type }}</td>
+                        <td>{{ depense.montant }}</td>
+                        {% set montant_after_tax = depense.montant * (1 + depense.taux_tax/100) %}
+                        {% set total_montant_after_tax = total_montant_after_tax + montant_after_tax %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p><b>Total Montant Apres Tax: {{ total_montant_after_tax }}</b></p>
+
+        </div>
+
+
+    </div>
+    </div>
+    <div class="recette-container">
+    <p class="recette" align="center"><b>Recette Total: {{ total_montant_courant + total_montant_non_courant - total_montant_after_interet - total_montant_after_tax}} </b></p>
+    {#<img class="bg" src="{{ asset('logo.png') }}" alt="logo">#}
+    </div>  <img class="bg" src="data:image/png;base64,{{ imageData }}" alt="logo">
+        <div class="qr-code">
+            <img src="data:image/png;base64,{{ qrCodeBinary }}" alt="QR Code" width="200" height="200">
+        </div>
+
+
+    </div>
+
+    <div class="qr-code">
+        <img src="data:image/png;base64,{{ qrCodeBinary }}" alt="QR Code" width="200" height="200">
+    </div>
+    </body>
+
+    <style>
+        .qr-code{
+            position: absolute;
+            bottom: 20px; /* Adjust bottom position as needed */
+            left: 80%; /* Adjust left position as needed */
+        }
+        body {
+            margin: 0; /* Ensure body has no margin */
+            padding: 0; /* Ensure body has no padding */
+        }
+        @page {
+            size: A4; /* Set the page size */
+            margin: 0; /* Reset margins to 0 */
+        }
+        .container {
+            max-width: 800px; /* Set maximum width for the content */
+            margin: 0 auto; /* Center-align the container */
+            padding: 20px; /* Add padding inside the container */
+            border: 2px solid #555; /* Add a border around the container */
+            border-radius: 10px; /* Optional: Add rounded corners to the border */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            /* Optional: Add a subtle shadow */
+        }
+
+        .bg{
+            opacity: 0.1;
+            position: absolute;
+            left: 0;
+            top: 300px;
+            width: 100%;
+            height: auto;
+        }
+
+        #table-container {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .recette-container{
+            text-align: center;
+        }
+        .recette{
+            font-family: 'Roboto', Arial, sans-serif;
+
+            font-size: 25px;
+
+            padding: 10px; /* Optional: Add padding for spacing inside the border */
+            border: 2px solid #000; /* Border with solid style and black color */
+            border-radius: 5px; /* Optional: Add rounded corners to the border */
+            display: inline-block;
+        }
+
+        /* Style for each table cell (containing the tables) */
+        .table-cell {
+            display: table-cell;
+            vertical-align: top;
+            padding: 20px;
+            background-color: lightblue; /* Light blue background color */
+            border: 1px solid black;
+
+        }
+        @media screen and (max-width: 600px) {
+            /* Adjust styles for smaller screens */
+        }
+
+        /* Style for inner tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+
+        }
+        .financial-title {
+            text-align: center; /* Center-align the text */
+            font-size: 28px; /* Adjust the font size */
+            color: #333; /* Set the text color to a dark shade */
+            margin-top: 30px; /* Add spacing above the title */
+            margin-bottom: 30px; /* Add spacing below the title */
+            font-family: Arial, sans-serif; /* Specify a professional font */
+            text-transform: uppercase; /* Convert text to uppercase */
+            letter-spacing: 2px; /* Increase letter spacing for emphasis */
+            border-bottom: 2px solid #333; /* Add an underline with a solid line */
+            padding-bottom: 10px; /* Add spacing below the underline */
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .row {
+            display: table-row;
+        }
+    </style>
+{% endblock %}

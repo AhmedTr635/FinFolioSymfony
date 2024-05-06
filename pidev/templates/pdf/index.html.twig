@@ -1,0 +1,112 @@
+{% block body %}
+    <style>
+        /* Style for the outer table container */
+        #table-container {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        /* Style for each table cell (containing the tables) */
+        .table-cell {
+            display: table-cell;
+            vertical-align: top;
+            padding: 20px;
+            background-color: #f0f8ff; /* Light blue background color */
+            border: 1px solid #ccc;
+        }
+
+        /* Style for inner tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+
+    <body>
+    <div id="table-container">
+        <div class="table-cell">
+            <h1>Actif Courant Table</h1>
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Montant</th>
+                    <th>Amortized Fee</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% set total_amortized_fee_courant = 0 %}
+                {% for actif_courant in actif_courants %}
+                    {% if actif_courant.type == 'Voiture' %}
+                        {% set amortization_rate = 0.1 %}
+                    {% elseif actif_courant.type == 'Stocks' %}
+                        {% set amortization_rate = 0.05 %}
+                    {% else %}
+                        {% set amortization_rate = 0.0 %}
+                    {% endif %}
+                    {% set amortized_fee = actif_courant.montant * amortization_rate %}
+                    {% set total_amortized_fee_courant = total_amortized_fee_courant + amortized_fee %}
+                    <tr>
+
+                        <td>{{ actif_courant.name }}</td>
+
+                        <td>{{ actif_courant.montant }}</td>
+                        <td>{{ amortized_fee }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {#<p>Total Amortized Fee: {{ total_amortized_fee_courant }}</p>#}
+        </div>
+
+        <div class="table-cell">
+            <h1>Actif Non Courant Table</h1>
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Valeur</th>
+                    <th>Amortized Fee</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% set total_amortized_fee_non_courant = 0 %}
+                {% for actif_non_courant in actif_non_courants %}
+                    {% if actif_non_courant.type == 'Logiciel' %}
+                        {% set amortization_rate = 0.1 %}
+                    {% elseif actif_non_courant.type == 'Materiel' %}
+                        {% set amortization_rate = 0.05 %}
+                    {% else %}
+                        {% set amortization_rate = 0.0 %}
+                    {% endif %}
+                    {% set amortized_fee_n = actif_non_courant.valeur * amortization_rate %}
+                    {% set total_amortized_fee_non_courant = total_amortized_fee_non_courant + amortized_fee_n %}
+                    <tr>
+
+                        <td>{{ actif_non_courant.name }}</td>
+
+                        <td>{{ actif_non_courant.valeur }}</td>
+                        <td>{{ amortized_fee_n }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {#  <p>Total Amortized Fee: {{ total_amortized_fee_non_courant }}</p>#}
+        </div>
+    </div>
+    </body>
+{% endblock %}

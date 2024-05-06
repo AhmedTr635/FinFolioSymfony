@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h1>Create ActifCourant</h1>
+
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_start(form, {'attr': {'class': 'my-form'}}) }}
+
+                <div class="form-group">
+                    {{ form_label(form.name, 'Name') }}
+                    {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.name) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.montant, 'Montant') }}
+                    {{ form_widget(form.montant, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.montant) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.type, 'Type') }}
+                    {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.type) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">{{ button_label|default('Save') }}</button>
+
+                {{ form_end(form) }}
+                <button class="btn btn-secondary" onclick="closeAddActifModal()">Cancel</button>
+                <a href="{{ path('app_actif_courant_index') }}">back to list</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,727 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ActifCourant List{% endblock %}
+
+{% block body %}
+    <h1>ActifCourant index</h1>
+
+
+    <div>
+        <label for="tableSelect">Select Table:</label>
+        <select id="tableSelect" onchange="toggleTable(this.value)">
+            <option selected="selected" value="actifCourant">Actif Courant</option>
+            <option value="actifNonCourant">Actif Non Courant</option>
+        </select>
+    </div>
+
+<div id="actifCourantTable">
+    <table  class="table">
+        <thead>
+            <tr>
+
+                <th>Name</th>
+                <th>Montant</th>
+                <th>Type</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for actif_courant in actif_courants %}
+            <tr>
+
+                <td>{{ actif_courant.name }}</td>
+                <td>{{ actif_courant.montant }}</td>
+                <td>{{ actif_courant.type }}
+                    {% if actif_courant.type == 'Voiture' %}
+                        <i class="fas fa-car"></i> <!-- Font Awesome car icon -->
+                    {% endif %}
+                    {% if actif_courant.type == 'Stocks' %}
+                        <i class="fas fa-chart-bar"></i> <!-- Font Awesome stocks icon -->
+                    {% endif %}</td>
+                <td>
+
+                    <!-- Edit Icon/Button -->
+                    <button class="btn btn-link" onclick="openEditActifModalc('{{ actif_courant.id }}')">
+                        <i class="fas fa-edit" style="color: #007bff;"></i>
+                    </button>
+                    <!-- Delete Icon -->
+                    <button class="btn btn-link" onclick="confirmDeletec({{ actif_courant.id }}, '{{ actif_courant.name }}')">
+                        <i class="fas fa-trash-alt" style="color: #dc3545;"></i>
+                    </button>
+
+
+
+
+
+
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+    <button class="btn btn-primary" onclick="openAddActifModalc()">Add Actif Courant</button>
+</div>
+    <!-- Button to Open Add ActifCourant Modal -->
+
+
+    <!-- Modal HTML for Add ActifCourant Form -->
+    <div id="addActifModal" class="modal" style="display: none;
+    justify-content: center; /* Horizontally center the modal content */
+    align-items: center; /* Vertically center the modal content */
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;">
+        <div class="modal-content" id="addActifModalContent"
+             style=" margin: 10% auto; margin-right: 20%; padding: 20px; border: 1px solid #888;
+
+             width: 40%; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            <span class="error" id="nameError"></span>
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmationModal" class="modal" style="display: none;
+         justify-content: center;
+         align-items: center;
+         background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;">
+        <div class="modal-content" id="deleteConfirmationContent"
+             style="margin: 10% auto;
+                    padding: 20px;
+                    background-color: #fff; /* White background */
+                    border: 1px solid #888;
+                    width: 40%;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+    <!-- Modal HTML for Edit Actif Form -->
+    <div id="editActifModal" class="modal" style="display: none;
+         justify-content: center;
+         align-items: center;
+         background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;">
+        <div class="modal-contentc" id="editActifModalContent" style="margin: 10% auto;
+                    padding: 20px;
+                    background-color: #fff; /* White background */
+                    border: 1px solid #888;
+                    width: 40%;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script>function toggleTable(value) {
+            const actifCourantTable = document.getElementById('actifCourantTable');
+            const actifNonCourantTable = document.getElementById('actifNonCourantTable');
+
+            if (value === 'actifCourant') {
+                actifCourantTable.style.display = 'block';
+                actifNonCourantTable.style.display = 'none';
+                renderPieChart();
+            } else if (value === 'actifNonCourant') {
+                actifCourantTable.style.display = 'none';
+                actifNonCourantTable.style.display = 'block';
+                renderBarChart();
+            }
+            
+        }
+
+
+        function openAddActifModalc() {
+            const modal = document.getElementById('addActifModal');
+            modal.style.display = 'block';
+
+            // Load the form content dynamically into the modal
+            const modalContent = document.getElementById('addActifModalContent');
+            modalContent.innerHTML = '';
+            fetch("{{ path('app_actif_courant_new') }}")
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+
+                })
+                .catch(error => {
+                    console.error('Error loading form:', error);
+                });
+        }
+
+        function closeAddActifModalc() {
+            const modal = document.getElementById('addActifModal');
+            modal.style.display = 'none';
+        }
+        function confirmDeletec(actifId, actifName) {
+            const modal = document.getElementById('deleteConfirmationModal');
+            modal.style.display = 'block';
+
+            // Load the delete confirmation form dynamically into the modal
+            const modalContent = document.getElementById('deleteConfirmationContent');
+            modalContent.innerHTML = '';
+
+            // Generate the delete URL with the actual actifId
+            const deleteUrl = "{{ path('app_actif_courant_delete', {'id': '__actif_id__'})|replace({'__actif_id__': 'actifId'}) }}".replace('actifId', actifId);
+
+            fetch(deleteUrl)
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+                    const actifNameElement = document.getElementById('actifNameToDelete');
+                    actifNameElement.textContent = actifName; // Set actif name in the confirmation message
+                })
+                .catch(error => {
+                    console.error('Error loading delete form:', error);
+                });
+        }
+
+        function closeDeleteConfirmationModalc() {
+            const modal = document.getElementById('deleteConfirmationModal');
+            modal.style.display = 'none';
+        }
+
+        function openEditActifModalc(actifId) {
+            const modal = document.getElementById('editActifModal');
+            modal.style.display = 'block';
+
+            // Load the edit form content dynamically into the modal
+            const modalContent = document.getElementById('editActifModalContent');
+            modalContent.innerHTML = '';
+
+            // Generate the edit URL with the actual actifId
+            const editUrl = "{{ path('app_actif_courant_edit', {'id': '__actif_id__'})|replace({'__actif_id__': 'actifId'}) }}".replace('actifId', actifId);
+
+            fetch(editUrl)
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading edit form:', error);
+                });
+        }
+
+        function closeEditActifModalc() {
+            const modal = document.getElementById('editActifModal');
+            modal.style.display = 'none';
+        }
+
+        function attachFormSubmissionListener() {
+            const form = document.getElementById('newActifForm');
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault(); // Prevent default form submission
+
+                try {
+                    const formData = new FormData(form);
+
+                    const response = await fetch(form.action, {
+                        method: form.method,
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        // Form submitted successfully, close the modal
+                        closeAddActifModalc();
+                        // Optionally, refresh or update the UI after successful submission
+                    } else {
+                        // Form submission failed, handle errors
+                        const responseData = await response.json();
+                        // Display error messages based on response data
+                        // Example: Update error elements in the loaded form content
+                        document.getElementById('nameError').textContent = responseData.errors.name || '';
+                        document.getElementById('montantError').textContent = responseData.errors.montant || '';
+                        document.getElementById('typeError').textContent = responseData.errors.type || '';
+                    }
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                }
+            });}
+
+
+    </script>
+
+
+<!-- Confirmation Modal (Hidden by Default) -->
+
+
+    {% block stylesheets %}
+        <style>
+        /* Custom CSS for table rows */
+        table.table {
+            width: 100%; /* Make the table fill its container */
+            border-collapse: collapse; /* Collapse table borders */
+            margin-bottom: 20px; /* Add spacing below the table */
+        }
+
+        table.table thead th {
+            background-color: rgba(0, 123, 255, 0.5); /* Header background color with reduced opacity */
+            color: #fff; /* Header text color */
+            padding: 15px; /* Header padding */
+            text-align: left;
+            font-weight: bold; /* Make header text bold */
+            font-size: 18px; /* Font size for headers *//* Header text alignment */
+        }
+
+        table.table tbody tr {
+            height: 80px; /* Row height */
+        }
+
+        table.table tbody tr td {
+            padding: 15px; /* Cell padding */
+            font-size: 18px; /* Font size */
+            text-align: left; /* Text alignment */
+            border-bottom: 1px solid #ddd; /* Bottom border for each row */
+        }
+
+        /* Custom font styles */
+        body {
+            font-family: 'Arial', sans-serif; /* Specify your preferred font */
+            font-size: 16px; /* Base font size */
+            line-height: 1.5; /* Line height for readability */
+            color: #333; /* Text color */
+        }
+
+        h1 {
+            font-size: 24px; /* Heading 1 font size */
+            margin-bottom: 20px; /* Bottom margin for headings */
+        }
+
+        /* Links */
+        a {
+            color: #007bff; /* Link color */
+            text-decoration: none; /* Remove underline */
+        }
+
+        a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
+        #editActifModal {
+            display: none;
+            justify-content: center; /* Horizontally center the modal */
+            align-items: center; /* Vertically center the modal */
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Vertically center the modal */
+        }
+
+        #editActifModalContent {
+            width: 50%; /* Adjust the width of the modal content */
+            padding: 20px;
+            border: 1px solid #888;
+            background-color: #fff; /* White background for modal content */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            justify-content: center; /* Horizontally center the modal */
+            align-items: center;
+        }
+    </style>
+    {% endblock %}
+
+
+
+
+
+
+
+
+
+
+    <div id="actifNonCourantTable"  style="display: none">
+    <table  class="table" >
+
+        <thead>
+        <tr>
+
+            <th>Name</th>
+            <th>Type</th>
+            <th>valeur</th>
+
+            <th>actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for actif_non_courant in actif_non_courants %}
+            <tr>
+
+                <td>{{ actif_non_courant.name }}</td>
+
+                <td>{{ actif_non_courant.type }}
+                    {% if actif_non_courant.type == 'Voiture' %}
+                        <i class="fas fa-car"></i> <!-- Font Awesome car icon -->
+                    {% endif %}
+                    {% if actif_non_courant.type == 'Stocks' %}
+                        <i class="fas fa-chart-bar"></i> <!-- Font Awesome stocks icon -->
+                    {% endif %}</td>
+                <td>{{ actif_non_courant.valeur }}</td>
+
+
+                <td>
+                    <!-- Edit Icon/Button -->
+                    <button class="btn btn-link" onclick="openEditActifModaln('{{ actif_non_courant.id }}')">
+                        <i class="fas fa-edit" style="color: #007bff;"></i>
+                    </button>
+                    <!-- Delete Icon -->
+                    <button class="btn btn-link" onclick="confirmDeleten({{ actif_non_courant.id }}, '{{ actif_non_courant.name }}')">
+                        <i class="fas fa-trash-alt" style="color: #dc3545;"></i>
+                    </button>
+
+
+
+
+
+
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+    <button class="btn btn-primary" onclick="openAddActifModaln()">Add Actif Non Courant</button>
+    </div>
+    <div id="addActifModal" class="modal" style="display: none;
+    justify-content: center; /* Horizontally center the modal content */
+    align-items: center; /* Vertically center the modal content */
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;">
+        <div class="modal-content" id="addActifModalContent"
+             style=" margin: 10% auto; margin-right: 20%; padding: 20px; border: 1px solid #888;
+
+             width: 40%; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+    <!-- Button to Open Add ActifCourant Modal -->
+
+
+    <!-- Modal HTML for Add ActifCourant Form -->
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmationModal" class="modal" style="display: none;
+         justify-content: center;
+         align-items: center;
+         background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;">
+        <div class="modal-content" id="deleteConfirmationContent"
+             style="margin: 10% auto;
+                    padding: 20px;
+                    background-color: #fff; /* White background */
+                    border: 1px solid #888;
+                    width: 40%;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+    <!-- Modal HTML for Edit Actif Form -->
+    <div id="editActifModal" class="modal" style="display: none;">
+        <div class="modal-content" id="editActifModalContent">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+    <div id="notification-container" >
+        <div id="notification" class="hidden">
+            <span id="notification-message"></span>
+            <button id="notification-close">Close</button>
+        </div>
+    </div>
+
+<h1>PDF Generator</h1>
+
+
+    <a href="{{ path('app_actif_courant_pdf') }}" >Generate PDF Report</a>
+
+
+    <div id="chart-container" style="width: 100%; height: 400px;"></div>
+
+
+
+    <script>
+        function openAddActifModaln() {
+            const modal = document.getElementById('addActifModal');
+            modal.style.display = 'block';
+
+            // Load the form content dynamically into the modal
+            const modalContent = document.getElementById('addActifModalContent');
+            modalContent.innerHTML = '';
+            fetch("{{ path('app_actif_non_courant_new') }}")
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading form:', error);
+                });
+
+        }
+
+        function closeAddActifModaln() {
+            const modal = document.getElementById('addActifModal');
+            showNotification('Actif added successfully.');
+            modal.style.display = 'none';
+        }
+        function confirmDeleten(actifId, actifName) {
+            const modal = document.getElementById('deleteConfirmationModal');
+            modal.style.display = 'block';
+
+            // Load the delete confirmation form dynamically into the modal
+            const modalContent = document.getElementById('deleteConfirmationContent');
+            modalContent.innerHTML = '';
+
+            // Generate the delete URL with the actual actifId
+            const deleteUrl = "{{ path('app_actif_non_courant_delete', {'id': '__actif_id__'})|replace({'__actif_id__': 'actifId'}) }}".replace('actifId', actifId);
+
+            fetch(deleteUrl)
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+                    const actifNameElement = document.getElementById('actifNameToDelete');
+                    actifNameElement.textContent = actifName; // Set actif name in the confirmation message
+                })
+                .catch(error => {
+                    console.error('Error loading delete form:', error);
+                });
+        }
+
+        function closeDeleteConfirmationModaln() {
+            const modal = document.getElementById('deleteConfirmationModal');
+            modal.style.display = 'none';
+        }
+
+        function openEditActifModaln(actifId) {
+            const modal = document.getElementById('editActifModal');
+            modal.style.display = 'block';
+
+            // Load the edit form content dynamically into the modal
+            const modalContent = document.getElementById('editActifModalContent');
+            modalContent.innerHTML = '';
+
+            // Generate the edit URL with the actual actifId
+            const editUrl = "{{ path('app_actif_non_courant_edit', {'id': '__actif_id__'})|replace({'__actif_id__': 'actifId'}) }}".replace('actifId', actifId);
+
+            fetch(editUrl)
+                .then(response => response.text())
+                .then(data => {
+                    modalContent.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error loading edit form:', error);
+                });
+        }
+
+        function closeEditActifModaln() {
+            const modal = document.getElementById('editActifModal');
+            modal.style.display = 'none';
+        }
+
+
+    </script>
+
+    <!--<script src="/public/js/charts-apex.js"></script>-->
+    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+    <!-- Include ApexCharts JavaScript file -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationMessage = document.getElementById('notification-message');
+
+            notificationMessage.textContent = message;
+            notification.classList.remove('hidden');
+            notification.style.visibility = 'visible';
+
+            // Close button event listener
+            const closeButton = document.getElementById('notification-close');
+            closeButton.addEventListener('click', () => {
+                notification.classList.add('hidden');
+            });
+
+            // Automatically hide after a delay (e.g., 5 seconds)
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 5000); // 5000 milliseconds (5 seconds)
+        }
+    </script>
+    <style>
+        #notification-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000; /* Ensure it's above other content */
+        }
+
+        #notification {
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        #notification.hidden {
+            transform: translateY(100%);
+            visibility: hidden;
+        }
+
+        #notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+
+
+
+
+
+            function renderPieChart() {
+                var seriesData = [30, 20 ]; // Sample data for the chart slices
+                var labels = ['Stocks', 'Voiture'];
+
+                new ApexCharts(document.querySelector("#chart-container"), {
+                    chart: {
+                        type: 'pie',
+                        width: '80%',
+                        height: 400
+                    },
+                    labels: labels,
+                    series: seriesData,
+                    plotOptions: {
+                        pie: {
+                            startAngle: 0,
+                            endAngle: 360,
+                            offsetY: 0,
+                            offsetX: 0,
+                            expandOnClick: false,
+                            donut: {
+                                size: '80%', // Adjust the size of the circular pie
+                                labels: {
+                                    show: true,
+                                    name: {
+                                        show: true,
+                                        fontSize: '14px',
+                                        fontFamily: 'Helvetica, Arial, sans-serif',
+                                        fontWeight: 400,
+                                        color: undefined,
+                                        offsetY: -10
+                                    },
+                                    value: {
+                                        show: true,
+                                        fontSize: '18px',
+                                        fontFamily: 'Helvetica, Arial, sans-serif',
+                                        fontWeight: 600,
+                                        color: undefined,
+                                        offsetY: 16,
+                                        formatter: function (val) {
+                                            return val.toFixed(0); // Format value to integer
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            chart: {
+                                width: '100%'
+                            },
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }]
+                }).render();
+
+
+            }
+
+            function renderBarChart() {
+                var seriesData = [1450,  1932];
+                var labels = ['Materiel', 'Logiciel', ];
+
+                new ApexCharts(document.querySelector('#chart-container'), {
+                    chart: {
+                        type: 'bar',
+                        width: '100%',
+                        height: 400
+                    },
+                    labels: labels,
+                    series: [{
+                        name: 'Data',
+                        data: seriesData
+                    }],
+                    xaxis: {
+                        categories: labels
+                    },
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            chart: {
+                                width: '100%'
+                            },
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }]
+                }).render();
+
+        }
+
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

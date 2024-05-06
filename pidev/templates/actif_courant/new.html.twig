@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New ActifCourant{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Create new ActifCourant</h1>
+
+        <div class="row">
+            <div class="col-md-6">
+                {# Render the ActifCourant form #}
+                <form id="newActifForm" action="{{ path('app_actif_courant_new') }}" method="post">
+                    {{ form_start(form, {'attr': {'class': 'my-form'}}) }}
+
+                    <div class="form-group">
+                        {{ form_label(form.name, 'Name') }}
+                        {{ form_widget(form.name, {'attr': {'class': 'form-control', 'style': 'width: 300%;'}}) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.montant, 'Montant') }}
+                        {{ form_widget(form.montant, {'attr': {'class': 'form-control', 'style': 'width: 200%;'}}) }}
+                        {{ form_errors(form.montant) }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form_label(form.type, 'Type') }}
+                        {{ form_widget(form.type, {'attr': {'class': 'form-control', 'style': 'width: 200%;'}}) }}
+                        {{ form_errors(form.type) }}
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary">Create</button>
+
+                    {{ form_end(form) }}
+                </form>
+                <button class="btn btn-secondary" onclick="closeAddActifModalc()">Cancel</button>
+
+                <a href="{{ path('app_actif_courant_pdf') }}" target="_blank">Generate PDF Report</a>
+
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

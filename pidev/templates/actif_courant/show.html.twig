@@ -1,0 +1,32 @@
+    {% extends 'base.html.twig' %}
+
+{% block title %}ActifCourant{% endblock %}
+
+{% block body %}
+    <h1>ActifCourant</h1>
+
+    <table class="table">
+        <tbody>
+
+            <tr>
+                <th>Name</th>
+                <td>{{ actif_courant.name }}</td>
+            </tr>
+            <tr>
+                <th>Montant</th>
+                <td>{{ actif_courant.montant }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ actif_courant.type }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_actif_courant_index') }}">back to list</a>
+
+    <a href="{{ path('app_actif_courant_edit', {'id': actif_courant.id}) }}">edit</a>
+    <a href="{{ path('app_actif_courant_delete', {'id': actif_courant.id}) }}">delete</a>
+
+    {{ include('actif_courant/_delete_form.html.twig') }}
+{% endblock %}
