@@ -158,9 +158,11 @@
         </div>
     </div>
 
+
     <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
 
-        <div class="card custom-width" style="margin-left: 50px; margin-top: 50px; width: 800px;">
+
+        <div class="card custom-width" style="margin-left: 20px; margin-top: 50px; width: 1000px;">
             <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
                 <table class="table text-nowrap">
                     <thead>
@@ -171,6 +173,7 @@
                         <th>Stop Loss</th>
                         <th>Prix Achat</th>
                         <th>Recent Value</th>
+                        <th>Date Achat</th>
                         <th>Rapid Action</th>
                     </tr>
                     </thead>
@@ -196,6 +199,7 @@
                             <td id="stopLoss-{{ digitalCoin.getId() }}">{{ digitalCoin.getStopLoss() }}</td>
                             <td>{{ digitalCoin.getPrixAchat() }}</td>
                             <td id="recent-value-{{ digitalCoin.getId() }}">Loading...</td>
+                            <td>{{ digitalCoin.dateAchat|date('Y-m-d H:i:s') }}</td>
                             <td><button class="btn btn-danger sell-button" data-id="{{ digitalCoin.getId() }}">SELL</button></td>
                         </tr>
                     {% else %}
@@ -208,14 +212,9 @@
             </div>
         </div>
     </div>
-    <div class="card" style="width: 18rem;">
-        <div class="card-body">
-            <h5 class="card-title">Digital Coins Distribution</h5>
-            <canvas id="donut-chart" width="400" height="400"></canvas>
-        </div>
-    </div>
+
     <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
-        <div class="card custom-width" style="margin-left: 50px; margin-top: 50px; width: 800px;">
+        <div class="card custom-width" style="margin-left: 20px; margin-top: 15px; width: 1000px;">
             <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
                 <table class="table text-nowrap">
                     <thead>
@@ -224,6 +223,7 @@
                         <th>Montant</th>
                         <th>ROI</th>
                         <th>Prix Achat</th>
+                        <th>Date Vente</th>
                     </tr>
                     </thead>
                     <tbody class="table-border-bottom-0" id="soldCoins">
@@ -247,6 +247,7 @@
                             <td id="roi-{{ digitalCoin.getId() }}">{% set roiValue = (digitalCoin.getROI() * digitalCoin.getMontant())/100 %}
                                 <span style="color: {% if roiValue < 0 %}red{% else %}green{% endif %}">{{ roiValue }}</span></td>
                             <td>{{ digitalCoin.getPrixAchat() }}</td>
+                            <td>{{ digitalCoin.dateVente|date('Y-m-d H:i:s') }}</td>
                         </tr>
                     {% else %}
                         <tr>
@@ -257,13 +258,89 @@
                 </table>
             </div>
         </div>
+        <div class="col-md-6">
+            <div class="card" style="width: 18rem; margin-top: 15px; margin-left: auto; margin-right: 50px;">
+                <div class="card-body">
+                    <div id="donut-chart"></div>
+                </div>
+            </div>
+        </div>
+
+
+
     </div>
+
+
 
 {# Static #}
 
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
    <script>
+       document.addEventListener("DOMContentLoaded", function() {
+           // Extract data from table and construct data for donut chart
+           const holdCoinsRows = document.querySelectorAll("#holdCoins tr");
+           const dataForDonutChart = [];
+           holdCoinsRows.forEach(row => {
+               const code = row.querySelector("td:first-child").textContent.trim();
+               const montant = parseFloat(row.querySelector("td:nth-child(2) .text-primary").textContent);
+               dataForDonutChart.push({ code: code, montant: montant });
+           });
+
+           // Render the donut chart
+           renderDonutChart(dataForDonutChart);
+       });
+
+       function renderDonutChart(data) {
+           // Construct options for the donut chart
+           const options = {
+               series: data.map(item => item.montant),
+               labels: data.map(item => item.code),
+               chart: {
+                   width: 380,
+                   type: 'donut',
+               },
+               plotOptions: {
+                   pie: {
+                       startAngle: -90,
+                       endAngle: 270
+                   }
+               },
+               dataLabels: {
+                   enabled: false
+               },
+               fill: {
+                   type: 'gradient',
+               },
+               legend: {
+                   formatter: function(val, opts) {
+                       return val + " - " + opts.w.globals.series[opts.seriesIndex];
+                   }
+               },
+               title: {
+                   text: 'Portfolio Distribution'
+               },
+               responsive: [{
+                   breakpoint: 480,
+                   options: {
+                       chart: {
+                           width: 200
+                       },
+                       legend: {
+                           position: 'bottom'
+                       }
+                   }
+               }]
+           };
+
+           // Get the div element for the donut chart
+           const chartDiv = document.getElementById('donut-chart');
+
+           // Create and render the donut chart
+           const chart = new ApexCharts(chartDiv, options);
+           chart.render();
+       }
+
        document.getElementById('premium-chart-btn').addEventListener('click', function() {
            $('#premium-chart-modal').modal('show');
        });

@@ -28,9 +28,36 @@ class DigitalCoinsController extends AbstractController
             'digital_coins' => $digitalCoinsRepository->findByUserIdAndDateVenteIsNull($UserId),
             'digital_coin' => $digitalCoin,
             'form' => $form->createView(),
-            'digital_coins_sold' => $digitalCoinsRepository->findByUserIdAndDateVenteIsNotNull($UserId),// Pass the form view to the template
+            'digital_coins_sold' => $digitalCoinsRepository->findByUserIdAndDateVenteIsNotNull($UserId),
+            'distribution' => $digitalCoinsRepository->findMontantByUserIdGroupByCode($UserId),
+            'totalHolding' => $digitalCoinsRepository->findTotalMontantByUserIdAndDateVenteIsNull($UserId),
+            'historicTrades' => $digitalCoinsRepository ->findTotalMontantByUserIdAndDateVenteIsNotNull($UserId),
+            'HistoricROI' => $digitalCoinsRepository ->findTotalRoiWhereDateVenteIsNotNull(),
+            'totalInvest' => $digitalCoinsRepository ->findTotalMontantByUserId($UserId),// Pass the form view to the template
         ]);
     }
+
+    #[Route('/stat/crypto/user', name: 'app_digital_coins_stat', methods: ['GET'])]
+    public function statUserCrypto(DigitalCoinsRepository $digitalCoinsRepository): Response
+    {
+        $digitalCoin = new DigitalCoins();
+        $UserId = 22;
+        $form = $this->createForm(DigitalCoinsType::class, $digitalCoin);
+
+
+        return $this->render('digital_coins/statUserCrypto.html.twig', [
+            'digital_coins' => $digitalCoinsRepository->findByUserIdAndDateVenteIsNull($UserId),
+            'digital_coin' => $digitalCoin,
+            'form' => $form->createView(),
+            'digital_coins_sold' => $digitalCoinsRepository->findByUserIdAndDateVenteIsNotNull($UserId),
+            'distribution' => $digitalCoinsRepository->findMontantByUserIdGroupByCode($UserId),
+            'totalHolding' => $digitalCoinsRepository->findTotalMontantByUserIdAndDateVenteIsNull($UserId),
+            'historicTrades' => $digitalCoinsRepository ->findTotalMontantByUserIdAndDateVenteIsNotNull($UserId),
+            'HistoricROI' => $digitalCoinsRepository ->findTotalRoiWhereDateVenteIsNotNull(),
+            'totalInvest' => $digitalCoinsRepository ->findTotalMontantByUserId($UserId),// Pass the form view to the template
+        ]);
+    }
+
 
     #[Route('/new', name: 'app_digital_coins_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

@@ -47,20 +47,35 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-lg-4 mb-3">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title">Location</h5>
-                <p class="card-text">
-                    <!-- Show location information here -->
-                </p>
+    {% if googleMapsLink is not null %}
+        <div class="map-container">
+            <div class="map-content">
+                <div id="map" style="height: 400px;"></div>
             </div>
+            <a href="{{ googleMapsLink }}" class="google-maps-link" target="_blank">View location on Google Maps</a>
         </div>
-    </div>
-
+    {% else %}
+        <p>Location not available for this event.</p>
+    {% endif %}
     <button class="btn btn-primary" onclick="location.href='{{ path('app_investdashuser_index') }}'">Back to List</button>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDuuYiAdEaQAOTzRqheqZdgZHT8ostySdc&callback=initMap"></script>
     <script>
+        function initMap() {
+            var latitude = {{ real_estate.latitude }};
+            var longitude = {{ real_estate.longitude }};
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 10,
+                center: { lat: latitude, lng: longitude }
+            });
+
+            var marker = new google.maps.Marker({
+                position: { lat: latitude, lng: longitude },
+                map: map
+            });
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
             const montantInput = document.getElementById('montantInput');

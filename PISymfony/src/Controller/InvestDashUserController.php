@@ -6,6 +6,7 @@ use App\Entity\Investissement;
 use App\Repository\InvestissementRepository;
 use App\Repository\RealEstateRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,12 +17,18 @@ use Symfony\Component\Routing\Annotation\Route;
 class InvestDashUserController extends AbstractController
 {
     #[Route('/', name: 'app_investdashuser_index', methods: ['GET'])]
-    public function index(RealEstateRepository $realEstateRepository, InvestissementRepository $investissementRepository): Response
+    public function index(RealEstateRepository $realEstateRepository, InvestissementRepository $investissementRepository,PaginatorInterface $paginator,Request $request): Response
     {
         // Get all real estates
         $realEstates = $realEstateRepository->findAll();
         $userId = 22;
         $userInvestments = $investissementRepository->findByUserId($userId);
+        $realEstates= $paginator->paginate(
+           $realEstates,
+            $request->query->getInt('page',1)  ,
+            3
+        );
+        $paginationTemplate = '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig';
 
         // Calculate investments sum for each real estate
         $investmentsSumByRealEstate = [];
@@ -34,6 +41,7 @@ class InvestDashUserController extends AbstractController
             'realEstates' => $realEstates,
             'investmentsSumByRealEstate' => $investmentsSumByRealEstate,
             'userInvestments' => $userInvestments,
+            'paginationTemplate' => $paginationTemplate,
         ]);
     }
     #[Route('/make_investment/{id}', name: 'app_make_investment', methods: ['POST'])]

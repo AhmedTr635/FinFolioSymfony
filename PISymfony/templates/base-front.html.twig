@@ -186,7 +186,7 @@
                 <li class="menu-item active open">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                        <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
+                        <div class="text-truncate" data-i18n="Dashboards">Dashboard</div>
                         <span class="badge badge-center rounded-pill bg-danger ms-auto">5</span>
                     </a>
                     <ul class="menu-sub">
@@ -196,8 +196,8 @@
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="{{ path('app_invest_user_dash') }}" class="menu-link">
-                                <div class="text-truncate" data-i18n="CRM">User Investissement</div>
+                            <a href="{{ path('app_stat_admin_dash') }}" class="menu-link">
+                                <div class="text-truncate" data-i18n="CRM">Stat Admin</div>
                             </a>
                         </li>
                         <li class="menu-item">
@@ -206,15 +206,21 @@
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="app-logistics-dashboard.html" class="menu-link">
-                                <div class="text-truncate" data-i18n="Logistics">Trading</div>
+                            <a href="{{ path('app_invest_user_dash') }}" class="menu-link">
+                                <div class="text-truncate" data-i18n="Academy">Stat User Invest</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="app-academy-dashboard.html" class="menu-link">
-                                <div class="text-truncate" data-i18n="Academy">Academy</div>
+                            <a href="{{ path('app_digital_coinsapp_digital_coins_index') }}" class="menu-link">
+                                <div class="text-truncate" data-i18n="Logistics">User Trading</div>
                             </a>
                         </li>
+                        <li class="menu-item">
+                            <a href="{{ path('app_stat_user_crypto') }}" class="menu-link">
+                                <div class="text-truncate" data-i18n="Academy">Stat User Crypto</div>
+                            </a>
+                        </li>
+
                     </ul>
                 </li>
 

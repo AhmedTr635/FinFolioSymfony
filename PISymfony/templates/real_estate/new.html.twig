@@ -16,7 +16,10 @@
                 <small class="text-muted float-end"></small>
             </div>
             <div class="card-body">
-                {{ form_start(form, {'attr': {'id': 'realEstateForm'}}) }}
+                {# {{ form_start(form, {'attr': {'id': 'realEstateForm'}}) }} #}
+
+                {{ form_start(form, {'attr': {'id': 'realEstateForm', 'action': path('app_real_estate_new')}}) }}
+
                 <div class="mb-3">
                     {{ form_label(form.name, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
                     {{ form_widget(form.name, {'attr': {'class': 'form-control', 'id': 'real_estate_name'}}) }}

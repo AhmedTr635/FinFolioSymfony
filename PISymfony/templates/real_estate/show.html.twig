@@ -31,5 +31,16 @@
 
     <button class="btn btn-primary" onclick="location.href='{{ path('app_real_estate_index') }}'">Back to List</button>
 
-    {{ include('real_estate/_delete_form.html.twig') }}
+
+    {% if invtot == 0 %}
+
+        {{ include('real_estate/_delete_form.html.twig') }}
+    {% else %}
+       <div class="alert alert-danger" role="alert">
+        Vous ne pouvez pas supprimer cette Immobilier !
+        Il y a des investissements en cours sur cette Immobilier avec un total de {{ invtot }} $.
+       </div>
+    {% endif %}
+
+
 {% endblock %}

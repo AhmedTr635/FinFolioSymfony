@@ -1,0 +1,114 @@
+{% extends 'base-front.html.twig' %}
+{% block body %}
+    <h1>khra</h1>
+    <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
+
+
+        <div class="card custom-width" style="margin-left: 20px; margin-top: 50px; width: 1000px;">
+            <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
+                <table class="table text-nowrap">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Montant</th>
+                        <th>ROI</th>
+                        <th>Stop Loss</th>
+                        <th>Prix Achat</th>
+                        <th>Recent Value</th>
+                        <th>Date Achat</th>
+                        <th>Rapid Action</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0" id="holdCoins">
+                    {% for digitalCoin in digital_coins %}
+                        <tr>
+                            <td>
+                                {% set imageName = digitalCoin.getCode() ~ '.png' %} {# Assuming image names follow this pattern: code.png #}
+                                {% if asset(imageName) %}
+                                    <img src="{{ asset(imageName) }}" alt="{{ digitalCoin.getCode() }}" height="25" width="30">
+                                {% else %}
+                                    <span>No Image</span>
+                                {% endif %}
+                                {{ digitalCoin.getCode() }}
+                            </td>
+
+                            <td id="montant-{{ digitalCoin.getId() }}">
+                                <div class="text-muted lh-1">
+                                    <span class="text-primary fw-medium">{{ digitalCoin.getMontant() }}</span>
+                                </div>
+                            </td>
+                            <td id="roi-{{ digitalCoin.getId() }}">Loading...</td>
+                            <td id="stopLoss-{{ digitalCoin.getId() }}">{{ digitalCoin.getStopLoss() }}</td>
+                            <td>{{ digitalCoin.getPrixAchat() }}</td>
+                            <td id="recent-value-{{ digitalCoin.getId() }}">Loading...</td>
+                            <td>{{ digitalCoin.dateAchat|date('Y-m-d H:i:s') }}</td>
+                            <td><button class="btn btn-danger sell-button" data-id="{{ digitalCoin.getId() }}">SELL</button></td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No records found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
+        <div class="card custom-width" style="margin-left: 20px; margin-top: 15px; width: 1000px;">
+            <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
+                <table class="table text-nowrap">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Montant</th>
+                        <th>ROI</th>
+                        <th>Prix Achat</th>
+                        <th>Date Vente</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0" id="soldCoins">
+                    {% for digitalCoin in digital_coins_sold %}
+                        <tr>
+                            <td>
+                                {% set imageName = digitalCoin.getCode() ~ '.png' %} {# Assuming image names follow this pattern: code.png #}
+                                {% if asset(imageName) %}
+                                    <img src="{{ asset(imageName) }}" alt="{{ digitalCoin.getCode() }}" height="25" width="30">
+                                {% else %}
+                                    <span>No Image</span>
+                                {% endif %}
+                                {{ digitalCoin.getCode() }}
+                            </td>
+
+                            <td id="montant-{{ digitalCoin.getId() }}">
+                                <div class="text-muted lh-1">
+                                    <span class="text-primary fw-medium">{{ digitalCoin.getMontant() }}</span>
+                                </div>
+                            </td>
+                            <td id="roi-{{ digitalCoin.getId() }}">{% set roiValue = (digitalCoin.getROI() * digitalCoin.getMontant())/100 %}
+                                <span style="color: {% if roiValue < 0 %}red{% else %}green{% endif %}">{{ roiValue }}</span></td>
+                            <td>{{ digitalCoin.getPrixAchat() }}</td>
+                            <td>{{ digitalCoin.dateVente|date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No records found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card" style="width: 18rem; margin-top: 15px; margin-left: auto; margin-right: 50px;">
+                <div class="card-body">
+                    <div id="donut-chart"></div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+{% endblock %}

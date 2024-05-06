@@ -57,6 +57,12 @@
             </div>
         {% endfor %}
     </div>
+     <div class="pagination-container" style="float: right; width: 30%;margin-top: 20px">
+
+        {{ knp_pagination_render(realEstates, paginationTemplate) }}
+    </div>
+
+
 
     {#     <button class="btn btn-primary" onclick="location.href='{{ path('app_real_estate_new') }}'">Create new</button> #}
 
@@ -85,17 +91,14 @@
                                 <span id="roi{{ real_estate.id }}"></span>
                             </div>
 
-                            {# <div class="mb-3">
-                                <!-- Add empty div for ApexChart -->
-                                <div id="roiChart{{ real_estate.id }}"></div>
-                            </div> #}
+
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                             <button type="button" class="btn btn-primary" onclick="confirmInvestment('{{ real_estate.id }}')">Confirmer</button>
                         </form>
                     </div>
                 </div>
             </div>
-        </div>
+
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
         <script>
@@ -281,6 +284,9 @@
             }
         </script>
     {% endfor %}
+
+        </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>

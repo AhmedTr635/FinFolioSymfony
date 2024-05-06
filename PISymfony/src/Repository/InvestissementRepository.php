@@ -58,12 +58,15 @@ class InvestissementRepository extends ServiceEntityRepository
     }
     public function getTotalInvestmentByRealEstateId(int $realEstateId): float
     {
-        return $this->createQueryBuilder('i')
+        $result = $this->createQueryBuilder('i')
             ->select('SUM(i.montant) as totalInvestment')
             ->andWhere('i.reId = :realEstateId')
             ->setParameter('realEstateId', $realEstateId)
             ->getQuery()
             ->getSingleScalarResult();
+
+        // If the result is null, return 0, otherwise return the result
+        return $result !== null ? (float) $result : 0.0;
     }
     public function getRealEstateValueById(int $realEstateId): float
     {

@@ -89,9 +89,25 @@ class ShowREUserController extends AbstractController
     #[Route('user/re/{id}', name: 'app_real_estate_user_show', methods: ['GET'])]
     public function show(RealEstate $realEstate): Response
     {
+        $latitude = $realEstate->getLatitude();
+        $longitude = $realEstate->getLongitude();
+
+        // Check if latitude and longitude are available
+        if ($latitude !== null && $longitude !== null) {
+            // Generate Google Maps link
+            $googleMapsLink = sprintf(
+                'https://www.google.com/maps/search/?api=1&query=%f,%f',
+                $latitude,
+                $longitude
+            );
+        } else {
+            // If latitude or longitude is null, set Google Maps link to null
+            $googleMapsLink = null;
+        }
 
         return $this->render('show_re_user/index.html.twig', [
             'real_estate' => $realEstate,
+            'googleMapsLink' => $googleMapsLink,
         ]);
     }
 

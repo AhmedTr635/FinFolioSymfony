@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\RealEstate;
 use App\Form\RealEstateType;
+use App\Repository\InvestissementRepository;
 use App\Repository\RealEstateRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +22,7 @@ class RealEstateController extends AbstractController
             'real_estates' => $realEstateRepository->findAll(),
         ]);
     }
-    #[Route('/new', name: 'app_real_estate_new', methods: ['GET', 'POST'])]
+    #[Route('/real/estate/new', name: 'app_realEstate_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $realEstate = new RealEstate();
@@ -86,17 +87,22 @@ class RealEstateController extends AbstractController
     }*/
 
     #[Route('/{id}', name: 'app_real_estate_show', methods: ['GET'])]
-    public function show(RealEstate $realEstate): Response
+    public function show(RealEstate $realEstate , InvestissementRepository $investissementRepository): Response
     {
+       $invtot = $investissementRepository->getTotalInvestmentByRealEstateId($realEstate->getId());
+
         return $this->render('real_estate/show.html.twig', [
             'real_estate' => $realEstate,
+            'invtot' => $invtot,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_real_estate_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, RealEstate $realEstate, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, RealEstate $realEstate, EntityManagerInterface $entityManager, InvestissementRepository $investissementRepository): Response
     {
         $form = $this->createForm(RealEstateType::class, $realEstate);
+
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -117,10 +123,15 @@ class RealEstateController extends AbstractController
             return $this->redirectToRoute('app_real_estate_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $invtot = $investissementRepository->getTotalInvestmentByRealEstateId($realEstate->getId());
+
         return $this->renderForm('real_estate/edit.html.twig', [
             'real_estate' => $realEstate,
             'form' => $form,
+            'invtot' => $invtot,
+
         ]);
+
     }
 
 
