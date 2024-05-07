@@ -1,0 +1,345 @@
+{% extends 'base-front.html.twig' %}
+
+{% block title %}Hello StatUserCryptoController!{% endblock %}
+
+{% block body %}
+    <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
+
+
+        <div class="card custom-width" style="margin-left: 20px; margin-top: 50px; width: 1000px;">
+            <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
+                <table class="table text-nowrap">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Montant</th>
+
+                        <th>Stop Loss</th>
+                        <th>Prix Achat</th>
+
+                        <th>Date Achat</th>
+
+                    </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0" id="holdCoins">
+                    {% for digitalCoin in digital_coins %}
+                        <tr>
+                            <td>
+                                {% set imageName = digitalCoin.getCode() ~ '.png' %} {# Assuming image names follow this pattern: code.png #}
+                                {% if asset(imageName) %}
+                                    <img src="{{ asset(imageName) }}" alt="{{ digitalCoin.getCode() }}" height="25" width="30">
+                                {% else %}
+                                    <span>No Image</span>
+                                {% endif %}
+                                {{ digitalCoin.getCode() }}
+                            </td>
+
+                            <td id="montant-{{ digitalCoin.getId() }}">
+                                <div class="text-muted lh-1">
+                                    <span class="text-primary fw-medium">{{ digitalCoin.getMontant() }}</span>
+                                </div>
+                            </td>
+
+                            <td id="stopLoss-{{ digitalCoin.getId() }}">{{ digitalCoin.getStopLoss() }}</td>
+                            <td>{{ digitalCoin.getPrixAchat() }}</td>
+
+                            <td>{{ digitalCoin.dateAchat|date('Y-m-d') }}</td>
+
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No records found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
+        <div class="card custom-width" style="margin-left: 20px; margin-top: 15px; width: 1000px;">
+            <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
+                <table class="table text-nowrap">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Montant</th>
+                        <th>ROI</th>
+                        <th>Prix Achat</th>
+                        <th>Date Vente</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0" id="soldCoins">
+                    {% for digitalCoin in digital_coins_sold %}
+                        <tr>
+                            <td>
+                                {% set imageName = digitalCoin.getCode() ~ '.png' %} {# Assuming image names follow this pattern: code.png #}
+                                {% if asset(imageName) %}
+                                    <img src="{{ asset(imageName) }}" alt="{{ digitalCoin.getCode() }}" height="25" width="30">
+                                {% else %}
+                                    <span>No Image</span>
+                                {% endif %}
+                                {{ digitalCoin.getCode() }}
+                            </td>
+
+                            <td id="montant-{{ digitalCoin.getId() }}">
+                                <div class="text-muted lh-1">
+                                    <span class="text-primary fw-medium">{{ digitalCoin.getMontant() }}</span>
+                                </div>
+                            </td>
+                            <td id="roi-{{ digitalCoin.getId() }}">{% set roiValue = (digitalCoin.getROI() * digitalCoin.getMontant())/100 %}
+                                <span style="color: {% if roiValue < 0 %}red{% else %}green{% endif %}">{{ roiValue }}</span></td>
+                            <td>{{ digitalCoin.getPrixAchat() }}</td>
+                            <td>{{ digitalCoin.dateVente|date('Y-m-d') }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No records found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card" style="width: 18rem; margin-top: 15px; margin-left: 10px; margin-right: 50px;">
+                    <div class="card-body">
+                        <div id="donut-chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <!-- Bar Chart -->
+                <div class="card" style="width: 700px; margin-top: 15px; margin-left:25px; margin-right: 50px;">
+                    <div class="card-body">
+                        <div id="line-chart" style="width: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <!-- Bar Chart -->
+            <div class="card" style="width: 700px; margin-top: 15px; margin-left:25px; margin-right: 50px;">
+                <div class="card-body">
+                    <div id="investissement-chart" style="width: 500px;"></div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Extract data for donut chart
+            const holdCoinsRows = document.querySelectorAll("#holdCoins tr");
+            const dataForDonutChart = [];
+            holdCoinsRows.forEach(row => {
+                const code = row.querySelector("td:first-child").textContent.trim();
+                const montant = parseFloat(row.querySelector("td:nth-child(2) .text-primary").textContent);
+                dataForDonutChart.push({ code: code, montant: montant });
+            });
+
+            // Extract data for line chart (Montant from soldCoins and ROI by Month)
+            const soldCoinsRows = document.querySelectorAll("#soldCoins tr");
+            const dataForLineChartMontant = {};
+            const dataForLineChartROI = {};
+            soldCoinsRows.forEach(row => {
+                const month = new Date(row.querySelector("td:nth-child(5)").textContent.trim()).getMonth() + 1; // Get the month from the date
+                const montant = parseFloat(row.querySelector("td:nth-child(2) .text-primary").textContent);
+                const roi = parseFloat(row.querySelector("td:nth-child(3) span").textContent); // Extract ROI
+                if (!dataForLineChartMontant[month]) {
+                    dataForLineChartMontant[month] = 0;
+                    dataForLineChartROI[month] = 0;
+                }
+                dataForLineChartMontant[month] += montant;
+                dataForLineChartROI[month] += roi;
+            });
+
+            // Extract data for investissement growth per month chart (Montant from both holdCoins and soldCoins)
+            const dataForInvestissementChart = {};
+            holdCoinsRows.forEach(row => {
+                const month = new Date(row.querySelector("td:nth-child(5)").textContent.trim()).getMonth() + 1; // Get the month from the date
+                const montant = parseFloat(row.querySelector("td:nth-child(2) .text-primary").textContent);
+                if (!dataForInvestissementChart[month]) {
+                    dataForInvestissementChart[month] = 0;
+                }
+                dataForInvestissementChart[month] += montant;
+            });
+            soldCoinsRows.forEach(row => {
+                const month = new Date(row.querySelector("td:nth-child(5)").textContent.trim()).getMonth() + 1; // Get the month from the date
+                const montant = parseFloat(row.querySelector("td:nth-child(2) .text-primary").textContent);
+                if (!dataForInvestissementChart[month]) {
+                    dataForInvestissementChart[month] = 0;
+                }
+                dataForInvestissementChart[month] += montant;
+            });
+
+            // Prepare data for the investissement growth per month chart
+            const seriesDataInvestissement = Array.from({ length: 12 }, (_, i) => dataForInvestissementChart[i + 1] || 0); // Replace missing data with 0
+
+            // Prepare data for the line chart
+            const seriesDataMontant = Array.from({ length: 12 }, (_, i) => dataForLineChartMontant[i + 1] || 0); // Replace missing data with 0
+            const seriesDataROI = Array.from({ length: 12 }, (_, i) => dataForLineChartROI[i + 1] || 0); // Replace missing data with 0
+
+            // Render the donut chart
+            renderDonutChart(dataForDonutChart);
+
+            // Render the line chart
+            renderLineChart(seriesDataMontant, seriesDataROI);
+
+            // Render the investissement growth per month chart
+            renderInvestissementChart(seriesDataInvestissement);
+        });
+
+        function renderDonutChart(data) {
+            // Construct options for the donut chart
+            const options = {
+                series: data.map(item => item.montant),
+                labels: data.map(item => item.code),
+                chart: {
+                    width: 380,
+                    type: 'donut',
+                },
+                plotOptions: {
+                    pie: {
+                        startAngle: -90,
+                        endAngle: 270
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                fill: {
+                    type: 'gradient',
+                },
+                legend: {
+                    formatter: function(val, opts) {
+                        return val + " - " + opts.w.globals.series[opts.seriesIndex];
+                    }
+                },
+                title: {
+                    text: 'Portfolio Distribution'
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            // Get the div element for the donut chart
+            const chartDiv = document.getElementById('donut-chart');
+
+            // Create and render the donut chart
+            const chart = new ApexCharts(chartDiv, options);
+            chart.render();
+        }
+
+        function renderLineChart(seriesDataMontant, seriesDataROI) {
+            // Construct options for the line chart
+            const options = {
+                series: [
+                    {
+                        name: "Montant",
+                        data: seriesDataMontant
+                    },
+                    {
+                        name: "ROI",
+                        data: seriesDataROI
+                    }
+                ],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'straight'
+                },
+                title: {
+                    text: 'Montant and ROI by Month',
+                    align: 'left'
+                },
+                grid: {
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                        opacity: 0.5
+                    },
+                },
+                xaxis: {
+                    categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'], // Month numbers
+                }
+            };
+
+            // Get the div element for the line chart
+            const chartDiv = document.getElementById('line-chart');
+
+            // Create and render the line chart
+            const chart = new ApexCharts(chartDiv, options);
+            chart.render();
+        }
+
+        function renderInvestissementChart(seriesDataInvestissement) {
+            // Construct options for the investissement growth per month chart
+            const options = {
+                series: [
+                    {
+                        name: "Investissement",
+                        data: seriesDataInvestissement
+                    }
+                ],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'straight'
+                },
+                title: {
+                    text: 'Investissement Growth per Month',
+                    align: 'left'
+                },
+                grid: {
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                        opacity: 0.5
+                    },
+                },
+                xaxis: {
+                    categories: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'], // Month numbers
+                }
+            };
+
+            // Get the div element for the investissement growth per month chart
+            const chartDiv = document.getElementById('investissement-chart');
+
+            // Create and render the investissement growth per month chart
+            const chart = new ApexCharts(chartDiv, options);
+            chart.render();
+        }
+    </script>
+
+{% endblock %}

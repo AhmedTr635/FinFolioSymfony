@@ -1,0 +1,188 @@
+{% extends 'base-front.html.twig' %}
+
+{% block body %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Create new RealEstate</title>
+        <style>
+            /* Add your custom CSS styles here */
+            .error-message {
+                color: red;
+            }
+            .valid-input {
+                border-color: green;
+            }
+            .invalid-input {
+                border-color: red;
+            }
+        </style>
+    </head>
+    <body>
+    <h1>Create new RealEstate</h1>
+
+    <form id="realEstateForm" method="post" action="{{ path('app_real_estate_new') }}">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" class="form-control">
+            <span id="name-error" class="error-message"></span>
+        </div>
+        <div class="form-group">
+            <label for="emplacement">Emplacement</label>
+            <input type="text" id="emplacement" name="emplacement" class="form-control">
+            <span id="emplacement-error" class="error-message"></span>
+        </div>
+        <div class="form-group">
+            <label for="ROI">ROI</label>
+            <input type="text" id="ROI" name="ROI" class="form-control">
+            <span id="ROI-error" class="error-message"></span>
+        </div>
+        <div class="form-group">
+            <label for="valeur">Valeur</label>
+            <input type="text" id="valeur" name="valeur" class="form-control">
+            <span id="valeur-error" class="error-message"></span>
+        </div>
+        <div class="form-group">
+            <label for="nbrchambres">Number of Bedrooms</label>
+            <input type="text" id="nbrchambres" name="nbrchambres" class="form-control">
+            <span id="nbrchambres-error" class="error-message"></span>
+        </div>
+        <div class="form-group">
+            <label for="superficie">Superficie</label>
+            <input type="text" id="superficie" name="superficie" class="form-control">
+            <span id="superficie-error" class="error-message"></span>
+        </div>
+        <div class="form-group">
+            <label for="nbrclick">Number of Clicks</label>
+            <input type="text" id="nbrclick" name="nbrclick" class="form-control">
+            <span id="nbrclick-error" class="error-message"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+
+    <!-- Add your custom JavaScript for real-time validation here -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('realEstateForm');
+            const nameInput = document.getElementById('name');
+            const emplacementInput = document.getElementById('emplacement');
+            const ROIInput = document.getElementById('ROI');
+            const valeurInput = document.getElementById('valeur');
+            const nbrchambresInput = document.getElementById('nbrchambres');
+            const superficieInput = document.getElementById('superficie');
+            const nbrclickInput = document.getElementById('nbrclick');
+
+            nameInput.addEventListener('input', function() {
+                validateName();
+            });
+
+            function validateName() {
+                const name = nameInput.value.trim();
+                if (!/^[a-zA-Z]*$/.test(name)) {
+                    showError(nameInput, 'Name must contain only alphabetic characters');
+                } else {
+                    hideError(nameInput);
+                }
+            }
+
+            function showError(input, message) {
+                const errorElement = input.nextElementSibling;
+                errorElement.textContent = message;
+                input.classList.remove('valid-input');
+                input.classList.add('invalid-input');
+            }
+
+            function hideError(input) {
+                const errorElement = input.nextElementSibling;
+                errorElement.textContent = '';
+                input.classList.remove('invalid-input');
+                input.classList.add('valid-input');
+            }
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent form submission for now
+
+                // Validate inputs
+                const isValid = validateForm();
+                if (isValid) {
+                    // If form is valid, you can submit the form
+                    form.submit();
+                }
+            });
+
+            function validateForm() {
+                let isValid = true;
+
+                // Validate Name
+                if (!nameInput.value.trim()) {
+                    showError(nameInput, 'Name is required');
+                    isValid = false;
+                } else {
+                    showSuccess(nameInput);
+                }
+
+                // Validate Emplacement (Alphabetic characters only)
+                if (!/^[a-zA-Z]*$/.test(emplacementInput.value.trim())) {
+                    showError(emplacementInput, 'Emplacement must contain only alphabetic characters');
+                    isValid = false;
+                } else {
+                    showSuccess(emplacementInput);
+                }
+
+                // Validate ROI (Numeric value)
+                if (!/^\d+(\.\d+)?$/.test(ROIInput.value.trim())) {
+                    showError(ROIInput, 'ROI must be a numeric value');
+                    isValid = false;
+                } else {
+                    showSuccess(ROIInput);
+                }
+
+                // Validate Valeur (Numeric value)
+                if (!/^\d+(\.\d+)?$/.test(valeurInput.value.trim())) {
+                    showError(valeurInput, 'Valeur must be a numeric value');
+                    isValid = false;
+                } else {
+                    showSuccess(valeurInput);
+                }
+
+                // Validate Number of Bedrooms (Numeric value)
+                if (!/^\d+$/.test(nbrchambresInput.value.trim())) {
+                    showError(nbrchambresInput, 'Number of Bedrooms must be a numeric value');
+                    isValid = false;
+                } else {
+                    showSuccess(nbrchambresInput);
+                }
+
+                // Validate Superficie (Numeric value)
+                if (!/^\d+(\.\d+)?$/.test(superficieInput.value.trim())) {
+                    showError(superficieInput, 'Superficie must be a numeric value');
+                    isValid = false;
+                } else {
+                    showSuccess(superficieInput);
+                }
+
+                // Validate Number of Clicks (Numeric value)
+                if (!/^\d+$/.test(nbrclickInput.value.trim())) {
+                    showError(nbrclickInput, 'Number of Clicks must be a numeric value');
+                    isValid = false;
+                } else {
+                    showSuccess(nbrclickInput);
+                }
+
+                return isValid;
+            }
+
+            function showSuccess(input) {
+                const errorElement = input.nextElementSibling;
+                errorElement.textContent = '';
+                input.classList.remove('invalid-input');
+                input.classList.add('valid-input');
+            }
+        });
+    </script>
+    </body>
+    </html>
+{% endblock %}

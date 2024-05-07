@@ -66,6 +66,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->commandes = new ArrayCollection();
+        $this->dons = new ArrayCollection();
+        $this->evennements = new ArrayCollection();
     }
 
     public function getCommandes(): Collection
@@ -394,4 +396,68 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: Don::class)]
+    private Collection $dons;
+
+    #[ORM\ManyToMany(targetEntity: Evennement::class, mappedBy: 'user')]
+    private Collection $evennements;
+
+    /**
+     * @return Collection<int, Don>
+     */
+    public function getDons(): Collection
+    {
+        return $this->dons;
+    }
+
+    public function addDon(Don $don): static
+    {
+        if (!$this->dons->contains($don)) {
+            $this->dons->add($don);
+            $don->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDon(Don $don): static
+    {
+        if ($this->dons->removeElement($don)) {
+            // set the owning side to null (unless already changed)
+            if ($don->getUserId() === $this) {
+                $don->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Evennement>
+     */
+    public function getEvennements(): Collection
+    {
+        return $this->evennements;
+    }
+
+    public function addEvennement(Evennement $evennement): static
+    {
+        if (!$this->evennements->contains($evennement)) {
+            $this->evennements->add($evennement);
+            $evennement->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvennement(Evennement $evennement): static
+    {
+        if ($this->evennements->removeElement($evennement)) {
+            $evennement->removeUser($this);
+        }
+
+        return $this;
+    }
+
+
 }

@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Don;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -12,10 +13,9 @@ class DonType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('montant_user')
-            ->add('user_id')
-            ->add('evenement_id')
-        ;
+            ->add('montant_user', NumberType::class, [
+            'label' => 'Montant',
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

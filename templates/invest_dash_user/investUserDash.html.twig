@@ -1,0 +1,519 @@
+{% extends 'base-front.html.twig' %}
+
+{% block title %}Investissement index{% endblock %}
+
+{% block body %}
+    <style>
+        .custom-width {
+            width: 500px;
+        }
+        .custom-card {
+            height: 449px;
+            width: 600px;
+            margin-left: 15px;
+        }
+        .custom-table {
+            width: 500px;
+            height: 449px;
+             /* Add margin to create space between the table and the card */
+        }
+        .mhmd-width {
+            margin-left: 120px;
+        }
+    </style>
+
+
+    <div class="row">
+
+        <div class="col-12 col-lg-6 col-xxl-5 order-lg-0 order-1 mb-4">
+            <div class="card h-100 custom-card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title m-0 me-2">Statistics des Investissements en Immobilier</h5>
+                    <div class="dropdown">
+                        <button class="btn p-0" type="button" id="sessionOverview" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="bx bx-dots-vertical-rounded"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sessionOverview">
+                            <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>
+                            <a class="dropdown-item" href="javascript:void(0);">Last Month</a>
+                            <a class="dropdown-item" href="javascript:void(0);">Last Year</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body row gap-md-0 gap-4">
+                    <div class="col-md-5">
+                        <h1 class="mb-0 text-nowrap">{{ totalInvestment }}</h1>
+                        <small class="text-success">
+                            +0.7645%
+                        </small>
+                        <div id="averageROIChart" class="ms-n3"></div>
+
+
+                        <div id="sessionOverviewChart" class="ms-n3"></div>
+                    </div>
+                    <div class="col-md-7 d-flex flex-column justify-content-between">
+                        <div class="d-flex justify-content-between">
+                            <div class="d-flex flex-column">
+                                <small class="text-muted">Revenue Annuel</small>
+                                <span class="fw-medium">{{ totalROIMontant |number_format(2,',')}}</span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <small class="text-muted">Total Tax</small>
+                                <span class="fw-medium">{{ totalTax }}</span>
+                            </div>
+                            <div class="d-flex flex-column">
+                                <small class="text-muted"></small>
+                                <span class="fw-medium"></span>
+                            </div>
+                        </div>
+                        <div class="progress-wrapper mb-4">
+                            <div class="mb-3">
+                                <small class="text-muted">ROI réel</small>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress w-100 me-2" style="height:20px">
+                                        <div class="progress-bar bg-primary" style="width: {{ percentageROITotal }}%" role="progressbar" aria-valuenow="{{ percentageROITotal }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small class="text-muted">{{ percentageROITotal |number_format(2,',')}}%</small>
+                                </div>
+                            </div>
+
+                            {# <div>
+                                <small class="text-muted">Invalid Session</small>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress w-100 me-2" style=" height:8px">
+                                        <div class="progress-bar bg-primary" style="width: 40%" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small class="text-muted">40%</small>
+                                </div>
+                            </div> #}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
+            <div class="card custom-width mhmd-width">
+                <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
+                    <table class="table text-nowrap">
+                        <thead>
+                        <tr>
+                            <th>Immobilier</th>
+                            <th>Montant</th>
+                            <th>Statut de Paiment</th>
+                            <th>ROI</th>
+                            <th>TAX</th>
+                            <th>Growth</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0" id="investUser">
+                        {% for investissement in investissements %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% set realEstate = realEstateRepository.findRealEstateById(investissement.reId) %}
+                                        {% if realEstate %}
+
+                                            {% if realEstate.imageData %}
+                                                <img src="{{ asset(realEstate.getImageData()) }}" alt="{{ realEstate.getName() }}" height="32" width="32" class="me-2">
+                                            {% else %}
+                                                <img src=src="{{ asset('uploads/images/noimage.jpg') }}" alt="{{ realEstate.getName() }}" height="32" width="32" class="me-2">
+                                            {% endif %}
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-medium lh-1">{{ realEstate.getName() }}</span>
+                                                <small class="text-muted">{{ realEstate.getEmplacement() }}</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="text-muted lh-1"><span class="text-primary fw-medium">{{ investissement.montant }}</span></div>
+                                    <small class="text-muted">{{ ((investissement.montant *100) / investissement.prixAchat) | number_format(2,',') }} %</small>
+                                </td>
+                                <td><span class="badge bg-label-success">Completed</span></td>
+                                <td><span class="text-primary fw-medium">{{ (investissement.montant * investissement.rOI)/100 }}</span></td>
+                                <td><span class="text-primary fw-medium">{{ investissement.tax }}</span></td>
+                                <td>
+                                    {% set realEstate = realEstateRepository.findRealEstateById(investissement.reId) %}
+                                    {{ realEstate.growth }}
+                                </td>
+                                <td>
+
+                                    <button class="btn btn-success confirm-buy-more open-update-modal" onclick="window.location='{{ path('app_investissement_edit', {'id': investissement.id}) }}'">Buy More</button>
+
+                                </td>
+                            </tr>
+
+
+                        {% else %}
+                            <tr>
+                                <td colspan="5">no records found</td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="chartAll"></div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card" style="width: 18rem; margin-top: 15px; margin-left: 10px; margin-right: 50px;">
+                <div class="card-body">
+                    <div id="comparaison"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <!-- Bar Chart -->
+            <div class="card" style="width: 700px; margin-top: 15px; margin-left:-250px; margin-right: 50px;">
+                <div class="card-body">
+                    <div id="expectedGrowth" style="width: 500px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# #}
+
+    <script src="../../assets/js/extended-ui-sweetalert2.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+
+        {# document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to all delete buttons
+            var deleteButtons = document.querySelectorAll('.confirm-delete');
+            deleteButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var form = this.closest('.delete-form');
+                    if (form) {
+                        // Show the confirmation dialog
+                        Swal.fire({title:"êtes vous sûr?",text:"Vous ne pourrez plus recupérer ces données!",icon:"warning",showCancelButton:!0,confirmButtonText:"Oui,je suis sûr",customClass:{confirmButton:"btn btn-danger me-3",cancelButton:"btn btn-label-secondary"},buttonsStyling:!1}).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();// If confirmed, submit the corresponding form
+                            }
+                        });
+                    }
+                });
+            });
+        }); #}
+        document.addEventListener("DOMContentLoaded", function() {
+            // Function to calculate expected growth
+            function calculateExpectedGrowth(roi, growth) {
+                return roi + (roi * growth) / 100;
+            }
+
+            // Initialize arrays to hold ROI and expected growth data
+            var roiData = [];
+            var expectedGrowthData = [];
+            var secondExpectedGrowthData = [];
+            var realEstateNames = [];
+
+            // Loop through investissements table rows
+            var table = document.getElementById("investUser");
+            var rows = table.getElementsByTagName("tr");
+            for (var i = 0; i < rows.length; i++) {
+                var cols = rows[i].getElementsByTagName("td");
+                if (cols.length > 3) { // Assuming ROI is in the 4th column and Growth is in the 6th column
+                    var realEstateName = cols[0].textContent.trim(); // Assuming real estate name is in the 1st column
+                    var roi = parseFloat(cols[3].textContent.trim());
+                    var growth = parseFloat(cols[5].textContent.trim());
+                    var expectedGrowth = calculateExpectedGrowth(roi, growth);
+                    var secondExpectedGrowth = calculateExpectedGrowth(expectedGrowth, growth);
+
+                    roiData.push(roi);
+                    expectedGrowthData.push(expectedGrowth);
+                    secondExpectedGrowthData.push(secondExpectedGrowth);
+                    realEstateNames.push(realEstateName);
+                }
+            }
+
+            // Chart options
+            var options = {
+                series: [{
+                    name: '2024',
+                    data: roiData
+                }, {
+                    name: '2025',
+                    data: expectedGrowthData
+                }, {
+                    name: '2026',
+                    data: secondExpectedGrowthData
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        endingShape: 'rounded'
+                    },
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                xaxis: {
+                    categories: realEstateNames // Use real estate names as categories
+                },
+                yaxis: {
+                    title: {
+                        text: 'ROI and Expected Growth'
+                    },
+                    labels: {
+                        formatter: function(val) {
+                            return val.toFixed(2);
+                        }
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return val.toFixed(2)  ;
+                        }
+                    }
+                }
+            };
+
+            // Render the chart
+            var chart = new ApexCharts(document.querySelector("#expectedGrowth"), options);
+            chart.render();
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            // Function to calculate the sum of values in a column
+            function calculateColumnTotal(columnIndex) {
+                var table = document.getElementById("investUser");
+                var rows = table.getElementsByTagName("tr");
+                var total = 0;
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    var cols = row.getElementsByTagName("td");
+                    if (cols.length > columnIndex) {
+                        total += parseFloat(cols[columnIndex].textContent.trim());
+                    }
+                }
+                return total;
+            }
+
+            // Calculate total tax, total montant, and total ROI
+            var taxTotal = calculateColumnTotal(4); // Assuming tax is in the 5th column
+            var montantTotal = calculateColumnTotal(1); // Assuming montant is in the 2nd column
+            var roiTotal = calculateColumnTotal(3); // Assuming ROI is in the 4th column
+
+            // Chart options
+            var options = {
+                series: [{
+                    name: 'Total Tax',
+                    data: [taxTotal]
+                }, {
+                    name: 'Total Montant',
+                    data: [montantTotal]
+                }, {
+                    name: 'Total ROI',
+                    data: [roiTotal]
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        endingShape: 'rounded'
+                    },
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                xaxis: {
+                    categories: ['Total']
+                },
+                yaxis: {
+                    title: {
+                        text: 'Amount'
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return val + "K"
+                        }
+                    }
+                }
+            };
+
+            // Render the chart
+            var chart = new ApexCharts(document.querySelector("#comparaison"), options);
+            chart.render();
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            var data = [];
+            var roiData = [];
+            var taxData = [];
+            var labels = [];
+            var investRows = document.querySelectorAll('#investUser tr');
+            investRows.forEach(function(row) {
+                var cols = row.querySelectorAll('td');
+                labels.push(cols[0].textContent.trim());
+                data.push(parseFloat(cols[1].textContent.trim()));
+                roiData.push(parseFloat(cols[3].textContent.trim()));
+                taxData.push(parseFloat(cols[4].textContent.trim()));
+            });
+
+            var options = {
+                series: [{
+                    name: 'Montant',
+                    data: data
+                }, {
+                    name: 'ROI',
+                    data: roiData
+                }, {
+                    name: 'Tax',
+                    data: taxData
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    stacked: true,
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        dataLabels: {
+                            position: 'top',
+                        },
+                         // Enable stacking
+                    },
+                },
+                dataLabels: {
+                    enabled: true,
+                    offsetY: -20,
+                    style: {
+                        fontSize: '12px',
+                        colors: ["#304758"]
+                    }
+                },
+                xaxis: {
+                    categories: labels,
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'left',
+                    offsetX: 40
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#chartAll"), options);
+            chart.render();
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            var options = {
+                series: [42], // Pass the average ROI percentage here
+                chart: {
+                    height: 300,
+                    type: 'radialBar',
+                },
+                plotOptions: {
+                    radialBar: {
+                        offsetY: 0,
+                        startAngle: 0,
+                        endAngle: 360,
+                        hollow: {
+                            margin: 5,
+                            size: '70%',
+                            background: 'transparent',
+                            image: undefined,
+                            imageOffsetX: 0,
+                            imageOffsetY: 0,
+                            position: 'front',
+                            dropShadow: {
+                                enabled: true,
+                                top: 3,
+                                left: 0,
+                                blur: 4,
+                                opacity: 0.24
+                            }
+                        },
+                        dataLabels: {
+                            name: {
+                                show: false,
+                            },
+                            value: {
+                                show: false,
+                            }
+                        }
+                    }
+                },
+                colors: ['#1ab7ea'],
+                labels: ['ROI'],
+                legend: {
+                    show: true,
+                    floating: true,
+                    fontSize: '16px',
+                    position: 'bottom', // Adjusted legend position
+                    offsetX: 10,
+                    offsetY: 10,
+                    labels: {
+                        useSeriesColors: true,
+                    },
+                    markers: {
+                        size: 0
+                    },
+                    formatter: function (seriesName, opts) {
+                        return seriesName + ": 42%"; // Format the legend here
+                    },
+                    itemMargin: {
+                        horizontal: 1
+                    }
+                },
+                responsive: [{
+                    breakpoint: undefined,
+                    options: {},
+                }],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'dark',
+                        type: 'horizontal',
+                        shadeIntensity: 0.5,
+                        gradientToColors: ['#ABE5A1'],
+                        inverseColors: true,
+                        opacityFrom: 1,
+                        opacityTo: 1,
+                        stops: [0, 100]
+                    },
+                },
+            };
+
+            var chart = new ApexCharts(document.querySelector("#averageROIChart"), options);
+            chart.render();
+        });
+
+    </script>
+
+
+{% endblock %}

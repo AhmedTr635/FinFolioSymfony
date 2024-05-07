@@ -50,10 +50,6 @@ class Evennement
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "L adresse est obligatoire")]
-    #[Assert\Length(
-        min: 10,
-        minMessage: "L adresse doit contenir au moins 10 charateres"
-    )]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 5000, nullable: true)]
@@ -64,8 +60,7 @@ class Evennement
     )]
     private ?string $description = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $rating = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imageData = null;
 
@@ -82,16 +77,50 @@ class Evennement
         $this->imageData = $imageData;
     }
 
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 8, nullable: true)]
+    private ?float $latitude = null;
+
+    #[ORM\Column(type: 'decimal', precision: 11, scale: 8, nullable: true)]
+    private ?float $longitude = null;
+
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): static
+    {
+        $this->latitude = $latitude;
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): static
+    {
+        $this->longitude = $longitude;
+        return $this;
+    }
+
     #[ORM\OneToMany(mappedBy: 'evenement_id', targetEntity: Don::class)]
     private Collection $dons;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'evennements')]
     private Collection $user;
 
+
+
+
+
     public function __construct()
     {
         $this->dons = new ArrayCollection();
         $this->user = new ArrayCollection();
+
 
     }
 
@@ -160,17 +189,6 @@ class Evennement
         return $this;
     }
 
-    public function getRating(): ?int
-    {
-        return $this->rating;
-    }
-
-    public function setRating(?int $rating): static
-    {
-        $this->rating = $rating;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Don>
@@ -210,6 +228,11 @@ class Evennement
         return $this->user;
     }
 
+    public function setUser(Collection $user): void
+    {
+        $this->user = $user;
+    }
+
     public function addUser(User $user): static
     {
         if (!$this->user->contains($user)) {
@@ -225,4 +248,11 @@ class Evennement
 
         return $this;
     }
+
+
+    public function __toString(): string
+    {
+        return $this->getNomEvent(); // Assuming getName() is a method that returns a string representation of the event.
+    }
+
 }

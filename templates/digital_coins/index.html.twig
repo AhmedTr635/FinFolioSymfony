@@ -1,0 +1,710 @@
+{% extends 'base-front.html.twig' %}
+
+{% block title %}DigitalCoins index{% endblock %}
+
+{% block body %}
+
+
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        #chart {
+            width: 810px;
+            height: 522px;
+        }
+        .custoom-card {
+            width: 290px;
+            margin-left: 290px;
+
+        }
+        .stCard{
+            width: 850px;
+            height: 550px;
+            margin-left: 50px;
+
+        }
+        .choice{
+            width: 150px;
+
+        }
+        .faza{
+            width: 100px;
+        }
+    </style>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card stCard">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="coin-select" class="form-label">Choose Coin:</label>
+                            <select class="form-select choice" id="coin-select">
+                                <option value="BTC">BTC - Bitcoin</option>
+                                <option value="ETH">ETH - Ethereum</option>
+                                <option value="BNB">BNB - BNB</option>
+                                <option value="SOL">SOL - Solana</option>
+                                <option value="XRP">XRP - Ripple</option>
+                                <option value="DOGE">DOGE - Dogecoin</option>
+                                <option value="ADA">ADA - Cardano</option>
+                                <option value="SHIB">SHIB - SHIBA INU</option>
+                                <option value="AVAX">AVAX - Avalanche</option>
+                                <option value="TRX">TRX - TRON</option>
+                                <option value="DOT">DOT - Polkadot</option>
+                                <option value="WBTC">WBTC - Wrapped Bitcoin</option>
+                                <option value="BCH">BCH - Bitcoin Cash</option>
+                                <option value="LINK">LINK - ChainLink</option>
+                                <option value="MATIC">MATIC - Polygon</option>
+                                <option value="LTC">LTC - Litecoin</option>
+                                <option value="NEAR">NEAR - NEAR Protocol</option>
+                                <option value="ICP">ICP - Internet Computer</option>
+                                <option value="DAI">DAI - Dai</option>
+                                <option value="UNI">UNI - Uniswap</option>
+                                <option value="APT">APT - Aptos</option>
+                                <option value="FDUSD">FDUSD - First Digital USD</option>
+                                <option value="ETC">ETC - Ethereum Classic</option>
+                                <option value="STX">STX - Stacks</option>
+                                <option value="FIL">FIL - Filecoin</option>
+                                <option value="ATOM">ATOM - Cosmos</option>
+                                <option value="XLM">XLM - Stellar Lumens</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+                             <label for="interval-select" class="form-label">Choose Interval:</label>
+                            <select class="form-select choice" id="interval-select">
+                                <option value="1m">1m</option>
+                                <option value="3m">3m</option>
+                                <option value="15m">15m</option>
+                            </select>
+
+
+                                                  </div>
+
+
+                    </div>
+
+                    <div id="chart"></div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card custoom-card">
+                <div class="card-body ">
+                    <form id="buy-form" method="post">
+                        <div class="mb-3">
+                            <label for="montant" class="form-label">Montant</label>
+                            <input type="text" class="form-control" id="montant" name="montant" placeholder="Enter montant">
+                        </div>
+                        <div class="mb-3">
+                            <label for="stopLoss" class="form-label">Stoploss</label>
+                            <input type="text" class="form-control" id="stopLoss" name="stopLoss" placeholder="Enter stoploss">
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="submit" class="btn btn-success faza">Buy</button>
+                            <button class="btn btn-primary" id="premium-chart-btn">Pro Chart</button>
+                        </div>
+
+
+
+                        <br>
+                        <div id="lastOpenPrice" style="display: none;"></div>
+                        <div id="lastOpenPriceContainer"></div>
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="premium-chart-modal" tabindex="-1" aria-labelledby="premium-chart-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="premium-chart-modal-label">Premium Chart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="width: 800px;height: 500px;">
+                    <!-- TradingView Widget BEGIN -->
+                    <div class="tradingview-widget-container" style="height:500px;">
+                        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+                        <div class="tradingview-widget-copyright">
+                            <a href="https://fr.tradingview.com/" rel="noopener nofollow" target="_blank">
+                                <span class="blue-text">Suivre tous les marchés sur TradingView</span>
+                            </a>
+                        </div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                            {
+                                "autosize": true,
+                                "symbol": "BINANCE:BTCUSDT",
+                                "interval": "D",
+                                "timezone": "Etc/UTC",
+                                "theme": "dark",
+                                "style": "1",
+                                "locale": "fr",
+                                "enable_publishing": false,
+                                "allow_symbol_change": true,
+                                "calendar": false,
+                                "support_host": "https://www.tradingview.com"
+                            }
+                        </script>
+                    </div>
+                    <!-- TradingView Widget END -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
+
+
+        <div class="card custom-width" style="margin-left: 20px; margin-top: 50px; width: 1000px;">
+            <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
+                <table class="table text-nowrap">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Montant</th>
+                        <th>ROI</th>
+                        <th>Stop Loss</th>
+                        <th>Prix Achat</th>
+                        <th>Recent Value</th>
+                        <th>Date Achat</th>
+                        <th>Rapid Action</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0" id="holdCoins">
+                    {% for digitalCoin in digital_coins %}
+                        <tr>
+                            <td>
+                                {% set imageName = digitalCoin.getCode() ~ '.png' %} {# Assuming image names follow this pattern: code.png #}
+                                {% if asset(imageName) %}
+                                    <img src="{{ asset(imageName) }}" alt="{{ digitalCoin.getCode() }}" height="25" width="30">
+                                {% else %}
+                                    <span>No Image</span>
+                                {% endif %}
+                                {{ digitalCoin.getCode() }}
+                            </td>
+
+                            <td id="montant-{{ digitalCoin.getId() }}">
+                                <div class="text-muted lh-1">
+                                    <span class="text-primary fw-medium">{{ digitalCoin.getMontant() }}</span>
+                                </div>
+                            </td>
+                            <td id="roi-{{ digitalCoin.getId() }}">Loading...</td>
+                            <td id="stopLoss-{{ digitalCoin.getId() }}">{{ digitalCoin.getStopLoss() }}</td>
+                            <td>{{ digitalCoin.getPrixAchat() }}</td>
+                            <td id="recent-value-{{ digitalCoin.getId() }}">Loading...</td>
+                            <td>{{ digitalCoin.dateAchat|date('Y-m-d H:i:s') }}</td>
+                            <td><button class="btn btn-danger sell-button" data-id="{{ digitalCoin.getId() }}">SELL</button></td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No records found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6 col-xxl-7 order-lg-1 order-0 mb-4">
+        <div class="card custom-width" style="margin-left: 20px; margin-top: 15px; width: 1000px;">
+            <div class="table-responsive text-nowrap custom-table" style="overflow-x: auto;">
+                <table class="table text-nowrap">
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Montant</th>
+                        <th>ROI</th>
+                        <th>Prix Achat</th>
+                        <th>Date Vente</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0" id="soldCoins">
+                    {% for digitalCoin in digital_coins_sold %}
+                        <tr>
+                            <td>
+                                {% set imageName = digitalCoin.getCode() ~ '.png' %} {# Assuming image names follow this pattern: code.png #}
+                                {% if asset(imageName) %}
+                                    <img src="{{ asset(imageName) }}" alt="{{ digitalCoin.getCode() }}" height="25" width="30">
+                                {% else %}
+                                    <span>No Image</span>
+                                {% endif %}
+                                {{ digitalCoin.getCode() }}
+                            </td>
+
+                            <td id="montant-{{ digitalCoin.getId() }}">
+                                <div class="text-muted lh-1">
+                                    <span class="text-primary fw-medium">{{ digitalCoin.getMontant() }}</span>
+                                </div>
+                            </td>
+                            <td id="roi-{{ digitalCoin.getId() }}">{% set roiValue = (digitalCoin.getROI() * digitalCoin.getMontant())/100 %}
+                                <span style="color: {% if roiValue < 0 %}red{% else %}green{% endif %}">{{ roiValue }}</span></td>
+                            <td>{{ digitalCoin.getPrixAchat() }}</td>
+                            <td>{{ digitalCoin.dateVente|date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6">No records found</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card" style="width: 18rem; margin-top: 15px; margin-left: auto; margin-right: 50px;">
+                <div class="card-body">
+                    <div id="donut-chart"></div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+
+{# Static #}
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   <script>
+       document.addEventListener("DOMContentLoaded", function() {
+           // Extract data from table and construct data for donut chart
+           const holdCoinsRows = document.querySelectorAll("#holdCoins tr");
+           const dataForDonutChart = [];
+           holdCoinsRows.forEach(row => {
+               const code = row.querySelector("td:first-child").textContent.trim();
+               const montant = parseFloat(row.querySelector("td:nth-child(2) .text-primary").textContent);
+               dataForDonutChart.push({ code: code, montant: montant });
+           });
+
+           // Render the donut chart
+           renderDonutChart(dataForDonutChart);
+       });
+
+       function renderDonutChart(data) {
+           // Construct options for the donut chart
+           const options = {
+               series: data.map(item => item.montant),
+               labels: data.map(item => item.code),
+               chart: {
+                   width: 380,
+                   type: 'donut',
+               },
+               plotOptions: {
+                   pie: {
+                       startAngle: -90,
+                       endAngle: 270
+                   }
+               },
+               dataLabels: {
+                   enabled: false
+               },
+               fill: {
+                   type: 'gradient',
+               },
+               legend: {
+                   formatter: function(val, opts) {
+                       return val + " - " + opts.w.globals.series[opts.seriesIndex];
+                   }
+               },
+               title: {
+                   text: 'Portfolio Distribution'
+               },
+               responsive: [{
+                   breakpoint: 480,
+                   options: {
+                       chart: {
+                           width: 200
+                       },
+                       legend: {
+                           position: 'bottom'
+                       }
+                   }
+               }]
+           };
+
+           // Get the div element for the donut chart
+           const chartDiv = document.getElementById('donut-chart');
+
+           // Create and render the donut chart
+           const chart = new ApexCharts(chartDiv, options);
+           chart.render();
+       }
+
+       document.getElementById('premium-chart-btn').addEventListener('click', function() {
+           $('#premium-chart-modal').modal('show');
+       });
+        const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+            width: 800,
+            height: 400,
+            priceScale: {
+                scaleMargins: {
+                    top: 0.3,
+                    bottom: 0.2
+                }
+            },
+            timeScale: {
+                visible: false,
+                timeVisible: true,
+                secondsVisible: false,
+                tickMarkType: 'timestamp'
+            }
+        });
+
+        const candleSeries = chart.addCandlestickSeries();
+        let lastOpenPrice = null;
+
+        function parseCandlestickData(data) {
+            const candlestickData = [];
+            for (let i = 0; i < data.length; i++) {
+                const time = new Date(data[i][0]).getTime();
+                const open = parseFloat(data[i][1]);
+                const high = parseFloat(data[i][2]);
+                const low = parseFloat(data[i][3]);
+                const close = parseFloat(data[i][4]);
+
+                if (!isNaN(open) && !isNaN(high) && !isNaN(low) && !isNaN(close)) {
+                    candlestickData.push({ time, open, high, low, close });
+                } else {
+                    console.warn("Skipping data point due to missing or invalid values:", { time, open, high, low, close });
+                }
+            }
+            return candlestickData;
+        }
+
+        function filterData(data) {
+            for (let i = 1; i < data.length; i++) {
+                if (data[i].open === null || isNaN(data[i].open)) {
+                    data[i].open = data[i - 1].open;
+                }
+                if (data[i].high === null || isNaN(data[i].high)) {
+                    data[i].high = data[i - 1].high;
+                }
+                if (data[i].low === null || isNaN(data[i].low)) {
+                    data[i].low = data[i - 1].low;
+                }
+                if (data[i].close === null || isNaN(data[i].close)) {
+                    data[i].close = data[i - 1].close;
+                }
+            }
+            return data;
+        }
+
+        function displayFilteredData(symbol, interval) {
+            fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}USDT&interval=${interval}`)
+                .then(response => response.json())
+                .then(newData => {
+                    const parsedData = parseCandlestickData(newData);
+                    const filteredData = filterData(parsedData);
+                    candleSeries.setData(filteredData);
+
+                    if (filteredData.length > 0) {
+                        lastOpenPrice = filteredData[filteredData.length - 1].open;
+                        document.getElementById('lastOpenPrice').innerText = `Current Price: ${lastOpenPrice}`;
+
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        // Event listener for coin selection change
+        document.getElementById('coin-select').addEventListener('change', function(event) {
+            const selectedCoin = event.target.value;
+            const selectedInterval = document.getElementById('interval-select').value;
+            displayFilteredData(selectedCoin, selectedInterval);
+            setInterval(function() {
+                displayFilteredData(selectedCoin, selectedInterval);
+            }, 60 * 1000);
+        });
+
+        // Event listener for interval selection change
+        document.getElementById('interval-select').addEventListener('change', function(event) {
+            const selectedInterval = event.target.value;
+            const selectedCoin = document.getElementById('coin-select').value;
+            displayFilteredData(selectedCoin, selectedInterval);
+            setInterval(function() {
+                displayFilteredData(selectedCoin, selectedInterval);
+            }, 60 * 1000);
+        });
+        function updateTables() {
+            // Fetch the updated data for the first table
+            fetch('{{ path('app_digital_coinsapp_digital_coins_table1_data') }}') // Replace with the actual route
+                .then(response => response.json())
+                .then(data => {
+                    // Update the first table with the new data
+                    // This will depend on how your table is structured
+                    // For example, if you're using DataTables, you can use the clear() and rows.add() functions
+                    // For demonstration, let's assume you're using DataTables and your table has ID 'table1'
+                    const table1 = $('#table1').DataTable();
+                    table1.clear().rows.add(data).draw();
+                })
+                .catch(error => console.error('Error:', error));
+
+            // Fetch the updated data for the second table
+            fetch('{{ path('app_digital_coinsapp_digital_coins_table2_data') }}') // Replace with the actual route
+                .then(response => response.json())
+                .then(data => {
+                    // Update the second table with the new data
+                    // This will depend on how your table is structured
+                    // For example, if you're using DataTables, you can use the clear() and rows.add() functions
+                    // For demonstration, let's assume you're using DataTables and your table has ID 'table2'
+                    const table2 = $('#table2').DataTable();
+                    table2.clear().rows.add(data).draw();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+
+
+        document.getElementById('buy-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            // Get the input values
+            const montant = document.getElementById('montant').value;
+            const stopLoss = document.getElementById('stopLoss').value;
+            const leverage = 0;
+            const coinCode = document.getElementById('coin-select').value;
+            const prixAchat = document.getElementById('lastOpenPrice').innerText.split(': ')[1];
+            const userId = 22; // Default user ID
+            const tax = montant * 0.08;
+
+            // Create a new FormData instance
+            const formData = new FormData();
+            formData.append('montant', montant);
+            formData.append('stopLoss', stopLoss);
+            formData.append('leverage', leverage);
+            formData.append('coin-select', coinCode);
+            formData.append('prixAchat', prixAchat);
+            formData.append('userId', userId);
+            formData.append('tax', tax);
+
+            // Send a POST request to the server
+            fetch('{{ path('app_digital_coinsapp_digital_coins_buy') }}', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        // If the server returns an error status, throw an error with the status text
+                        throw new Error(response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle the response data here
+                    console.log(data);
+                    document.getElementById('montant').value = '';
+                    document.getElementById('stopLoss').value = '';
+                    document.getElementById('leverage').value = '';
+
+                    // Show success alert
+                    Swal.fire(
+                        'Success!',
+                        'Your Trade was successful!',
+                        'success'
+                    );
+                    updateTables();
+                })
+                .catch(error => {
+                    // Handle the error here
+                    console.error('Error:', error);
+                });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Fetch recent values for each digital coin
+            {% for digitalCoin in digital_coins %}
+            fetchRecentValue('{{ digitalCoin.getCode() }}', '{{ digitalCoin.getId() }}', '{{ digitalCoin.getPrixAchat() }}');
+            {% endfor %}
+
+            // Set interval to update recent values every minute
+            setInterval(updateRecentValues, 60000);
+        });
+
+        function updateRecentValues() {
+            {% for digitalCoin in digital_coins %}
+            fetchRecentValue('{{ digitalCoin.getCode() }}', '{{ digitalCoin.getId() }}', '{{ digitalCoin.getPrixAchat() }}', '{{ digitalCoin.getMontant() }}');
+            {% endfor %}
+        }
+
+        function fetchRecentValue(symbol, id, prixAchat,montant) {
+            fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`)
+                .then(response => response.json())
+                .then(data => {
+                    const recentValueCell = document.getElementById(`recent-value-${id}`);
+                    const stopLoss = document.getElementById(`stopLoss-${id}`);
+                    const roiCell = document.getElementById(`roi-${id}`);
+                    const montantCell = document.getElementById(`montant-${id}`);
+                    if (recentValueCell && roiCell) {
+                        const recentValue = parseFloat(data.price);
+                        recentValueCell.textContent = recentValue.toFixed(2);
+
+                        // Calculate ROI
+                        const roi = ((recentValue - prixAchat)/prixAchat) * 100;
+                        console.log(roi);
+                        console.log(montantCell);
+                        roiCell.textContent = roi.toFixed(2)+'%';
+                        const sellButton = document.querySelector(`.sell-button[data-id="${id}"]`);
+                        if (sellButton) {
+                            sellButton.setAttribute('data-roi', roi);
+                        }
+                        if (recentValue < stopLoss) {
+                            // Trigger sell action
+                            sell(id, roi);
+                        }
+
+                        // Update the cell color based on ROI
+                        if (roi > 0) {
+                            roiCell.style.color = 'green';
+                        } else {
+                            roiCell.style.color = 'red';
+                        }
+                        if(recentValue < prixAchat){
+                            recentValueCell.style.color = 'red';
+                        }else{
+                            recentValueCell.style.color = 'green';
+                        }
+
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching recent value:', error);
+                    const recentValueCell = document.getElementById(`recent-value-${id}`);
+                    if (recentValueCell) {
+                        recentValueCell.textContent = 'Error';
+                        recentValueCell.style.color = 'red';
+                    }
+                });
+        }
+        function sell(digitalCoinId, recentRoi) {
+            fetch('{{ path('app_digital_coinsapp_digital_coins_sell') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: digitalCoinId, roi: recentRoi }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    Swal.fire(
+                        'Success!',
+                        'Your Sell was successful!',
+                        'success'
+                    );
+                    updateTables();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('An error occurred while selling the digital coin.');
+                });
+        }
+        function getImageName(code) {
+            switch (code) {
+                case 'BTC':
+                    return 'BTC.png';
+                case 'ETH':
+                    return 'ETH.png';
+                case 'XRP':
+                    return 'XRP.png';
+                case 'ADA':
+                    return 'ADA.png';
+                case 'DOGE':
+                    return 'DOGE.png';
+                case 'BNB':
+                    return 'BNB.png';
+                case 'SOL':
+                    return 'SOL.png';
+                case 'SHIB':
+                    return 'SHIB.png';
+                case 'AVAX':
+                    return 'AVAX.png';
+                case 'TRX':
+                    return 'TRX.png';
+                case 'MATIC':
+                    return 'MATIC.png';
+                case 'LTC':
+                    return 'LTC.png';
+
+                // Add more cases for other codes if needed
+                default:
+                    return null; // Return null if no matching image found
+            }
+        }
+
+        function fetchPrice(symbol) {
+            return fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}USDT`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    return parseFloat(data.price);
+                })
+                .catch(error => {
+                    console.error('Error fetching price:', error);
+                    throw error; // Re-throw the error to handle it in the calling code
+                });
+        }
+        document.querySelectorAll('.sell-button').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                const digitalCoinId = event.target.getAttribute('data-id');
+                console.log("Digital Coin ID:", digitalCoinId);
+
+                const recentRoiCell = document.getElementById('roi-' + digitalCoinId); // Find the ROI cell
+                if (recentRoiCell) {
+                    const recentRoi = recentRoiCell.textContent.trim(); // Extract the ROI value
+                    console.log('Recent ROI:', recentRoi); // Log the extracted ROI value
+
+                    fetch('{{ path('app_digital_coinsapp_digital_coins_sell') }}', { // Replace 'app_digital_coins_sell' with the correct route name
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ id: digitalCoinId, roi: recentRoi }),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Handle the response data here
+                            console.log(data);
+                            // Optionally, you can show a success message to the user
+                            Swal.fire(
+                                'Success!',
+                                'Your Sell was successful!',
+                                'success'
+                            );
+                            updateTables();
+
+
+                            // Optionally, you can refresh the page or update the UI as needed
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                            // Optionally, you can show an error message to the user
+                            alert('An error occurred while selling the digital coin.');
+                        });
+                } else {
+                    console.error('ROI cell not found for Digital Coin ID:', digitalCoinId);
+                }
+            });
+        });
+
+        // Function to render the donut chart
+
+
+    </script>
+{% endblock %}

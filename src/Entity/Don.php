@@ -19,11 +19,12 @@ class Don
     private ?float $montant_user = null;
 
     #[ORM\ManyToOne(inversedBy: 'dons')]
-    private ?User $user_id
-        = null;
+    private ?User $user_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'dons')]
     private ?Evennement $evenement_id = null;
+
+
 
     public function getId(): ?int
     {

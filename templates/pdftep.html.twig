@@ -1,0 +1,76 @@
+<div class="expenses-container">
+    <h2>Expenses</h2>
+    <table class="expenses-table">
+        <thead>
+        <tr>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.type }}</td>
+                <td>{{ expense.montant }}</td>
+                <td>{{ expense.date|date('Y-m-d') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>/* CSS Styles for expenses table */
+    /* Apply styles to the expenses container */
+    /* Center align the table header */
+    /* Center align the h2 title */
+    .expenses-container h2 {
+        text-align: center;
+    }
+
+
+    .expenses-container {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        padding: 30px; /* Increased padding */
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    }
+    .expenses-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    /* Style the table header */
+    .expenses-table thead th {
+        background-color: #270093;
+        color: #ffffff;
+        padding: 15px; /* Increased padding */
+        text-align: left;
+        font-size: 18px; /* Larger font size */
+    }
+
+    /* Style the table rows */
+    .expenses-table tbody tr {
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* Alternate row background color */
+    .expenses-table tbody tr:nth-child(even) {
+        background-color: rgba(130, 202, 255, 0.18);
+    }
+
+    /* Style the table cells */
+    .expenses-table td {
+        padding: 15px; /* Increased padding */
+        font-size: 16px; /* Larger font size */
+    }
+
+    /* Add hover effect to rows */
+    .expenses-table tbody tr:hover {
+        background-color: #e0e0e0;
+        cursor: pointer;
+    }
+
+
+</style>

@@ -1,0 +1,379 @@
+{% extends 'base-front.html.twig' %}
+
+{% block body %}
+    <style>
+        .custom-card {
+            width: 750px;
+            height: 350px;
+            margin-top: 25px;
+            margin-left: 25px;
+        }
+        .custom-table {
+            width: 700px;
+            height: 300px;
+            overflow-x: auto;
+        }
+        .custom-chart {
+            width:400px;
+            height: 400px;
+        }
+    </style>
+    <div class="card custom-card" >
+        <span class="text-muted">Cryptomonnaie</span>
+        <div class="table-responsive custom-table" style="overflow-x: auto;">
+            <table class="table text-nowrap">
+                <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Montant</th>
+
+                    <th>Stop Loss</th>
+                    <th>Prix Achat</th>
+
+                    <th>Date Achat</th>
+
+                </tr>
+                </thead>
+                <tbody class="table-border-bottom-0" id="Coins">
+                {% for digitalCoin in digital_coins %}
+                    <tr>
+                        <td>
+                            {% set imageName = digitalCoin.getCode() ~ '.png' %} {# Assuming image names follow this pattern: code.png #}
+                            {% if asset(imageName) %}
+                                <img src="{{ asset(imageName) }}" alt="{{ digitalCoin.getCode() }}" height="25" width="30">
+                            {% else %}
+                                <span>No Image</span>
+                            {% endif %}
+                            {{ digitalCoin.getCode() }}
+                        </td>
+
+                        <td id="montant-{{ digitalCoin.getId() }}">
+                            <div class="text-muted lh-1">
+                                <span class="text-primary fw-medium">{{ digitalCoin.getMontant() }}</span>
+                            </div>
+                        </td>
+
+                        <td id="stopLoss-{{ digitalCoin.getId() }}">{{ digitalCoin.getStopLoss() }}</td>
+                        <td>{{ digitalCoin.getPrixAchat() }}</td>
+
+                        <td>{{ digitalCoin.dateAchat|date('Y-m-d') }}</td>
+
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6">No records found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card custom-width custom-card">
+        <span class="text-muted">Investissement</span>
+        <div class="table-responsive custom-table" style="overflow-x: auto;">
+            <table class="table text-nowrap">
+                <thead>
+                <tr>
+                    <th>Immobilier</th>
+                    <th>Montant</th>
+                    <th>Statut de Paiment</th>
+                    <th>ROI</th>
+                    <th>TAX</th>
+                    <th>Real Estate ID</th>
+                    <th>Growth</th>
+
+                </tr>
+                </thead>
+                <tbody class="table-border-bottom-0" id="investissement">
+                {% for investissement in investissements %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% set realEstate = realEstateRepository.findRealEstateById(investissement.reId) %}
+                                {% if realEstate %}
+
+                                    {% if realEstate.imageData %}
+                                        <img src="{{ asset(realEstate.getImageData()) }}" alt="{{ realEstate.getName() }}" height="32" width="32" class="me-2">
+                                    {% else %}
+                                        <img src=src="{{ asset('uploads/images/noimage.jpg') }}" alt="{{ realEstate.getName() }}" height="32" width="32" class="me-2">
+                                    {% endif %}
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-medium lh-1">{{ realEstate.getName() }}</span>
+                                        <small class="text-muted">{{ realEstate.getEmplacement() }}</small>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="text-muted lh-1"><span class="text-primary fw-medium">{{ investissement.montant }}</span></div>
+                            <small class="text-muted">{{ ((investissement.montant *100) / investissement.prixAchat) | number_format(2,',') }} %</small>
+                        </td>
+                        <td><span class="badge bg-label-success">Completed</span></td>
+                        <td><span class="text-primary fw-medium">{{ (investissement.montant * investissement.rOI)/100 }}</span></td>
+                        <td><span class="text-primary fw-medium">{{ investissement.tax }}</span></td>
+                        <td>{{ investissement.reId }}</td>
+                        <td>
+                            {% set realEstate = realEstateRepository.findRealEstateById(investissement.reId) %}
+                            {{ realEstate.getGrowth() }}
+                        </td>
+
+                    </tr>
+
+
+                {% else %}
+                    <tr>
+                        <td colspan="5">no records found</td>
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card custom-card">
+        <span class="text-muted">Immobilier</span>
+        <div class="table-responsive custom-table" style="overflow-x: auto;">
+            <table class="table text-nowrap">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Immobilier</th>
+                    <th>Valeur</th>
+                    <th>ROI</th>
+                    <th>Nombre de visite</th>
+                    <th>Growth</th>
+                </tr>
+                </thead>
+                <tbody class="table-border-bottom-0" id="realEstates">
+                {% for realEstate in real_estates %}
+                    <tr>
+                        <td>{{ realEstate.getId() }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if realEstate.imageData %}
+                                    <img src="{{ asset(realEstate.getImageData()) }}" alt="{{ realEstate.getName() }}" height="32" width="32" class="me-2">
+                                {% else %}
+                                    <img src="{{ asset('uploads/images/noimage.jpg') }}" alt="{{ realEstate.getName() }}" height="32" width="32" class="me-2">
+                                {% endif %}
+                                <div class="d-flex flex-column">
+                                    <span class="fw-medium lh-1">{{ realEstate.getName() }}</span>
+                                    <small class="text-muted">{{ realEstate.getEmplacement() }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-muted lh-1"><span class="text-primary fw-medium">{{ realEstate.valeur() }}</span></div>
+                            <!-- Assuming montant is a property of real estate entity -->
+                            <!-- You may need to adjust the property names based on your entity structure -->
+                        </td>
+                        <td><span class="text-primary fw-medium">{{ realEstate.getROI() }}</span></td>
+                        <td><span class="text-primary fw-medium">{{ realEstate.nbrclick() }}</span></td>
+                        <td>{{ realEstate.getGrowth() }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6">No records found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+<div class="card custom-card">
+    <div id="nbrclicksChart" class="drachneya1 custom-chart"></div>
+</div>
+<div class="card custom-card">
+    <div id="chartValueMontant" class="drachneya custom-chart"></div>
+</div>
+<div class="card custom-card">
+    <div id="chartValueMontant1" class="coinsMontant custom-chart"></div>
+</div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Initialize objects to hold data
+            var montantByCode = {};
+            var investissementSumByRealEstate = {};
+            var realEstateNames = [];
+            var nbrclicksData = [];
+
+            // Loop through coins table rows
+            var coinsTable = document.getElementById("Coins");
+            var coinsRows = coinsTable.getElementsByTagName("tr");
+            for (var i = 0; i < coinsRows.length; i++) {
+                var cols = coinsRows[i].getElementsByTagName("td");
+                if (cols.length > 0) {
+                    var code = cols[0].textContent.trim();
+                    var montant = parseFloat(cols[1].textContent.trim());
+
+                    if (!(code in montantByCode)) {
+                        montantByCode[code] = 0;
+                    }
+                    montantByCode[code] += montant;
+                }
+            }
+
+            // Convert montant data to array
+            var montantData = Object.values(montantByCode);
+
+            // Chart options for donut chart
+            var donutOptions = {
+                series: montantData,
+                labels: Object.keys(montantByCode),
+                chart: {
+                    type: 'donut',
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            // Render the donut chart
+            var donutChart = new ApexCharts(document.querySelector("#chartValueMontant"), donutOptions);
+            donutChart.render();
+
+            // Loop through investissements table rows
+            var investissementTable = document.getElementById("investissement");
+            var investissementRows = investissementTable.getElementsByTagName("tr");
+            for (var i = 0; i < investissementRows.length; i++) {
+                var cols = investissementRows[i].getElementsByTagName("td");
+                if (cols.length > 0) {
+                    var realEstateId = cols[5].textContent.trim();
+                    var montant = parseFloat(cols[1].textContent.trim());
+
+                    if (!(realEstateId in investissementSumByRealEstate)) {
+                        investissementSumByRealEstate[realEstateId] = 0;
+                        realEstateNames.push(cols[0].textContent.trim());
+                    }
+                    investissementSumByRealEstate[realEstateId] += montant;
+                }
+            }
+
+            // Convert investissement sum data to array
+            var investissementSumData = Object.values(investissementSumByRealEstate);
+
+            // Chart options for stacked column chart
+            var stackedColumnOptions = {
+                series: [{
+                    name: 'Total Montant',
+                    data: investissementSumData
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '50%',
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                title: {
+                    text: 'Total Montant per Real Estate ID',
+                    align: 'center'
+                },
+                xaxis: {
+                    categories: realEstateNames
+                },
+                yaxis: {
+                    title: {
+                        text: 'Total Montant'
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return val.toFixed(2);
+                        }
+                    }
+                }
+            };
+
+            // Render the stacked column chart
+            var stackedColumnChart = new ApexCharts(document.querySelector("#chartValueMontant1"), stackedColumnOptions);
+            stackedColumnChart.render();
+
+            // Loop through realEstates table rows
+            var table = document.getElementById("realEstates");
+            var rows = table.getElementsByTagName("tr");
+            for (var i = 0; i < rows.length; i++) {
+                var cols = rows[i].getElementsByTagName("td");
+                if (cols.length > 3) {
+                    var realEstateName = cols[0].textContent.trim();
+                    var nbrclicks = parseInt(cols[3].textContent.trim());
+
+                    nbrclicksData.push(nbrclicks);
+                }
+            }
+
+            // Chart options for nbrclicks
+            var nbrclicksOptions = {
+                series: [{
+                    name: 'Number of Clicks',
+                    data: nbrclicksData
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        columnWidth: '55%',
+                        endingShape: 'rounded'
+                    },
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                xaxis: {
+                    categories: realEstateNames // Use real estate names as categories
+                },
+                yaxis: {
+                    title: {
+                        text: 'Number of Clicks'
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return val;
+                        }
+                    }
+                }
+            };
+
+            // Render the chart for nbrclicks
+            var nbrclicksChart = new ApexCharts(document.querySelector("#nbrclicksChart"), nbrclicksOptions);
+            nbrclicksChart.render();
+        });
+    </script>
+
+
+
+{% endblock %}

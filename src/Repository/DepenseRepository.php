@@ -45,16 +45,49 @@ class DepenseRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
-    public function searchByType($query)
+    public function getExpensesByDepenseType()
+    {
+        // Fetch all expenses
+        $depenses = $this->createQueryBuilder('d')
+            ->getQuery()
+            ->getResult();
+
+        // Group expenses by tax type and calculate total expenses for each tax type
+        $expensesByTaxType = [];
+        foreach ($depenses as $depense) {
+            $depenseType = $depense->getType();
+            if (!isset($expensesByTaxType[$depenseType])) {
+                $expensesByTaxType[$depenseType] = 0;
+            }
+            $expensesByTaxType[$depenseType] += $depense->getMontant();
+        }
+
+        // Prepare data for the chart
+        $labels = array_keys($expensesByTaxType);
+        $data = array_values($expensesByTaxType);
+
+        // Return the data with 'tax_type' key included
+        return [
+            'depense' => $labels,
+            'total' => $data
+        ];
+    }
+    public function findByTerm($term)
     {
         return $this->createQueryBuilder('d')
-            ->andWhere('d.type LIKE :query')
-            ->setParameter('query', '%' . $query . '%')
+            ->andWhere('d.type LIKE :term')
+            ->setParameter('term', '%'.$term.'%')
             ->getQuery()
             ->getResult();
     }
-
-
+    public function findDepensesByUserId(int $userId)
+    {
+        return $this->createQueryBuilder('d')
+            ->andWhere('d.user = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getResult();
+    }
 
     public function getTotalItemCount()
     {

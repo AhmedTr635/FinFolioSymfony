@@ -1,0 +1,177 @@
+{% extends 'base-front.html.twig' %}
+
+{% block title %}RealEstate{% endblock %}
+
+{% block body %}
+
+
+    <div class="row mb-5">
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100" style="margin-top: 25px;margin-left: 25px">
+                {% if real_estate.imageData %}
+                    <img class="card-img-top" src="{{ asset(real_estate.imageData) }}" alt="Card image cap" />
+                {% else %}
+                    <img class="card-img-top" src="{{ asset('uploads/images/noimage.jpg') }}" alt="Card image cap" />
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ real_estate.name }}</h5>
+                    <p class="card-text">
+                        Emplacement: {{ real_estate.emplacement }}<br>
+                        ROI: {{ real_estate.ROI }}<br>
+                        Valeur: {{ real_estate.valeur }}<br>
+                        Nbrchambres: {{ real_estate.nbrchambres }}<br>
+                        Superficie: {{ real_estate.superficie }}<br>
+                        Growth: {{ real_estate.growth }}
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100" style="margin-top: 25px; width: 780px">
+                <div class="card-body">
+                    <h5 class="card-title">Data Visualization</h5>
+                    <div class="mb-3">
+                        <label for="montantInput" class="form-label">Montant</label>
+                        <input type="text" class="form-control" id="montantInput" name="montant" style="width: 200px;" value="10000">
+                        <span id="montant-error" class="error-message"></span>
+                    </div>
+
+                        <!-- Add Apex chart here -->
+                    <div id="chart"></div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if googleMapsLink is not null %}
+        <div class="map-container">
+            <div class="map-content">
+                <div id="map" style="height: 400px;"></div>
+            </div>
+            <a href="{{ googleMapsLink }}" class="google-maps-link" target="_blank">View location on Google Maps</a>
+        </div>
+    {% else %}
+        <p>Location not available for this event.</p>
+    {% endif %}
+    <button class="btn btn-primary" onclick="location.href='{{ path('app_investdashuser_index') }}'">Back to List</button>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDuuYiAdEaQAOTzRqheqZdgZHT8ostySdc&callback=initMap"></script>
+    <script>
+        function initMap() {
+            var latitude = {{ real_estate.latitude }};
+            var longitude = {{ real_estate.longitude }};
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 10,
+                center: { lat: latitude, lng: longitude }
+            });
+
+            var marker = new google.maps.Marker({
+                position: { lat: latitude, lng: longitude },
+                map: map
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const montantInput = document.getElementById('montantInput');
+
+            montantInput.addEventListener('input', function () {
+                updateChart();
+            });
+
+            function updateChart() {
+                const montant = parseFloat(montantInput.value);
+                const growth = parseFloat('{{ real_estate.growth }}');
+                const ROI = parseFloat('{{ real_estate.ROI }}');
+                const valeur = parseFloat('{{ real_estate.valeur }}');
+
+                let montantAccumulated = montant;
+                let ROIAnnuelAccumulated = montant * (ROI / 100);
+                let valeurImmobilierAccumulated = valeur;
+
+
+                const investmentData = [];
+                const ROIAnnuelData = [];
+                const valeurImmobilierData = [];
+
+                for (let i = 0; i < 5; i++) {
+                    investmentData.push(montant.toFixed(2));
+                    ROIAnnuelData.push(ROIAnnuelAccumulated.toFixed(2));
+                    valeurImmobilierData.push((valeurImmobilierAccumulated/100) .toFixed(2));
+
+                    (ROIAnnuelAccumulated *= (1 + (ROI / 100))).toFixed(2);
+                    (valeurImmobilierAccumulated *= (1 + (growth / 100))).toFixed(2);
+                }
+
+                const options = {
+                    series: [
+                        { name: 'Investissement', data: investmentData },
+                        { name: 'ROI Annuel', data: ROIAnnuelData },
+                        { name: 'Valeur Immobilier', data: valeurImmobilierData },
+                    ],
+                    chart: {
+                        type: 'bar',
+                        height: 350,
+                        stacked: true,
+                        toolbar: {
+                            show: true
+                        },
+                        zoom: {
+                            enabled: true
+                        }
+                    },
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            legend: {
+                                position: 'bottom',
+                                offsetX: -10,
+                                offsetY: 0
+                            }
+                        }
+                    }],
+                    plotOptions: {
+                        bar: {
+                            horizontal: false,
+                            borderRadius: 10,
+                            borderRadiusApplication: 'end',
+                            borderRadiusWhenStacked: 'last',
+                            dataLabels: {
+                                total: {
+                                    enabled: true,
+                                    style: {
+                                        fontSize: '13px',
+                                        fontWeight: 900
+                                    }
+                                }
+                            }
+                        },
+                    },
+                    xaxis: {
+                        type: 'year',
+                        categories: ['2025', '2026', '2027', '2028','2029'],
+                    },
+                    legend: {
+                        position: 'right',
+                        offsetY: 40
+                    },
+                    fill: {
+                        opacity: 1
+                    }
+                };
+
+                const chart = new ApexCharts(document.querySelector("#chart"), options);
+                chart.render();
+            }
+
+            updateChart();
+        });
+    </script>
+
+
+{% endblock %}

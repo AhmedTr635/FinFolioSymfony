@@ -1,17 +1,17 @@
 
-{% extends 'evennement/sidebar.html.twig' %}
+{% extends 'sidebar.html.twig' %}
 {% block container %}
     {% block the_navbar %}
 
-        <!-- Core CSS -->
-        <link rel="stylesheet" href="{{ asset('../../assets/vendor/css/rtl/core.css') }}" class="template-customizer-core-css" />
-        <link rel="stylesheet" href="{{ asset('../../assets/vendor/css/rtl/theme-default.css') }}" class="template-customizer-theme-css" />
-        <link rel="stylesheet" href="{{ asset('../../assets/css/demo.css') }}" />
+{#        <!-- Core CSS -->#}
+{#        <link rel="stylesheet" href="../../assets/vendor/css/rtl/core.css" class="template-customizer-core-css" />#}
+{#        <link rel="stylesheet" href="../../assets/vendor/css/rtl/theme-default.css" class="template-customizer-theme-css" />#}
+{#        <link rel="stylesheet" href="../../assets/css/demo.css" />#}
 
-        <!-- Vendors CSS -->
-        <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
-        <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/typeahead-js/typeahead.css') }}" />
-        <link rel="stylesheet" href="{{ asset('../../assets/vendor/libs/fullcalendar/fullcalendar.css') }}" />
+{#        <!-- Vendors CSS -->#}
+{#        <link rel="stylesheet" href="../../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />#}
+{#        <link rel="stylesheet" href="../../assets/vendor/libs/typeahead-js/typeahead.css" />#}
+{#        <link rel="stylesheet" href="../../assets/vendor/libs/fullcalendar/fullcalendar.css" />#}
 
         {% block body %}
             <div id="calendar" class="custom-calendar"></div>
@@ -123,22 +123,20 @@
                 /* Style for the event title */
                 .fc-event-title {
                     font-size: 14px;
-                    font-weight: bold;
+                    color: #696CFF;
+
+
                 }
 
-                /* Style for the event time */
-                .fc-event-time {
-                    font-size: 12px;
-                    color: #666;
+
+                .fc-event-title-container{
+                    background-color: #E7E7FF;
+
                 }
 
-                /* Style for the event details */
-                .fc-event-details {
-                    margin-top: 5px;
-                    font-size: 12px;
-                    color: #888;
+               .fc-daygrid-day-frame fc-scrollgrid-sync-inner{
+                    background-color: #0a6aa1;
                 }
-
 
 
 

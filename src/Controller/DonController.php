@@ -7,11 +7,19 @@ use App\Entity\Evennement;
 use App\Entity\User;
 use App\Form\DonType;
 use App\Repository\DonRepository;
+use App\Repository\EvennementRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Mime\Email;
 
 #[Route('/don')]
 class DonController extends AbstractController
@@ -82,16 +90,32 @@ class DonController extends AbstractController
     }
 
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('/give-donation/{id}', name: 'app_don_give_donation', methods: ['POST'])]
-    public function giveDonation(Request $request, Evennement $evennement): Response
+    public function giveDonation(Request $request, Evennement $evennement, MailerInterface $mailer, DonRepository $donRepository): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         // Retrieve the submitted donation amount from the request
         $amount = $request->request->get('montant');
 
+        // Check if the donation amount exceeds the needed amount for the event
+        $neededAmount = $evennement->getMontant();
+        $collectedAmount = $donRepository->getTotalDonationForEvent($evennement);
+
+        if ($collectedAmount + $amount > $neededAmount) {
+            // Add a flash message
+            $this->addFlash('error', 'Donation amount exceeds the needed amount for this event.');
+
+            // Redirect back to the event index
+            return $this->redirectToRoute('app_evennement_index');
+        }
+
+
         // Get the user by ID (replace 118 with the ID you choose)
-        $userId = 118;
+        $userId = 116;
         $entityManager = $this->getDoctrine()->getManager();
-        $user = $entityManager->getRepository(User::class)->find($userId);
+        $user = $this->getUser();
 
         // Create a new Don entity and set its properties
         $donation = new Don();
@@ -105,8 +129,27 @@ class DonController extends AbstractController
         $entityManager->persist($donation);
         $entityManager->flush();
 
+        $transport = Transport::fromDsn('smtp://finfoliofinfolio@gmail.com:txzoffvmvmoiuyzw@smtp.gmail.com:587');
+
+        // Create a Mailer object
+        $mailer = new Mailer($transport);
+        // Send the donation confirmation email to the user
+        $email = (new Email())
+            ->from('finfoliofinfolio@gmail.com') // Replace with your organization's email address
+            ->to($user->getEmail())
+            ->subject('Thank You for Your Donation!')
+            ->html($this->renderView(
+                'don/donation_confirmation_email.html.twig',
+                ['user' => $user, 'donation' => $donation, 'evennement' => $evennement]
+            ));
+
+        $mailer->send($email);
+
         // Optionally, redirect the user to a different page
-        return $this->redirectToRoute('app_evennement_index');
+        return $this->redirectToRoute('app_evennement_index', [
+            'neededAmount' => $neededAmount,
+            'collectedAmount' => $collectedAmount,
+        ]);
     }
 
 
@@ -132,4 +175,29 @@ class DonController extends AbstractController
     }
 
 
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    #[Route('/progress', name: 'progress')]
+
+    public function yourAction($eventId, Evennement $evennement, DonRepository $donRepository): Response
+    {
+        // If event is not found, handle accordingly (e.g., show an error message)
+        if (!$evennement) {
+            throw $this->createNotFoundException('Event not found');
+        }
+
+        // Get the total amount needed from the Evennement entity
+        $totalAmountNeeded = $evennement->getMontant(); // Assuming getMontant() is a method in your Evennement entity
+
+        // Get the total sum of montantuser for the event using repository function
+        $totalMontant = $donRepository->getTotalMontantForEvennement($evennement);
+
+        // Render the Twig template and pass the collected amount and total amount needed to it
+        return $this->render('evennement/show.html.twig', [
+            'totalMontant' => $totalMontant,
+            'totalAmountNeeded' => $totalAmountNeeded,
+        ]);
+    }
 }

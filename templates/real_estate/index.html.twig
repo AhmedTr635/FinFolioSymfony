@@ -1,0 +1,80 @@
+{% extends 'base-front.html.twig' %}
+
+{% block title %}RealEstate index{% endblock %}
+
+{% block body %}
+    <h1></h1>
+
+    <div class="row">
+        {% for real_estate in real_estates %}
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100">
+                    {% if real_estate.imageData %}
+                        <img class="card-img-top" src="{{ asset(real_estate.imageData) }}" alt="Card image cap" />
+                    {% else %}
+                        <img class="card-img-top" src="{{ asset('uploads/images/noimage.jpg') }}" alt="Card image cap" />
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ real_estate.name }}</h5>
+                        <p class="card-text">
+                            Emplacement: {{ real_estate.emplacement }}<br>
+                            ROI: {{ real_estate.ROI }}<br>
+                            Valeur: {{ real_estate.valeur }}<br>
+                            Chambres: {{ real_estate.nbrchambres }}<br>
+                            Superficie: {{ real_estate.superficie }}<br>
+                            Click: {{ real_estate.nbrclick }}<br>
+                            Growth: {{ real_estate.growth }}<br>
+
+                        </p>
+                        {% if real_estate.virtualTourLink %}
+                            <button class="btn btn-info show-virtual-tour" data-url="{{ real_estate.virtualTourLink }}">Virtual Tour</button>
+                        {% else %}
+                            <div class="alert alert-danger" role="alert">
+                                Pas de Tour Virtuel disponible
+                            </div>
+                        {% endif %}
+                        <a href="{{ path('app_real_estate_show', {'id': real_estate.id}) }}" class="btn btn-primary">Afficher</a>
+                        <a href="{{ path('app_real_estate_edit', {'id': real_estate.id}) }}" class="btn btn-secondary">Modifier</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col">
+                <p>No records found.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button class="btn btn-primary" onclick="location.href='{{ path('app_realEstate_new') }}'">Ajouter</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const virtualTourButtons = document.querySelectorAll('.show-virtual-tour');
+            virtualTourButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const url = this.getAttribute('data-url');
+                    if (url) {
+                        Swal.fire({
+                            title: 'Virtual Tour',
+                            html: `Opening Virtual Tour at: <a href="${url}" target="_blank">${url}</a>`,
+                            icon: 'info',
+                            confirmButtonText: 'OK'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'No Virtual Tour Available',
+                            text: 'Unfortunately, there is no virtual tour available for this real estate.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/realEstate.js') }}"></script>
+{% endblock %}

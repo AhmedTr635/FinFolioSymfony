@@ -18,27 +18,30 @@
 
 </div>
 
-<div class="form-group">
-    {{ form_label(form.montant) }}
-    {{ form_widget(form.montant, {'attr': {'class': 'form-control js-input', 'type': 'number', 'id': 'evennement_montant'}}) }}
 
-    <span id="evennement_montant-error" class="error-message"></span>
-    {% if form_errors(form.montant) %}
-        <div class="error">{{ form_errors(form.montant) }}</div>
-    {% endif %}
-</div>
+
 
 <div class="form-group">
-    {{ form_label(form.date) }}
-    {{ form_widget(form.date, {'attr': {'class': 'form-control js-input js-datepicker', 'type': 'date', 'id': 'evennement_date', 'required': 'required'}}) }}
-
-
-    <span id="evennement_date-error" class="error-message"></span>
-    {% if form_errors(form.date) %}
-        <div class="error">{{ form_errors(form.date) }}</div>
-    {% endif %}
-
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_label(form.montant, null, {'label_attr': {'class': 'control-label'}}) }}
+            {{ form_widget(form.montant, {'attr': {'class': 'form-control js-input', 'id': 'evennement_montant'}}) }}
+            <span id="evennement_montant-error" class="error-message"></span>
+            {% if form_errors(form.montant) %}
+                <div class="error">{{ form_errors(form.montant) }}</div>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.date, null, {'label_attr': {'class': 'control-label'}}) }}
+            {{ form_widget(form.date, {'attr': {'class': 'form-control js-input', 'id': 'evennement_date'}}) }}
+            <span id="evennement_date-error" class="error-message"></span>
+            {% if form_errors(form.date) %}
+                <div class="error">{{ form_errors(form.date) }}</div>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
 
 <div class="form-group">
     {{ form_label(form.adresse) }}
@@ -50,6 +53,29 @@
     {% endif %}
 
 </div>
+
+<div class="form-group">
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_label(form.latitude, null, {'label_attr': {'class': 'control-label'}}) }}
+            {{ form_widget(form.latitude, {'attr': {'class': 'form-control js-input', 'id': 'evennement_latitude'}}) }}
+            <span id="evennement_latitude-error" class="error-message"></span>
+            {% if form_errors(form.latitude) %}
+                <div class="error">{{ form_errors(form.latitude) }}</div>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.longitude, null, {'label_attr': {'class': 'control-label'}}) }}
+            {{ form_widget(form.longitude, {'attr': {'class': 'form-control js-input', 'id': 'evennement_longitude'}}) }}
+            <span id="evennement_longitude-error" class="error-message"></span>
+            {% if form_errors(form.longitude) %}
+                <div class="error">{{ form_errors(form.longitude) }}</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
 
 <div class="form-group">
     {{ form_label(form.description) }}
