@@ -4,8 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Don;
 use App\Entity\Evennement;
+
+use App\Entity\Rating;
 use App\Entity\User;
 use App\Form\EvennementType;
+
 use App\Form\RatingType;
 use App\Repository\DonRepository;
 use App\Repository\EvennementRepository;
@@ -39,13 +42,15 @@ class EvennementController extends AbstractController
 
         $upcomingEvent = $evennementRepository->findUpcomingEvent();
 
-        $showRatingForm = true; // Set this based on your logic
+        $neededAmount = $request->query->get('neededAmount');
+        $collectedAmount = $request->query->get('collectedAmount');
+
 
 
         $evennements= $paginator->paginate(
             $evennements,
             $request->query->getInt('page',1)  ,
-            3
+            6
         );
         $paginationTemplate = '@KnpPaginator/Pagination/twitter_bootstrap_v4_pagination.html.twig';
 
@@ -55,11 +60,14 @@ class EvennementController extends AbstractController
             'paginationTemplate' => $paginationTemplate,
             'evennements' => $evennements,
             'upcomingEvent' => $upcomingEvent,
+            'neededAmount' => $neededAmount,
+            'collectedAmount' => $collectedAmount,
 
 
 
         ]);
     }
+
 
 
 

@@ -7,6 +7,7 @@ use App\Entity\Evennement;
 use App\Entity\User;
 use App\Form\DonType;
 use App\Repository\DonRepository;
+use App\Repository\EvennementRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -93,10 +94,23 @@ class DonController extends AbstractController
      * @throws TransportExceptionInterface
      */
     #[Route('/give-donation/{id}', name: 'app_don_give_donation', methods: ['POST'])]
-    public function giveDonation(Request $request, Evennement $evennement, MailerInterface $mailer): Response
+    public function giveDonation(Request $request, Evennement $evennement, MailerInterface $mailer, DonRepository $donRepository): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         // Retrieve the submitted donation amount from the request
         $amount = $request->request->get('montant');
+
+        // Check if the donation amount exceeds the needed amount for the event
+        $neededAmount = $evennement->getMontant();
+        $collectedAmount = $donRepository->getTotalDonationForEvent($evennement);
+
+        if ($collectedAmount + $amount > $neededAmount) {
+            // Add a flash message
+            $this->addFlash('error', 'Donation amount exceeds the needed amount for this event.');
+
+            // Redirect back to the event index
+            return $this->redirectToRoute('app_evennement_index');
+        }
+
 
         // Get the user by ID (replace 118 with the ID you choose)
         $userId = 116;
@@ -117,7 +131,7 @@ class DonController extends AbstractController
 
         $transport = Transport::fromDsn('smtp://finfoliofinfolio@gmail.com:txzoffvmvmoiuyzw@smtp.gmail.com:587');
 
-// Create a Mailer object
+        // Create a Mailer object
         $mailer = new Mailer($transport);
         // Send the donation confirmation email to the user
         $email = (new Email())
@@ -129,12 +143,13 @@ class DonController extends AbstractController
                 ['user' => $user, 'donation' => $donation, 'evennement' => $evennement]
             ));
 
-
-
         $mailer->send($email);
 
         // Optionally, redirect the user to a different page
-        return $this->redirectToRoute('app_evennement_index');
+        return $this->redirectToRoute('app_evennement_index', [
+            'neededAmount' => $neededAmount,
+            'collectedAmount' => $collectedAmount,
+        ]);
     }
 
 

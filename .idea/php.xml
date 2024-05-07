@@ -145,6 +145,9 @@
       <path value="$PROJECT_DIR$/finfolioweb/vendor/twig/extra-bundle" />
       <path value="$PROJECT_DIR$/finfolioweb/vendor/twig/twig" />
       <path value="$PROJECT_DIR$/finfolioweb/vendor/webmozart/assert" />
+      <path value="$PROJECT_DIR$/finfolioweb/vendor/tattali/calendar-bundle" />
+      <path value="$PROJECT_DIR$/finfolioweb/vendor/knplabs/knp-components" />
+      <path value="$PROJECT_DIR$/finfolioweb/vendor/knplabs/knp-paginator-bundle" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.0" />

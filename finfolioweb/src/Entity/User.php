@@ -63,10 +63,15 @@ class User
     #[ORM\ManyToMany(targetEntity: Evennement::class, mappedBy: 'user')]
     private Collection $evennements;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Rating::class)]
+    private Collection $ratings;
+
+
     public function __construct()
     {
         $this->dons = new ArrayCollection();
         $this->evennements = new ArrayCollection();
+        $this->ratings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -303,4 +308,41 @@ class User
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Rating>
+     */
+    public function getRatings(): Collection
+    {
+        return $this->ratings;
+    }
+
+    public function addRating(Rating $rating): static
+    {
+        if (!$this->ratings->contains($rating)) {
+            $this->ratings->add($rating);
+            $rating->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRating(Rating $rating): static
+    {
+        if ($this->ratings->removeElement($rating)) {
+            // set the owning side to null (unless already changed)
+            if ($rating->getUser() === $this) {
+                $rating->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getNom(); // Assuming getUsername() is a method that returns a string representation of the user.
+    }
+
+
 }
