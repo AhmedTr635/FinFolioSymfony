@@ -142,16 +142,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Button to open rating popup -->
-                                    <button class="btn btn-primary" onclick="openRatingPopup({{ evennement.id }})">Give Rating</button>
 
-                                    <!-- Rating popup -->
-                                    <div id="ratingModal{{ evennement.id }}" class="modal">
-                                        <div class="modal-content">
-                                            <span class="close" onclick="closeRatingPopup({{ evennement.id }})">&times;</span>
-
-                                        </div>
-                                    </div>
 
                                     <div id="donationModal{{ evennement.id }}" class="modal"> <!-- Append evennement.id to the id -->
                                         <div class="modal-content">
@@ -208,18 +199,6 @@
 
 <script>
 /////////////////////////////////////Rating////////////////////////////////////////////////////////////
-
-// Function to open rating popup
-function openRatingPopup(evennementId) {
-    var modal = document.getElementById("ratingModal" + evennementId);
-    modal.style.display = "block";
-}
-
-// Function to close rating popup
-function closeRatingPopup(evennementId) {
-    var modal = document.getElementById("ratingModal" + evennementId);
-    modal.style.display = "none";
-}
 
 
 

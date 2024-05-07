@@ -113,8 +113,6 @@ class Evennement
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'evennements')]
     private Collection $user;
 
-    #[ORM\OneToMany(mappedBy: 'evennement', targetEntity: Rating::class)]
-    private Collection $ratings;
 
 
 
@@ -122,7 +120,6 @@ class Evennement
     {
         $this->dons = new ArrayCollection();
         $this->user = new ArrayCollection();
-        $this->ratings = new ArrayCollection();
 
 
     }
@@ -263,38 +260,6 @@ class Evennement
         return $this;
     }
 
-    /**
-     * @return Collection<int, Rating>
-     */
-    public function getRatings(): Collection
-    {
-        return $this->ratings;
-    }
 
-    public function addRating(Rating $rating): static
-    {
-        if (!$this->ratings->contains($rating)) {
-            $this->ratings->add($rating);
-            $rating->setEvennement($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRating(Rating $rating): static
-    {
-        if ($this->ratings->removeElement($rating)) {
-            // set the owning side to null (unless already changed)
-            if ($rating->getEvennement() === $this) {
-                $rating->setEvennement(null);
-            }
-        }
-
-        return $this;
-    }
-    public function __toString(): string
-    {
-        return $this->getNomEvent(); // Assuming getName() is a method that returns a string representation of the event.
-    }
 
 }

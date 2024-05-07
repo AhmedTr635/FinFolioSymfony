@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\Entity\Don;
 use App\Entity\Evennement;
 
-use App\Entity\Rating;
+
 use App\Entity\User;
 use App\Form\EvennementType;
 
-use App\Form\RatingType;
+
 use App\Repository\DonRepository;
 use App\Repository\EvennementRepository;
 use Doctrine\ORM\EntityManagerInterface;
