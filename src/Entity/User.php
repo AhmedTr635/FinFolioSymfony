@@ -459,5 +459,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-
+    public function __toString(): string
+    {
+        // Customize this method to return a string representation of the User entity
+        return (string) $this->getId();
+    }
 }

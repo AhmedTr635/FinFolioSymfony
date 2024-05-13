@@ -1,0 +1,159 @@
+{% block offer_popup %}
+    {# Your popup content goes here #}
+    <div class="modal fade" id="offerPopup" tabindex="-1" aria-labelledby="offerPopupLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="offerPopupLabel">You will send an offer to ..... </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Hidden input fields for credit_id and user_id -->
+                    <input type="hidden" id="creditIdInput" name="credit_id">
+                    <input type="hidden" id="userIdInput" name="user_id">
+
+                    <!-- Add montant input field -->
+                    <div class="mb-3">
+                        <label for="montantInput" class="form-label">Montant:</label>
+                        <input type="text" class="form-control" id="montantInput" name="montant" placeholder="Enter Montant">
+                        <div id="montantError" class="invalid-feedback">Montant is required.</div>
+                    </div>
+                    <!-- Add intret input field -->
+                    <div class="mb-3">
+                        <label for="intretInput" class="form-label">Intret:</label>
+                        <input type="text" class="form-control" id="intretInput" name="intret" placeholder="Enter Intret">
+                        <div id="intretError" class="invalid-feedback">Intret is required.</div>
+                        <!-- Label to display interest value -->
+                        <div id="interestLabel" class="form-text" style="color: blue; font-size: 15px;">Interest: </div>
+                    </div>
+
+                    <!-- Alert container -->
+                    <div id="alertContainer"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="sendOfferBtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sendOfferBtn').addEventListener('click', function() {
+            // Retrieve form data
+            var montant = document.getElementById('montantInput').value;
+            var interet = document.getElementById('intretInput').value;
+            var credit_id = document.getElementById('creditIdInput').value;
+            var user_id = document.getElementById('userIdInput').value;
+
+            if (!montant && !interet) {
+                document.getElementById('montantInput').classList.add('is-invalid');
+                document.getElementById('intretInput').classList.add('is-invalid');
+                document.getElementById('montantError').style.display = 'block';
+                document.getElementById('intretError').style.display = 'block';
+                return; // Prevent form submission
+            } else {
+                document.getElementById('montantInput').classList.remove('is-invalid');
+                document.getElementById('intretInput').classList.remove('is-invalid');
+                document.getElementById('montantError').style.display = 'none';
+                document.getElementById('intretError').style.display = 'none';
+            }
+
+            if (!montant) {
+                document.getElementById('montantInput').classList.add('is-invalid');
+                document.getElementById('montantError').style.display = 'block';
+                return; // Prevent form submission
+            } else {
+                document.getElementById('montantInput').classList.remove('is-invalid');
+                document.getElementById('montantError').style.display = 'none';
+            }
+
+            if (!interet) {
+                document.getElementById('intretInput').classList.add('is-invalid');
+                document.getElementById('intretError').style.display = 'block';
+                return; // Prevent form submission
+            } else {
+                document.getElementById('intretInput').classList.remove('is-invalid');
+                document.getElementById('intretError').style.display = 'none';
+            }
+
+            // Make AJAX request to submit form data
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '{{ path('app_offre_new') }}', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        // Handle success response
+                        console.log('Offer sent successfully!');
+                        // Display success alert
+                        var alertContainer = document.getElementById('alertContainer'); // Assuming there is a container div with id 'alertContainer'
+                        alertContainer.innerHTML = xhr.response.alertHtml;
+                        // Optionally, close the modal or perform any other action
+                        $('#offerPopup').modal('hide'); // Assuming you're using Bootstrap modal
+                    } else {
+                        // Handle error response
+                        console.error('Failed to send offer.');
+                    }
+                }
+            };
+            var formData = JSON.stringify({ montant: montant, interet: interet, credit_id: credit_id, user_id: user_id });
+            xhr.send(formData);
+
+        });
+    </script>
+
+
+    <script>
+        // Function to validate the loan calculator form in the popup
+        function validateLoanCalculatorPopupForm() {
+            const loanAmount = document.getElementById('loanAmountInput').value;
+            const interestRate = document.getElementById('interestRateInput').value;
+            const loanTerm = document.getElementById('loanTermInput').value;
+
+            // Check if any of the fields are empty
+            if (!loanAmount) {
+                document.getElementById('loanAmountError').style.display = 'block';
+                document.getElementById('loanAmountInput').classList.add('is-invalid');
+                return false; // Prevent form submission
+            } else {
+                document.getElementById('loanAmountError').style.display = 'none';
+                document.getElementById('loanAmountInput').classList.remove('is-invalid');
+            }
+
+            if (!interestRate) {
+                document.getElementById('interestRateError').style.display = 'block';
+                document.getElementById('interestRateInput').classList.add('is-invalid');
+                return false; // Prevent form submission
+            } else {
+                document.getElementById('interestRateError').style.display = 'none';
+                document.getElementById('interestRateInput').classList.remove('is-invalid');
+            }
+
+            if (!loanTerm) {
+                document.getElementById('loanTermError').style.display = 'block';
+                document.getElementById('loanTermInput').classList.add('is-invalid');
+                return false; // Prevent form submission
+            } else {
+                document.getElementById('loanTermError').style.display = 'none';
+                document.getElementById('loanTermInput').classList.remove('is-invalid');
+            }
+
+            // Validation passed
+            return true; // Allow form submission
+        }
+
+        // Add event listener to the loan calculator form in the popup
+        document.getElementById('loanCalculatorForm').addEventListener('submit', function(event) {
+            // Prevent default form submission
+            event.preventDefault();
+
+            // Validate the form
+            if (validateLoanCalculatorPopupForm()) {
+                // If validation passed, submit the form
+                this.submit();
+            }
+        });
+    </script>
+
+{% endblock %}

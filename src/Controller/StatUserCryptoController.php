@@ -15,7 +15,7 @@ class StatUserCryptoController extends AbstractController
     public function index(DigitalCoinsRepository $digitalCoinsRepository): Response
     {
         $digitalCoin = new DigitalCoins();
-        $UserId = 22;
+        $UserId = $this->getUser()->getId();
 
 
 

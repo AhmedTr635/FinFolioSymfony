@@ -12,42 +12,101 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Knp\Snappy\Pdf;
 
 
 #[Route('/credit')]
 class CreditController extends AbstractController
 {
-    #[Route('/', name: 'app_credit_index', methods: ['GET'])]
-    public function index(CreditRepository $creditRepository): Response
-    {
-        $credits = $creditRepository->findAll(); // Fetch credits from repository
+    private $entityManager;
 
-        return $this->render('templateController/listofCredit.html.twig', [
-            'credits' => $credits, // Pass credits to the template
-        ]);
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
     }
+
+    #[Route('/', name: 'app_credit_index', methods: ['GET'])]
+    public function index(CreditRepository $creditRepository, UserRepository $userRepository): Response
+    {
+$user=$this->getUser();
+        // Check if the user with ID 106 exists
+        if ($user) {
+            // Get the solde
+            $solde = $user->getSolde();
+        } else {
+            // Handle the case where the user with ID 106 is not found
+            // You can redirect to an error page or display an error message
+            // For example:
+            throw $this->createNotFoundException('User  not found');
+        }
+
+
+        $solde = number_format($solde, 2, '.', ',');
+        $credits = $creditRepository->findAll();
+        $users = $userRepository->findAll();
+        //////////////////////////login(session)//////////////////////////////////
+        $filteredCredits = [];
+        foreach ($credits as $credit) {
+            if ($credit->getUserId() && $credit->getUserId()->getId() != $user->getId()) {
+                $filteredCredits[] = $credit;
+            }
+        }
+        // Calculate ratings for each user
+        $userRatings = $this->calculateUserRatings($users);
+
+        // Fetch statistics data
+        $statisticsData = $this->getStatisticsData();
+
+        // Merge credit data and statistics data
+        // Fetch statistics data
+        $statisticsData = $this->getStatisticsData();
+        $totalCreditRequestsAmount = $this->getTotalCreditRequestsAmount();
+
+        // Merge credit data and statistics data
+        $data = [
+            'credits' => $filteredCredits,
+            'users'=> $users,
+            'userRatings' => $userRatings,
+            'totalCreditRequestsAmount' => $totalCreditRequestsAmount,
+
+            'solde' => $solde,
+            'totalCreditRequests' => $statisticsData['totalCreditRequests'],
+            'amountStats' => $statisticsData['amountStats'],
+            'interestStats' => $statisticsData['interestStats'],
+        ];
+
+        return $this->render('templateController/listofCredit.html.twig', $data);
+    }
+
 
     #[Route('/CreditRequests', name: 'app_credit_index1', methods: ['GET'])]
     public function index1(CreditRepository $creditRepository): Response
     {
-        $credits = $creditRepository->findAll(); // Fetch credits from repository
+        // Specify the user ID you want to fetch credits for
+        $userId = $this->getUser()->getId();
+
+        // Fetch credits for the user with ID 133
+        $credits = $creditRepository->findBy(['user_id' => $userId]);
 
         return $this->render('templateController/index.html.twig', [
-            'credits' => $credits, // Pass credits to the template
+            'credits' => $credits,
         ]);
     }
-
-
     #[Route('/new', name: 'app_credit_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $credit = new Credit();
-
-
         $form = $this->createForm(Credit1Type::class, $credit);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Fetch the user entity from the repository
+//            $user = $this->getDoctrine()->getRepository(User::class)->find(107);
+$user=$this->getUser();
+            // Set the user on the Credit entity
+            $credit->setUserId($user);
+
+            // Persist and flush the Credit entity
             $entityManager->persist($credit);
             $entityManager->flush();
 
@@ -58,6 +117,7 @@ class CreditController extends AbstractController
             'credit' => $credit,
             'form' => $form->createView(),
         ]);
+
     }
 
     #[Route('/{id}', name: 'app_credit_show', methods: ['GET'])]
@@ -90,7 +150,7 @@ class CreditController extends AbstractController
     #[Route('/{id}', name: 'app_credit_delete', methods: ['POST'])]
     public function delete(Request $request, Credit $credit, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$credit->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $credit->getId(), $request->request->get('_token'))) {
             $entityManager->remove($credit);
             $entityManager->flush();
         }
@@ -98,14 +158,9 @@ class CreditController extends AbstractController
         return $this->redirectToRoute('app_credit_index1', [], Response::HTTP_SEE_OTHER);
     }
 
-    // Import the Credit entity class if not already imported
-
-
-
-
 
     #[Route('/{user_id}/{credit_id}', name: 'app_chat', methods: ['GET'])]
-    public function chat($user_id, $credit_id, UserRepository $userRepository): Response
+    public function chat($user_id, $credit_id ,UserRepository $userRepository): Response
     {
         // Set user_id to 1
         $user1 = $userRepository->find($user_id);
@@ -122,8 +177,9 @@ class CreditController extends AbstractController
         }
 
         // Fetch the second user associated with the Credit entity
-        $user2 = $credit->getUserId(); // Assuming you have a method to get the user associated with the credit
-
+        $user2 = $credit->getUserId();
+        // Assuming you have a method to get the user associated with the credit
+        $userName = $user2->getNom();
         // Log the IDs of the two users
 
 
@@ -131,20 +187,105 @@ class CreditController extends AbstractController
         $content = $this->renderView('templateController/chat.html.twig', [
             'user1' => $user1,
             'user2' => $user2,
+
             'controller_name' => 'DefaultController',
         ]);
 
         return new Response($content);
     }
 
+    #[Route('/pdf', name: 'app_pdf', methods: ['POST'])]
+    public function generatePdfAction(Pdf $pdf)
+    {
+        // Render the Twig template to HTML
+        $html = $this->renderView('your_template.html.twig', [
+            // Pass any necessary variables to the template
+
+        ]);
+
+        // Generate the PDF
+        $pdfContent = $pdf->getOutputFromHtml($html);
+
+        // Return a Symfony Response with the PDF content
+        return new Response(
+            $pdfContent,
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="your_filename.pdf"'
+            ]
+        );
+    }
+
+
+    private function getStatisticsData(): array
+    {
+        // Total Number of Credit Requests
+        $totalCreditRequests = $this->entityManager
+            ->createQuery('SELECT COUNT(c.id) AS total_credit_requests FROM App\Entity\Credit c')
+            ->getSingleScalarResult();
+
+        // Average, Minimum, and Maximum Amount Requested
+        $amountStats = $this->entityManager
+            ->createQuery('SELECT MAX((c.montant)) AS maximum_amount_requested,
+                          MIN((c.montant)) AS minimum_amount_requested,
+                          AVG((c.montant)) AS average_amount_requested
+                     FROM App\Entity\Credit c')
+            ->getSingleResult();
 
 
 
 
 
 
+        // Average, Minimum, and Maximum Interest Rates
+        $interestStats = $this->entityManager
+            ->createQuery('SELECT AVG(c.interetMax) AS average_interest_max,
+                          AVG(c.interetMin) AS average_interest_min,
+                          MIN(c.interetMax) AS minimum_interest_max,
+                          MIN(c.interetMin) AS minimum_interest_min,
+                          MAX(c.interetMax) AS maximum_interest_max,
+                          MAX(c.interetMin) AS maximum_interest_min
+                     FROM App\Entity\Credit c')
+            ->getSingleResult();
+
+        // Correlation Between Amount Requested and Interest Rates
 
 
+        return [
+            'totalCreditRequests' => $totalCreditRequests,
+            'amountStats' => $amountStats,
+            'interestStats' => $interestStats,
+        ];
+    }
+    private function getTotalCreditRequestsAmount(): float
+    {
+        $totalAmount = $this->entityManager
+            ->createQuery('SELECT SUM(c.montant) AS total_credit_amount FROM App\Entity\Credit c')
+            ->getSingleScalarResult();
+
+        return (float) $totalAmount;
+    }
+
+    private function calculateUserRatings(array $users): array
+    {
+        $ratings = [];
+
+        foreach ($users as $user) {
+            // Calculate the rating based on nbcredit
+            $rating = $this->calculateRating($user->getNbCredit());
+            $ratings[$user->getId()] = $rating;
+        }
+
+        return $ratings;
+    }
+
+    private function calculateRating(int $nbCredit): float
+    {
+        // Your rating calculation logic here
+        // Example: Let's say the rating is simply the square root of the number of credits
+        return sqrt($nbCredit);
+    }
 
 
 

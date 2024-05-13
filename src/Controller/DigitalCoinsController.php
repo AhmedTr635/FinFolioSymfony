@@ -20,7 +20,7 @@ class DigitalCoinsController extends AbstractController
     public function index(DigitalCoinsRepository $digitalCoinsRepository): Response
     {
         $digitalCoin = new DigitalCoins();
-        $UserId = 22;
+        $UserId = $this->getUser()->getId();
         $form = $this->createForm(DigitalCoinsType::class, $digitalCoin);
 
 
@@ -41,7 +41,7 @@ class DigitalCoinsController extends AbstractController
     public function statUserCrypto(DigitalCoinsRepository $digitalCoinsRepository): Response
     {
         $digitalCoin = new DigitalCoins();
-        $UserId = 22;
+        $UserId = $this->getUser()->getId();
         $form = $this->createForm(DigitalCoinsType::class, $digitalCoin);
 
 

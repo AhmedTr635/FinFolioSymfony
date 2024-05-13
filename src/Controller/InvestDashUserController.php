@@ -21,7 +21,8 @@ class InvestDashUserController extends AbstractController
     {
         // Get all real estates
         $realEstates = $realEstateRepository->findAll();
-        $userId = 22;
+        $userId =   $this->getUser()->getId();
+        ;
         $userInvestments = $investissementRepository->findByUserId($userId);
         $realEstates= $paginator->paginate(
            $realEstates,
@@ -58,7 +59,7 @@ class InvestDashUserController extends AbstractController
         $investissement->setPrixAchat($realEstate->getValeur());
         $investissement->setROI($realEstate->getROI());
         $investissement->setReId($realEstate->getId());
-        $investissement->setUserId(22);
+        $investissement->setUserId($this->getUser()->getId());
 
         // Other fields like montant and tax will be filled by the user in the form
         // Calculate the tax (assuming it's 8% of montant)

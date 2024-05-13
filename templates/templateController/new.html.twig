@@ -1,0 +1,301 @@
+{% extends 'baseCredits.html.twig' %}
+
+{% block title %}New Credit{% endblock %}
+
+{% block content %}
+    {% block body %}
+        <div class="container">
+            <div class="row justify-content-center mt-5">
+                <div class="col-lg-5">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Your Credit Request</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ form_start(form, {'attr': {'id': 'creditForm'}}) }}
+                            <div class="mb-3">
+                                {{ form_label(form.montant, 'Montant', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.montant, {'attr': {'class': 'form-control form-control-lg'}}) }}
+
+
+                            </div>
+
+
+                            <div class="mb-3">
+                                {{ form_label(form.dateD, 'Date Debut', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.dateD, {'attr': {'class': 'form-control form-control-lg'}}) }}
+{#                                {{ form_errors(form.dateD) }} #}{# Display validation errors for Date Debut field #}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_label(form.dateF, 'Date Fin', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.dateF, {'attr': {'class': 'form-control form-control-lg'}}) }}
+{#                                {{ form_errors(form.dateF) }} #}{# Display validation errors for Date Fin field #}
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col">
+                                    {{ form_label(form.interetMax, 'intérêt Max:', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.interetMax, {'attr': {'class': 'form-control form-control-lg'}}) }}
+{#                                    {{ form_errors(form.interetMax) }} #}{# Display validation errors for Intérêt Max field #}
+                                </div>
+                                <div class="col">
+                                    {{ form_label(form.interetMin, 'intérêt Min:', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.interetMin, {'attr': {'class': 'form-control form-control-lg'}}) }}
+{#                                    {{ form_errors(form.interetMin) }} #}{# Display validation errors for Intérêt Min field #}
+
+                                </div>
+
+                            </div>
+                            <button type="submit" class="btn btn-primary">Send</button>
+
+                            <button id="loanCalculatorButton" type="button" class="btn btn-secondary">Loan Calculator</button>
+                            <span style="margin-left: 10px; margin-right: 10px;"></span>
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{ form_end(form) }}
+                            <div id="loanCalculatorPopup" class="loan-calculator-popup" style="display: none; position: absolute; top: 50%; left: 59%; transform: translate(-50%, -50%); width: 400px;">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Loan Calculator</h5>
+                                        <form method="post" id="loanCalculatorForm">
+                                            <div class="mb-3">
+                                                <label for="loanAmountInput" class="form-label">Loan Amount</label>
+                                                <input type="text" class="form-control" id="montant" placeholder="Enter loan amount">
+                                                <div id="loanAmountError" class="invalid-feedback" style="display: none;">Please enter a valid loan amount.</div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="interestRateInput" class="form-label">Interest Rate (%)</label>
+                                                <input type="text" class="form-control" id="interestRateInput" placeholder="Enter interest rate">
+                                                <div id="interestRateError" class="invalid-feedback" style="display: none;">Please enter a valid interest rate.</div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="loanTermInput" class="form-label">Loan Term (years)</label>
+                                                <input type="text" class="form-control" id="loanTermInput" placeholder="Enter loan term">
+                                                <div id="loanTermError" class="invalid-feedback" style="display: none;">Please enter a valid loan term.</div>
+                                            </div>
+                                            <div id="errorMessage" style="color: red; margin-bottom: 10px; display: none;">Please fill in all fields.</div>
+                                            <button type="submit" class="btn btn-primary">Calculate</button>
+                                            <button type="button" class="btn btn-secondary" id="printScheduleBtn">Print Schedule</button>
+                                        </form>
+                                        <div id="loanResultContainer" style="margin-top: 10px;"></div>
+                                    </div>
+                                </div>
+
+
+
+                        </div>
+            <div class="row">
+                <!-- Additional content here -->
+            </div>
+
+
+
+
+        <script>
+            // Function to handle loan calculator button click
+            document.getElementById('loanCalculatorButton').addEventListener('click', function() {
+                // Toggle loan calculator popup display
+                var loanCalculatorPopup = document.getElementById('loanCalculatorPopup');
+                if (loanCalculatorPopup.style.display === 'block') {
+                    loanCalculatorPopup.style.display = 'none';
+                } else {
+                    loanCalculatorPopup.style.display = 'block';
+                }
+            });
+
+            // Function to format input value with commas
+            function numberWithCommas(x) {
+                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+
+            // Function to validate the loan calculator input
+            function validateForm() {
+                // Retrieve values from form inputs
+                 var loanAmount = parseFloat(document.getElementById('montant').value.replace(/,/g, ""));
+                 var interestRate = parseFloat(document.getElementById('interestRateInput').value);
+                 var loanTerm = parseFloat(document.getElementById('loanTermInput').value);
+
+                 if (!loanAmount && !interestRate && !loanTerm) {
+                     // Display the general error message
+                     document.getElementById('errorMessage').style.display = 'block';
+                     document.getElementById('montant').classList.add('is-invalid');
+                     document.getElementById('loanAmountError').style.display = 'block'
+                     document.getElementById('interestRateError').style.display = 'block';
+                     document.getElementById('interestRateInput').classList.add('is-invalid');
+                     document.getElementById('loanTermError').style.display = 'block';
+                     document.getElementById('loanTermInput').classList.add('is-invalid');
+
+                     return false;
+                 }
+                     else
+
+                     document.getElementById('errorMessage').style.display = 'none';
+                 document.getElementById('loanAmountError').style.display = 'none';
+                 document.getElementById('montant').classList.remove('is-invalid');
+                 document.getElementById('interestRateError').style.display = 'none';
+                 document.getElementById('interestRateInput').classList.remove('is-invalid');
+                 document.getElementById('loanTermError').style.display = 'none';
+                 document.getElementById('loanTermInput').classList.remove('is-invalid');
+
+
+                // // Check if any of the fields are empty
+                 if (!loanAmount) {
+                     document.getElementById('montant').classList.add('is-invalid');
+                     document.getElementById('loanAmountError').style.display = 'block';
+
+
+                     return false;
+                 } else {
+                //     // Hide the error message if the loan amount is not empty
+                    document.getElementById('loanAmountError').style.display = 'none';
+                     document.getElementById('montant').classList.remove('is-invalid');
+
+                 }
+                //
+                 if (!interestRate) {
+                     // Display the error message for the interest rate input
+                     document.getElementById('interestRateError').style.display = 'block';
+                     document.getElementById('interestRateInput').classList.add('is-invalid');
+                     return false;
+                 } else {
+                     // Hide the error message if the interest rate is not empty
+                     document.getElementById('interestRateError').style.display = 'none';
+                     document.getElementById('interestRateInput').classList.remove('is-invalid');
+
+
+
+                 }
+
+                 if (!loanTerm) {
+                     // Display the error message for the loan term input
+                     document.getElementById('loanTermError').style.display = 'block';
+                     document.getElementById('loanTermInput').classList.add('is-invalid');
+                     return false;
+                 } else {
+                     // Hide the error message if the loan term is not empty
+                     document.getElementById('loanTermError').style.display = 'none';
+                     document.getElementById('loanTermInput').classList.remove('is-invalid');
+                 }
+
+                // All fields are filled, return true
+                return true;
+            }
+
+            document.getElementById('loanCalculatorForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                // Validate the form
+                if (validateForm()) {
+                    calculateLoan();
+                }
+            });
+
+
+
+
+            // Function to calculate loan
+            function calculateLoan() {
+                // Retrieve values from input fields
+                var loanAmount = parseFloat(document.getElementById('montant').value.replace(/,/g, ""));
+                var interestRate = parseFloat(document.getElementById('interestRateInput').value);
+                var loanTerm = parseFloat(document.getElementById('loanTermInput').value);
+
+
+
+                // Perform loan calculation
+                var monthlyInterestRate = interestRate / 100 / 12;
+                var numberOfPayments = loanTerm * 12;
+                var monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
+
+                // Format loan amount with commas
+                var formattedLoanAmount = numberWithCommas(loanAmount);
+
+                // Display monthly payment with orange color
+                var loanResultContainer = document.getElementById('loanResultContainer');
+                loanResultContainer.innerHTML = 'Monthly Payment: <span style="color: orange;">$' + monthlyPayment.toFixed(2) + '</span>';
+                loanResultContainer.style.display = 'block'; // Make the container visible
+            }
+
+            // Function to print payment schedule
+            document.getElementById('printScheduleBtn').addEventListener('click', function() {
+                // Retrieve values from input fields
+                var loanAmount = parseFloat(document.getElementById('montant').value.replace(/,/g, ""));
+                var interestRate = parseFloat(document.getElementById('interestRateInput').value);
+                var loanTerm = parseFloat(document.getElementById('loanTermInput').value);
+
+                // Validate input
+                if (!validateForm()) {
+                    document.getElementById('errorMessage').style.display = 'block';
+                    return;
+                }
+                else
+
+
+                    // Perform loan calculation
+                    var monthlyInterestRate = interestRate / 100 / 12;
+                var numberOfPayments = loanTerm * 12;
+                var monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
+
+                // Generate payment schedule
+                var paymentSchedule = [];
+                var currentDate = new Date();
+                var remainingBalance = loanAmount;
+
+                for (var i = 0; i < numberOfPayments; i++) {
+                    var interestPayment = remainingBalance * monthlyInterestRate;
+                    var principalPayment = monthlyPayment - interestPayment;
+                    var paymentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, currentDate.getDate());
+                    paymentSchedule.push({ date: paymentDate, payment: monthlyPayment, interest: interestPayment, principal: principalPayment, balance: remainingBalance });
+                    remainingBalance -= principalPayment;
+                }
+
+                // Generate HTML table for payment schedule
+                var tableHtml = '<table border="1">';
+                tableHtml += '<thead><tr><th>Date</th><th>Payment</th><th>Interest</th><th>Principal</th><th>Balance</th></tr></thead><tbody>';
+                for (var j = 0; j < paymentSchedule.length; j++) {
+                    var paymentRow = paymentSchedule[j];
+                    tableHtml += '<tr><td>' + paymentRow.date.toLocaleDateString() + '</td><td>$' + paymentRow.payment.toFixed(2) + '</td><td>$' + paymentRow.interest.toFixed(2) + '</td><td>$' + paymentRow.principal.toFixed(2) + '</td><td>$' + paymentRow.balance.toFixed(2) + '</td></tr>';
+                }
+                tableHtml += '</tbody></table>';
+
+                // Open new window and print payment schedule
+                var printWindow = window.open('', '_blank');
+                printWindow.document.write('<html><head><title>Loan Payment Schedule</title></head><body>');
+                printWindow.document.write('<h2>Loan Payment Schedule</h2>');
+                printWindow.document.write(tableHtml);
+                printWindow.document.write('</body></html>');
+
+                // Close the print window after printing
+                printWindow.document.close();
+                printWindow.print();
+            });
+
+            // Function to format input value with commas for montant
+            document.getElementById('montant').addEventListener('input', function() {
+                var value = this.value.replace(/\D/g, ''); // Remove non-digit characters
+                this.value = numberWithCommas(value);
+            });
+
+            // Function to format input value with commas for credit1_montant
+            document.getElementById('credit1_montant').addEventListener('input', function() {
+                var value = this.value.replace(/\D/g, ''); // Remove non-digit characters
+                this.value = numberWithCommas(value);
+            });
+        </script>
+
+
+
+
+
+
+
+
+
+
+
+    {% endblock %}
+{% endblock %}

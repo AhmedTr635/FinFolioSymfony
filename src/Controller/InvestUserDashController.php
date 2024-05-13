@@ -18,14 +18,14 @@ class InvestUserDashController extends AbstractController
     #[Route('/invest/user/dash', name: 'app_invest_user_dash')]
     public function index(InvestissementRepository $investissementRepository , RealEstateRepository $realEstateRepository,EntityManagerInterface $entityManager): Response
     {
-        $userId=22;
+        $userId=$this->getUser()->getId();
         $totalInvestment = $entityManager->getRepository(Investissement::class)->getTotalInvestmentByUserId($userId);
         $totalROIMontant = $entityManager->getRepository(Investissement::class)->getTotalRoiInvestmentsByUserId($userId);
         $percentageROITotal = ($totalROIMontant / $totalInvestment) * 100;
         $totalTax = $entityManager->getRepository(Investissement::class)->totalTaxByUserId($userId);
 
         return $this->render('invest_dash_user/investUserDash.html.twig', [
-            'investissements' => $investissementRepository->findByUserId(22),
+            'investissements' => $investissementRepository->findByUserId($this->getUser()->getId()),
             'real_estates' => $realEstateRepository->findAll(),
             'realEstateRepository' => $realEstateRepository,
             'investissementRepository' => $investissementRepository,

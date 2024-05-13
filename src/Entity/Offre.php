@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\OffreRepository;
-use Cassandra\Float_;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -15,7 +14,9 @@ class Offre
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
+    #[ORM\ManyToOne(targetEntity: Credit::class, inversedBy: 'offres')]
+    #[ORM\JoinColumn(name: "credit_id", referencedColumnName: "id", nullable: false)]
+    private ?Credit $credit;
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'offres')]
     #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: false)]
     private ?User $user;
@@ -25,9 +26,9 @@ class Offre
     #[Assert\Type(type: 'float', message: 'The montant must be a floating-point number')]
     private ?float $montant = null;
 
-    #[ORM\Column(type: 'float', nullable: true)]
-
-    private ?float $credit_id = null;
+    #[ORM\ManyToOne(targetEntity: Credit::class, inversedBy: 'Offre')]
+    #[ORM\JoinColumn(name: "credit_id", referencedColumnName: "id", nullable: false)]
+    private ?Credit $credit_id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'Offre')]
     #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id", nullable: false)]
@@ -35,7 +36,7 @@ class Offre
 
     #[ORM\Column(name: "interet", type: Types::FLOAT)]
     #[Assert\NotNull(message: 'The interet cannot be null')]
-    #[Assert\Type(type: 'float', message: 'The interet must be a floating-point number')]
+   #[Assert\Type(type: 'float', message: 'The interet must be a floating-point number')]
     private ?float $interet = null;
 
 
@@ -70,12 +71,12 @@ class Offre
         return $this;
     }
 
-    public function getCreditId(): ?float
+    public function getCreditId(): ?Credit
     {
         return $this->credit_id;
     }
 
-    public function setCreditId(?Float $credit_id): static
+    public function setCreditId(?Credit $credit_id): static
     {
         $this->credit_id = $credit_id;
 

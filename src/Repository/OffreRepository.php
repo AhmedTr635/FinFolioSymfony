@@ -20,6 +20,15 @@ class OffreRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Offre::class);
     }
+    public function findReceivedOffersByUserId(int $userId): array
+    {
+        return $this->createQueryBuilder('o')
+            ->join('o.credit', 'c')
+            ->andWhere('c.user_id = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getResult();
+    }
 
 //    /**
 //     * @return Offre[] Returns an array of Offre objects

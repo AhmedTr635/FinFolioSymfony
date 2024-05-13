@@ -56,7 +56,15 @@ security:
         - { path: ^/user/verificationPassword, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/user/frontUser, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/user, roles: ROLE_USER }
-        # config/packages/security.yaml
+        - { path: ^/stat/user/crypto, roles: ROLE_USER }
+        - { path: ^/stat/admin/dash, roles: ROLE_ADMIN }
+        - { path: ^/invest/user/dash, roles: ROLE_USER }
+        - { path: ^/credit, roles: ROLE_USER }
+        - { path: ^/offre/, roles: ROLE_USER }
+        - { path: ^/investissement/user, roles: ROLE_USER }
+
+
+            # config/packages/security.yaml
             # Configuration de la redirection en cas d'accès refusé
 
 
