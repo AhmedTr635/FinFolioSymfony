@@ -733,7 +733,7 @@ dd($submittedVerificationCode);
     {
 
 
-        $transport = Transport::fromDsn('smtp://finfoliofinfolio@gmail.com:txzoffvmvmoiuyzw@smtp.gmail.com:587');
+        $transport = Transport::fromDsn('smtp://finfoliofinfolio@gmail.com:sys@smtp.gmail.com:587');
 
 // Create a Mailer object
         $mailer = new Mailer($transport);
